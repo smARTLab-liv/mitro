@@ -1,0 +1,17 @@
+<package>
+  <description brief="kinect_test">
+
+     kinect_test
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/kinect_test</url>
+
+  <depend package="roscpp"/>
+  <depend package="pcl"/>
+
+</package>
+
+
