@@ -1,0 +1,14 @@
+<package>
+  <description brief="face_tracker">
+
+     face_tracker
+
+  </description>
+  <author>danielhennes</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/face_tracker</url>
+
+</package>
+
+

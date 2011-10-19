@@ -1,0 +1,14 @@
+<package>
+  <description brief="mitro_interactive_masters">
+
+     mitro_interactive_masters
+
+  </description>
+  <author>danielhennes</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_interactive_masters</url>
+
+</package>
+
+

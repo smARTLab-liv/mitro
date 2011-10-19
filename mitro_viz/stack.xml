@@ -1,0 +1,9 @@
+<stack>
+  <description brief="mitro_viz">mitro_viz</description>
+  <author>Maintained by danielhennes</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_viz</url>
+  <depend stack="ros" />
+
+</stack>
