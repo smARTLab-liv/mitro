@@ -1,0 +1,14 @@
+<package>
+  <description brief="mitro_description">
+
+     mitro_description
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_description</url>
+
+</package>
+
+

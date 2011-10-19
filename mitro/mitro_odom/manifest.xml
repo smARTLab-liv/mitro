@@ -1,0 +1,14 @@
+<package>
+  <description brief="mitro_odom">
+
+     mitro_odom
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_odom</url>
+
+</package>
+
+

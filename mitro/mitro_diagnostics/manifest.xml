@@ -1,0 +1,14 @@
+<package>
+  <description brief="mitro_diagnostics">
+
+     mitro_diagnostics
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_diagnostics</url>
+
+</package>
+
+

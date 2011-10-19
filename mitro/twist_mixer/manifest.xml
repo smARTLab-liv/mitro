@@ -1,0 +1,14 @@
+<package>
+  <description brief="twist_mixer">
+
+     twist_mixer
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/twist_mixer</url>
+
+</package>
+
+

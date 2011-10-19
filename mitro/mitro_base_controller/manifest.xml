@@ -1,0 +1,14 @@
+<package>
+  <description brief="mitro_base_controller">
+
+     mitro_base_controller
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_base_controller</url>
+
+</package>
+
+
