@@ -8,7 +8,8 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_diagnostics</url>
-
+  
+  <depend package="rospy" />
 </package>
 
 
