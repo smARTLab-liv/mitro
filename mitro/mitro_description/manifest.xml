@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_description</url>
 
+  <depend package="urdf"/>
+
 </package>
 
 

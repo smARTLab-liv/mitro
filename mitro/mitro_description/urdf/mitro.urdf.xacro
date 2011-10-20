@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+
+<robot name="mitro">
+    <!-- Properties (Constants) -->
+    <property name="M_PI" value="3.14159"/>
+    <property name="base_diameter" value="0.4572"/>
+    <property name="base_lift" value="0.11"/>
+    <property name="hokuyo_scan_height" value="0.056"/>
+
+    <macro name="mitro">
+
+      <link name="base_plate">
+        <visual>
+          <origin xyz="0 0 0.0" rpy="0 0 0" />
+          <geometry>
+            <mesh filename="package://mitro_description/meshes/base_plate.dae"/>
+          </geometry>
+          <!--<material name="wood">
+            <texture filename="package://tele_description/meshes/wood.tga"/>
+          </material>-->
+        </visual>
+      </link>
+      
+      <link name="base_laser">
+        <visual>
+          <origin xyz="0 0 ${-hokuyo_scan_height}" rpy="0 0 0" />
+          <geometry>
+            <mesh filename="package://mitro_description/meshes/hokuyo_urg_2.dae"/>
+          </geometry>
+        </visual>
+      </link>
+
+      <link name="base_link">
+      </link>
+
+      <joint name="base_plate_joint" type="fixed">
+        <origin xyz="0 0 ${base_lift}"/>
+        <parent link="base_link"/>
+        <child link="base_plate"/>
+      </joint>
+
+      <joint name="base_laser_joint" type="fixed">
+        <origin xyz="${base_diameter/2 - 0.030 - 0.025} 0.002 ${hokuyo_scan_height + 0.019}" rpy="0 0 -0.032" />
+        <parent link="base_plate"/>
+        <child link="base_laser"/>
+      </joint>
+    </macro>
+
+    <mitro />
+
+</robot>

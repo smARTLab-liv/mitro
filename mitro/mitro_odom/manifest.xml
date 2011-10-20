@@ -9,6 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_odom</url>
 
+  <depend package="roscpp" />
+  <depend package="nav_msgs" />
+  <depend package="tf" />
+  <depend package="mitro_base_controller" />
+
 </package>
 
 

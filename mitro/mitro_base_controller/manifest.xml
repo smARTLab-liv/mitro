@@ -9,6 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_base_controller</url>
 
+  <depend package="roscpp" />
+  <depend package="geometry_msgs" />
+
 </package>
 
 

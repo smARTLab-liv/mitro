@@ -1,0 +1,18 @@
+<package>
+  <description brief="mitro_calibration">
+
+     mitro_calibration
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_calibration</url>
+  
+  <depend package="rospy" />
+  <depend package="sensor_msgs" />
+  <depend package="geometry_msgs" />
+  <depend package="nav_msgs" />
+  <depend package="mitro_base_controller" />
+
+</package>
