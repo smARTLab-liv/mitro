@@ -12,11 +12,13 @@ ros::Publisher cmd_vel_pub;
 double vel_rot;
 double vel_linear;
 ros::Time last_time;
+bool receiving = false;
 
 void cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
     vel_rot = msg->angular.z;
     vel_linear = msg->linear.x;
     last_time = ros::Time::now();
+	receiving = true;
 }
 
 void update() {
@@ -28,7 +30,10 @@ void update() {
         vc.velocity_left *= 1 / (2 * PI) * TICKS_PER_REV / 2.0;
     }
     else {
-        ROS_WARN("Did not receive Twist message in time!");
+		if (receiving) {
+        	ROS_WARN("Did not receive Twist message in time!");
+			receiving = false;
+		}
         vc.velocity_right = 0;
         vc.velocity_left = 0;
     }
