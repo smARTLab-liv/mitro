@@ -1,7 +1,7 @@
 <launch>
     <!-- launch file for mitro odometry -->
     
-    <node pkg="mitro_odom" type="mitro_odom" name="mitro_odom" ns="">
+    <node pkg="mitro_odom" type="mitro_odom" name="mitro_odom">
         <param name="frame_id" value="odom" />
         <param name="child_frame_id" value="base_link" />
     </node>

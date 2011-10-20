@@ -1,6 +1,6 @@
 <launch>
     <!-- launch file for sysinfo publisher -->
-    <node name="sysinfo" pkg="mitro_diagnostics" type="sysinfo.py" output="screen" ns=""/>
+    <node name="sysinfo" pkg="mitro_diagnostics" type="sysinfo.py" output="screen" />
     <!-- optional -->
     <!-- <param name="battery_name" value="BAT0" /> -->
     
