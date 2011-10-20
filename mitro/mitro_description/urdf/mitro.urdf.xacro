@@ -9,28 +9,19 @@
 
     <macro name="mitro">
 
+      <link name="base_link">
+      </link>
+
       <link name="base_plate">
         <visual>
           <origin xyz="0 0 0.0" rpy="0 0 0" />
           <geometry>
-            <mesh filename="package://mitro_description/meshes/base_plate.dae"/>
+            <mesh filename="package://mitro_description/meshes/base_plate.stl"/>
           </geometry>
-          <!--<material name="wood">
-            <texture filename="package://tele_description/meshes/wood.tga"/>
-          </material>-->
+	  <material name="wood">
+	    <color rgba="0.65 0.5 0.37 1"/>
+	  </material>
         </visual>
-      </link>
-      
-      <link name="base_laser">
-        <visual>
-          <origin xyz="0 0 ${-hokuyo_scan_height}" rpy="0 0 0" />
-          <geometry>
-            <mesh filename="package://mitro_description/meshes/hokuyo_urg_2.dae"/>
-          </geometry>
-        </visual>
-      </link>
-
-      <link name="base_link">
       </link>
 
       <joint name="base_plate_joint" type="fixed">
@@ -39,11 +30,61 @@
         <child link="base_plate"/>
       </joint>
 
+      <link name="base_laser">
+	<visual>
+	  <origin xyz="0.0 0.0 ${-hokuyo_scan_height}" rpy="${M_PI/2} 0 ${M_PI/2}" />
+	  <geometry>OD
+	    <mesh filename="package://mitro_description/meshes/hokuyo_urg.stl"/>
+	  </geometry>
+	  <material name="dark grey">
+	    <color rgba="0.2 0.2 0.2 1"/>
+	  </material>
+	</visual>
+      </link>
+
       <joint name="base_laser_joint" type="fixed">
         <origin xyz="${base_diameter/2 - 0.030 - 0.025} 0.002 ${hokuyo_scan_height + 0.019}" rpy="0 0 -0.032" />
         <parent link="base_plate"/>
         <child link="base_laser"/>
       </joint>
+
+      <link name="top_plate">
+        <visual>
+          <origin xyz="0 0 0.0" rpy="0 0 0" />
+          <geometry>
+            <mesh filename="package://mitro_description/meshes/top_plate.stl"/>
+          </geometry>
+	  <material name="wood">
+	    <color rgba="0.65 0.5 0.37 1"/>
+	  </material>
+        </visual>
+      </link>
+
+      <joint name="top_plate_joint" type="fixed">
+        <origin xyz="0 0 0.15"/>
+        <parent link="base_plate"/>
+        <child link="top_plate"/>
+      </joint>
+
+      <link name="kinect_link">
+	<visual>
+	  <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+	  <geometry>
+	    <mesh filename="package://mitro_description/meshes/kinect.stl"/>
+	  </geometry>
+	  <material name="dark grey">
+	    <color rgba="0.2 0.2 0.2 1"/>
+	  </material>
+	</visual>
+      </link>
+
+      <joint name="kinect_joint" type="fixed">
+        <origin xyz="0 0 1.5"/>
+        <parent link="base_link"/>
+        <child link="kinect_link"/>
+      </joint>
+
+
     </macro>
 
     <mitro />
