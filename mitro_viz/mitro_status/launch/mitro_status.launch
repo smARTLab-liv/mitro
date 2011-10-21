@@ -1,0 +1,6 @@
+<launch>
+	<!-- launch file for mitro status panel -->
+	
+	<node pkg="mitro_status" type="mitro_status.py" name="mitro_status" output="screen" />
+
+</launch>
