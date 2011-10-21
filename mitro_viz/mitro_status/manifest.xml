@@ -8,7 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_status</url>
+  
+  <depend package="rospy" />
+  <depend package="nav_msgs" />
+  <depend package="std_msgs" />
 
 </package>
-
-
