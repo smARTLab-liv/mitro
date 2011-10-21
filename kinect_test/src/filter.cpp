@@ -8,14 +8,16 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/project_inliers.h>
+#include <pcl/filters/radius_outlier_removal.h>
 
 int main (int argc, char** argv) 
 {
 
   pcl::PointCloud<pcl::PointXYZRGB> rgb_cloud;
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>),
-    cloud_floor (new pcl::PointCloud<pcl::PointXYZ>);
-
+    cloud_floor (new pcl::PointCloud<pcl::PointXYZ>),
+    cloud_without_floor (new pcl::PointCloud<pcl::PointXYZ>),
+    cloud_without_floor_filtered(new pcl::PointCloud<pcl::PointXYZ>);
 
   std::string fn = "cloud_84.pcd";
   if (argc > 1)
@@ -45,7 +47,7 @@ int main (int argc, char** argv)
   // Mandatory
   seg.setModelType (pcl::SACMODEL_PLANE);
   seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setDistanceThreshold (0.05);
+  seg.setDistanceThreshold (0.02);
 
   // seg.setInputCloud (cloud.makeShared ());
   // seg.segment (*inliers, *coefficients);
@@ -71,28 +73,56 @@ int main (int argc, char** argv)
   // Extract the inliers
   extract.setInputCloud (cloud);
   extract.setIndices (inliers);
+  extract.setNegative (false);
+  extract.filter (*cloud_floor);
+
+
+  extract.setInputCloud (cloud);
+  extract.setIndices (inliers);
   extract.setNegative (true);
   extract.filter (*cloud_without_floor);
+
+
+  pcl::RadiusOutlierRemoval<pcl::PointXYZ> outlier_filter;
+  outlier_filter.setInputCloud(cloud_without_floor);
+  outlier_filter.setRadiusSearch(0.1f);
+  outlier_filter.setMinNeighborsInRadius(25);
+  outlier_filter.filter(*cloud_without_floor_filtered);
+
+
+  int num_p_wo_floor = cloud_without_floor->width *
+    cloud_without_floor->height;
+
+  int num_p_filtered = cloud_without_floor_filtered->width *
+    cloud_without_floor_filtered->height;
+
+  ROS_INFO("outlier filtering removed %d points. final cloud has %d points.", (num_p_wo_floor - num_p_filtered), num_p_filtered);
+
+
 
   ROS_INFO("done!");
 
 
   coefficients->values[3] += 0.1;
 
-  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_projected (new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::ProjectInliers<pcl::PointXYZ> proj;
-  proj.setModelType (pcl::SACMODEL_PLANE);
-  proj.setInputCloud (cloud);
-  proj.setModelCoefficients (coefficients);
-  proj.filter (*cloud_projected);
+  // pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_projected (new pcl::PointCloud<pcl::PointXYZ>);
+  // pcl::ProjectInliers<pcl::PointXYZ> proj;
+  // proj.setModelType (pcl::SACMODEL_PLANE);
+  // proj.setInputCloud (cloud);
+  // proj.setModelCoefficients (coefficients);
+  // proj.filter (*cloud_projected);
+
+
 
 
   std::cerr << "PointCloud representing the planar component: " << cloud_floor->width * cloud_floor->height << " data points." << std::endl;
 
+  pcl::io::savePCDFileASCII("cloud_floor.pcd", *cloud_floor);
+  pcl::io::savePCDFileASCII("cloud_without_floor.pcd", *cloud_without_floor);
 
-  std::string out_fn = "output.pcd";
-  pcl::io::savePCDFileASCII(out_fn.c_str(), *cloud_floor);
-
+  pcl::io::savePCDFileASCII("cloud_without_floor_filtered.pcd", *cloud_without_floor_filtered);
+  
+  pcl::io::savePCDFileASCII("cloud.pcd", *cloud);
 
 
       // // Create the filtering object

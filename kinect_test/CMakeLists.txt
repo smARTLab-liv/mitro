@@ -30,3 +30,8 @@ rosbuild_add_executable(voxel_grid.cpp src/voxel_grid.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
 rosbuild_add_executable(filter.cpp src/filter.cpp)
+
+
+rosbuild_find_ros_package(dynamic_reconfigure)
+include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+gencfg()

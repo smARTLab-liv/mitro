@@ -6,6 +6,7 @@
   <arg name="camera" default="camera" />
 
   <arg name="pi/2" value="1.5707963267948966" />
+  <arg name="alpha" value="1.16" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
 
@@ -17,7 +18,7 @@
 
 
   <node pkg="tf" type="static_transform_publisher" name="$(arg camera)_link" 
-	args="0 0 1.3 0 0 0 /bob/base_link /$(arg camera)_link 100" />
+	args="0 0 1.56 0 $(arg alpha) 0 /bob/base_link /$(arg camera)_link 100" />
 
 
 <!--
