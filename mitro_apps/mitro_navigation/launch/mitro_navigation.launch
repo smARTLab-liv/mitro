@@ -1,0 +1,26 @@
+<launch>
+    <!-- launch file for navigation -->
+    
+    <!-- optional: specify map -->
+    <arg name="map" value="swarmlab" />
+
+    <!-- start MITRO basic nodes and sensor nodes -->
+    <include file="$(find mitro_bringup)/launch/full.launch"/>
+
+    <!-- start map server -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find mitro_navigation)/maps/$(arg map).yaml" output="screen" />
+
+    <!-- start amcl localization -->
+    <include file="$(find mitro_navigation)/launch/amcl.launch" />
+
+    <!-- start move_base -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find mitro_navigation)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find mitro_navigation)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find mitro_navigation)/config/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find mitro_navigation)/config/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find mitro_navigation)/config/base_local_planner_params.yaml" command="load" />
+        <remap from="cmd_vel" to="cmd_twist"/>
+    </node>
+    
+</launch>
