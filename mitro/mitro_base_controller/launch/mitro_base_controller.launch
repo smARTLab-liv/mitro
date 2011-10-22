@@ -8,7 +8,9 @@
     </node>  
     
     <!-- launch base controller -->
-    <node pkg="mitro_base_controller" type="mitro_base_controller" name="mitro_base_controller" output="screen" />
+    <node pkg="mitro_base_controller" type="mitro_base_controller" name="mitro_base_controller" output="screen" >
+        <remap from="cmd_twist" to="cmd_twist_mixed" />
+    </node>
 
     <!-- initialize relais -->
     <node pkg="mitro_base_controller" type="init_relais.py" name="init_relais" output="screen" />
