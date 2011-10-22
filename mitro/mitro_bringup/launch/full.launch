@@ -8,6 +8,6 @@
     <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
     
     <!-- start kinect -->
-    <!-- <include file="$(find mitro_kinect)/launch/kinect.launch" /> -->
+    <include file="$(find mitro_kinect)/launch/mitro_kinect.launch" />
 
 </launch>
