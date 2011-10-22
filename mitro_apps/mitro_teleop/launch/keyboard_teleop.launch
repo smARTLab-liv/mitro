@@ -7,7 +7,7 @@
         <param name="run_vel" value="1" />
         <param name="yaw_rate" value="1.5" />
         <param name="yaw_run_rate" value="2.5" />
-        <remap from="cmd_vel" to="cmd_twist"/>
+        <remap from="cmd_vel" to="cmd_twist_keyboard"/>
     </node>
     
 </launch>

@@ -10,7 +10,7 @@
     <!-- standard PR2 teleop -->
     <node pkg="pr2_teleop" type="teleop_pr2" name="pr2_teleop" output="screen" args="--deadman_no_publish" >
         <rosparam file="$(find mitro_teleop)/config/teleop.yaml" command="load" />
-        <remap from="cmd_vel" to="cmd_twist"/>
+        <remap from="cmd_vel" to="cmd_twist_ps3"/>
     </node>
     
 </launch>        

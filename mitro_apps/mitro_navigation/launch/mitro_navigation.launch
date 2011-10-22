@@ -20,7 +20,7 @@
         <rosparam file="$(find mitro_navigation)/config/local_costmap_params.yaml" command="load" />
         <rosparam file="$(find mitro_navigation)/config/global_costmap_params.yaml" command="load" />
         <rosparam file="$(find mitro_navigation)/config/base_local_planner_params.yaml" command="load" />
-        <remap from="cmd_vel" to="cmd_twist"/>
+        <remap from="cmd_vel" to="cmd_twist_move_base"/>
     </node>
     
 </launch>
