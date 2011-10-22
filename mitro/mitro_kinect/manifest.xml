@@ -9,6 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_kinect</url>
 
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="pcl"/>
+  <depend package="dynamic_reconfigure"/>
+
 </package>
 
 
