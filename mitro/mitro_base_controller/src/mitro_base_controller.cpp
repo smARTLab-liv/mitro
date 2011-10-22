@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
     ros::NodeHandle n;
 
     ros::Subscriber cmd_vel_sub = n.subscribe("cmd_twist", 10, cmd_twist_cb);
-    cmd_vel_pub = n.advertise<mitro_base_controller::VelocityCommand>("cmd_vel", 10);;
+    cmd_vel_pub = n.advertise<mitro_base_controller::VelocityCommand>("cmd_vel", 10);
   
     vel_rot = 0;
     vel_linear = 0;

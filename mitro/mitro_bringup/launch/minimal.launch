@@ -19,4 +19,7 @@
     <!-- launch system info publisher -->
     <include file="$(find mitro_diagnostics)/launch/sysinfo.launch" />
     
+    <!-- launch twist mixer -->
+    <include file="$(find twist_mixer)/launch/twist_mixer.launch" />
+    
 </launch>

@@ -1,0 +1,8 @@
+<launch>
+    <!-- launch file for the twist mixer -->
+    
+    <node pkg="twist_mixer" type="twist_mixer" name="twist_mixer" output="screen" >
+        <rosparam file="$(find twist_mixer)/config/twist_mixer.yaml" command="load" />
+    </node>
+
+</launch>
