@@ -30,6 +30,8 @@ float static KINECT_PITCH_ANGLE = 0.41;
 std::string static TOPIC_CLOUD_IN = "cloud";
 std::string static TOPIC_CLOUD_OBSTACLES = "cloud_obstacles";
 std::string static TOPIC_CLOUD_VOXEL = "cloud_voxel";
+std::string static TF_FRAME = "/odom_kinect";
+std::string static TF_TARGET_FRAME = "/base_link";
 
 // dynamic reconfigure parameters
 float voxel_size = 0.025f;
@@ -136,7 +138,7 @@ void filter(sensor_msgs::PointCloud2::Ptr cloud_in)
   tf::Quaternion quaternion;
   quaternion.setEuler(pitch, roll, 0.0d);
   transform.setRotation( quaternion );
-  tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, "/bob/odom", "/bob/odom_kinect"));
+  tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, TF_FRAME, TF_TARGET_FRAME));
 
   pcl::ExtractIndices<pcl::PointXYZ> extract;
   extract.setInputCloud (pcl_cloud);
