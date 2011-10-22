@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 import roslib; roslib.load_manifest("mitro_diagnostics")
 import rospy
 from mitro_diagnostics.msg import SysInfo
