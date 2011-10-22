@@ -33,7 +33,7 @@
       <link name="base_laser">
 	<visual>
 	  <origin xyz="0.0 0.0 ${-hokuyo_scan_height}" rpy="${M_PI/2} 0 ${M_PI/2}" />
-	  <geometry>OD
+	  <geometry>
 	    <mesh filename="package://mitro_description/meshes/hokuyo_urg.stl"/>
 	  </geometry>
 	  <material name="dark grey">
@@ -50,7 +50,7 @@
 
       <link name="top_plate">
         <visual>
-          <origin xyz="0 0 0.0" rpy="0 0 0" />
+          <origin xyz="0 0 0" rpy="0 0 0" />
           <geometry>
             <mesh filename="package://mitro_description/meshes/top_plate.stl"/>
           </geometry>
@@ -66,9 +66,12 @@
         <child link="top_plate"/>
       </joint>
 
+
+<!-- kinect -->
+
       <link name="kinect_link">
 	<visual>
-	  <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+	  <origin xyz="0 0 0" rpy="0 0 0" />
 	  <geometry>
 	    <mesh filename="package://mitro_description/meshes/kinect.stl"/>
 	  </geometry>
@@ -79,11 +82,38 @@
       </link>
 
       <joint name="kinect_joint" type="fixed">
-        <origin xyz="0 0 1.5"/>
+        <origin xyz="0 0 1.56" rpy="0 1.16 0"/>
         <parent link="base_link"/>
         <child link="kinect_link"/>
       </joint>
 
+      <link name="kinect_depth_frame"/>
+      <joint name="kinect_depth_frame_joint" type="fixed">
+	<origin xyz="0 -0.02 0"/>
+	<parent link="kinect_link"/>
+	<child link="kinect_depth_frame"/>
+      </joint>
+
+      <link name="kinect_rgb_frame"/>
+      <joint name="kinect_rgb_frame_joint" type="fixed">
+	<origin xyz="0 -0.045 0"/>
+	<parent link="kinect_link"/>
+	<child link="kinect_rgb_frame"/>
+      </joint>
+
+      <link name="kinect_depth_optical_frame"/>
+      <joint name="kinect_depth_frame_optical_joint" type="fixed">
+	<origin xyz="0 0 0" rpy="-${M_PI/2} 0 -${M_PI/2}"/>
+	<parent link="kinect_depth_frame"/>
+	<child link="kinect_depth_optical_frame"/>
+      </joint>
+
+      <link name="kinect_rgb_optical_frame"/>
+      <joint name="kinect_rgb_frame_optical_joint" type="fixed">
+	<origin xyz="0 0 0" rpy="-${M_PI/2} 0 -${M_PI/2}"/>
+	<parent link="kinect_rgb_frame"/>
+	<child link="kinect_rgb_optical_frame"/>
+      </joint>
 
     </macro>
 
