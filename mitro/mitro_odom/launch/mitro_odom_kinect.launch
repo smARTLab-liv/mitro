@@ -1,0 +1,10 @@
+<launch>
+    <!-- launch file for mitro odometry,
+	 when launched with kinect orientation detection -->
+    
+    <node pkg="mitro_odom" type="mitro_odom" name="mitro_odom">
+        <param name="frame_id" value="odom" />
+        <param name="child_frame_id" value="odom_kinect" />
+    </node>
+    
+</launch>
