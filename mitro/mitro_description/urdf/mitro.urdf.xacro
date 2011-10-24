@@ -6,10 +6,11 @@
     <property name="base_diameter" value="0.4572"/>
     <property name="base_plate_lift" value="0.11"/>
     <property name="base_plate_height" value="0.016"/>
-    <property name="top_plate_lift" value="0.15"/> <!-- TODO: requires meassurement -->
+    <property name="top_plate_lift" value="0.12"/>
     <property name="top_plate_height" value="0.016"/> <!-- TODO: requires meassurement -->
     <property name="hokuyo_scan_height" value="0.056"/>
-    <property name="pole_length" value="1.5"/>
+    <property name="pole_length" value="1.45"/>
+    <property name="pole_x_offset" value="-0.0611"/>
     <property name="kinect_pitch_angle" value="1.16"/>
 
     <macro name="mitro">
@@ -73,7 +74,7 @@
 
       <link name="base_pole_link" />
       <joint name="base_pole_joint" type="fixed">
-	<origin xyz="-0.05 0 0" rpy="0 0 0"/> <!-- TODO: meassurement required -->
+	<origin xyz="${pole_x_offset} 0 0" rpy="0 0 0"/>
 	<parent link="base_plate"/>
 	<child link="base_pole_link"/>
       </joint>
@@ -82,7 +83,7 @@
         <visual>
           <origin xyz="0 0 -${pole_length/2}" rpy="0 0 0" />
           <geometry>
-	    <box size="0.04 0.04 ${pole_length}"/>
+	    <box size="0.045 0.045 ${pole_length}"/>
           </geometry>
 	  <material name="aluminium">
 	    <color rgba="0.8 0.8 0.8 1"/>
@@ -112,21 +113,21 @@
       </link>
 
       <joint name="kinect_joint" type="fixed">
-        <origin xyz="0.1 0 0" rpy="0 ${kinect_pitch_angle} 0"/> <!-- TODO: requires meassurement -->
+        <origin xyz="0.095 -0.01 0" rpy="0 ${kinect_pitch_angle} 0"/> <!-- TODO: requires meassurement -->
         <parent link="top_pole_link"/>
         <child link="kinect_link"/>
       </joint>
 
       <link name="kinect_depth_frame"/>
       <joint name="kinect_depth_frame_joint" type="fixed">
-	<origin xyz="0 -0.02 0"/>
+	<origin xyz="0 0.0125 0"/>
 	<parent link="kinect_link"/>
 	<child link="kinect_depth_frame"/>
       </joint>
 
       <link name="kinect_rgb_frame"/>
       <joint name="kinect_rgb_frame_joint" type="fixed">
-	<origin xyz="0 -0.045 0"/>
+	<origin xyz="0 0.0125 0"/>
 	<parent link="kinect_link"/>
 	<child link="kinect_rgb_frame"/>
       </joint>
