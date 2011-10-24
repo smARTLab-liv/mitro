@@ -102,7 +102,7 @@
 
       <link name="kinect_link">
 	<visual>
-	  <origin xyz="0 0 0" rpy="0 0 0" />
+	  <origin xyz="0 0.01 0" rpy="0 0 0" />
 	  <geometry>
 	    <mesh filename="package://mitro_description/meshes/kinect.stl"/>
 	  </geometry>
@@ -113,7 +113,7 @@
       </link>
 
       <joint name="kinect_joint" type="fixed">
-        <origin xyz="0.095 -0.01 0" rpy="0 ${kinect_pitch_angle} 0"/> <!-- TODO: requires meassurement -->
+        <origin xyz="0.08 -0.01 0" rpy="0 ${kinect_pitch_angle} 0"/> <!-- TODO: requires meassurement -->
         <parent link="top_pole_link"/>
         <child link="kinect_link"/>
       </joint>
