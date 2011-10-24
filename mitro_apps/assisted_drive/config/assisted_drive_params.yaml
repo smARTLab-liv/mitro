@@ -1,0 +1,5 @@
+source_topic: cmd_twist_tele
+target_topic: cmd_twist_tele_assisted
+costmap_topic: 
+max_range: 1.5          # maximum range for which obstacles will be considered
+clearing_dist: 0.1      # minimum distance required between robot base and obstacles

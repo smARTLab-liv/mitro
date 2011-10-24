@@ -1,0 +1,8 @@
+<launch>
+    <!-- launch file for assisted drive -->
+    
+    <node pkg="assisted_drive" type="assisted_drive" name="assisted_drive" output="screen">
+        <rosparam file="$(find assisted_drive)/config/assisted_drive_params.yaml" command="load" />
+    </node>
+    
+</launch>
