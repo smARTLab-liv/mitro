@@ -4,9 +4,6 @@
     <!-- optional: specify map -->
     <arg name="map" value="swarmlab" />
 
-    <!-- start MITRO basic nodes and sensor nodes -->
-    <include file="$(find mitro_bringup)/launch/full.launch"/>
-
     <!-- start map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find mitro_navigation)/maps/$(arg map).yaml" output="screen" />
 
