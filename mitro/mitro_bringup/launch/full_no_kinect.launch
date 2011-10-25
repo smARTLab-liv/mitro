@@ -1,0 +1,13 @@
+<launch>
+    <!-- launch basic nodes and sensors for mitro -->
+    
+    <!-- start basic nodes -->
+    <include file="$(find mitro_bringup)/launch/minimal.launch" />
+
+    <!-- start odom -->
+    <include file="$(find mitro_odom)/launch/mitro_odom_kinect.launch" />
+    
+    <!-- start hokuyo -->
+    <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
+
+</launch>
