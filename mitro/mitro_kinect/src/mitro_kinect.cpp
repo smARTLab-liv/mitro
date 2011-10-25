@@ -138,7 +138,8 @@ void filter(sensor_msgs::PointCloud2::Ptr cloud_in)
   tf::Quaternion quaternion;
   quaternion.setEuler(pitch, roll, 0.0d);
   transform.setRotation( quaternion );
-  tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, TF_FRAME, TF_TARGET_FRAME));
+  //tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, TF_FRAME, TF_TARGET_FRAME));
+  tf_broadcaster->sendTransform(tf::StampedTransform(transform, ros::Time::now(), TF_FRAME, TF_TARGET_FRAME));
 
   pcl::ExtractIndices<pcl::PointXYZ> extract;
   extract.setInputCloud (pcl_cloud);
