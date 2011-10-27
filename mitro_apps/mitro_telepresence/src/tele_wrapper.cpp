@@ -18,12 +18,12 @@ void sysinfo_cb(const mitro_diagnostics::SysInfo::ConstPtr& msg) {
     float battery_level = msg->battery_level;
     float signal_level = msg->wifi_signallevel;
     float signal_percent = 100 - (signal_level - 30) * 100.0 / 65.0;
-    printf("BAT%f\n", battery_level / 100.0);
-    printf("SIG%f\n", signal_percent / 100.0);
+    printf("BAT%f:", battery_level / 100.0);
+    printf("SIG%f:", signal_percent / 100.0);
 }
 
 void odom_cb(const nav_msgs::Odometry::ConstPtr& msg) {
-    printf("SPD%f\n",msg->twist.twist.linear.x);
+    printf("SPD%f:",msg->twist.twist.linear.x);
 }
 
 void update(const ros::TimerEvent& event){
