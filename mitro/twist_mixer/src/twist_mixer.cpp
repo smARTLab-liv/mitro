@@ -21,7 +21,7 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg, int32_t priority) {
         current_level = priority;
         time_last = ros::Time::now();
         twist_mixed.linear.x = msg->linear.x;
-        twist_mixed.angular.x = msg->angular.x;
+        twist_mixed.angular.z = msg->angular.z;
         twist_pub.publish(twist_mixed);
         
         time_last = time_now;
