@@ -104,12 +104,18 @@
 	<remap from="image_rect" to="image_raw"/>  <!-- Use raw image for efficiency -->
       </node>
 
+      <node pkg="nodelet" type="nodelet" name="mitro_kinect"
+	    args="load mitro_kinect/MitroKinectNodelet /$(arg manager)">
+      </node>
+
     </group>      
 
   </group> <!-- camera -->
 
+<!--
   <node pkg="mitro_kinect" type="mitro_kinect" name="mitro_kinect">
     <remap from="cloud" to="/kinect/depth/points"/>
   </node>
+-->
 
 </launch>

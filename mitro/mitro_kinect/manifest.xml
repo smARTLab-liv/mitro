@@ -13,6 +13,11 @@
   <depend package="tf"/>
   <depend package="pcl"/>
   <depend package="dynamic_reconfigure"/>
+  <depend package="nodelet"/>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+  </export>
 
 </package>
 
