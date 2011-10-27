@@ -20,10 +20,12 @@ void sysinfo_cb(const mitro_diagnostics::SysInfo::ConstPtr& msg) {
     float signal_percent = 100 - (signal_level - 30) * 100.0 / 65.0;
     printf("BAT%f:", battery_level / 100.0);
     printf("SIG%f:", signal_percent / 100.0);
+    fflush(stdout);
 }
 
 void odom_cb(const nav_msgs::Odometry::ConstPtr& msg) {
     printf("SPD%f:",msg->twist.twist.linear.x);
+    fflush(stdout);
 }
 
 void update(const ros::TimerEvent& event){
