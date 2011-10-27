@@ -41,7 +41,7 @@ void update(const ros::TimerEvent& event){
 		x=scanf("%s",string);
 
 		//If command is 2 characters long as expected
-		if (x>2){
+		if (x>0){
 			
 			//Translate command to twist message and send
 			if (!strcmp(string, "FW")){
