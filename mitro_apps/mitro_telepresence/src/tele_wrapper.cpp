@@ -7,7 +7,12 @@
 #include <string>
 #include <iostream>
 
-ros::Publisher motor_pub; //Motor publisher
+ros::Publisher twist_pub;
+
+float FORWARD_SPEED = 0.3;
+float BACKWARD_SPEED = 0.1;
+float CURVE_TURNING_SPEED = 0.5;
+float INPLACE_TURNING_SPEED = 0.5;
 
 void sysinfo_cb(const mitro_diagnostics::SysInfo::ConstPtr& msg) {
     float battery_level = msg->battery_level;
@@ -39,46 +44,46 @@ void update(const ros::TimerEvent& event){
 			//Translate command to twist message and send
 			if (!strcmp(string, "FW")){
 				//printf("FW"); 
-				msg.linear.x=0.3f;
+				msg.linear.x=FORWARD_SPEED;
 				msg.angular.z=0.0f;
-				motor_pub.publish(msg);
+				twist_pub.publish(msg);
 			}
-		        else if (!strcmp(string, "FL")){
-		      		//printf("FL");
-		                msg.linear.x=0.3f;
-		                msg.angular.z=0.5f;
-		                motor_pub.publish(msg);
-		        }
-		        else if (!strcmp(string, "FR")){
-		                //printf("FR");
-		                msg.linear.x=0.3f;
-		                msg.angular.z=-0.5f;
-		                motor_pub.publish(msg);
-		        }
-		        else if (!strcmp(string, "LE")){
-		                //printf("LE");
-		                msg.linear.x=0.0f;
-		                msg.angular.z=0.5f;
-		                motor_pub.publish(msg);
-		        }
-		        else if (!strcmp(string, "RI")){
-		                //printf("RI");
-		                msg.linear.x=0.0f;
-		                msg.angular.z=-0.5f;
-		                motor_pub.publish(msg);
-		        }
-		        else if (!strcmp(string, "BK")){
-		                //printf("BK");
-		                msg.linear.x=-0.1f;
-		                msg.angular.z=0.0f;
-		                motor_pub.publish(msg);
-		        }
-		        else if (!strcmp(string, "ST")){
-		                //printf("ST");
-		                msg.linear.x=0.0f;
-		                msg.angular.z=0.0f;
-		                motor_pub.publish(msg);
-		        }
+	        else if (!strcmp(string, "FL")){
+	      		//printf("FL");
+                msg.linear.x=FORWARD_SPEED;
+                msg.angular.z=CURVE_TURNING_SPEED;
+                twist_pub.publish(msg);
+	        }
+	        else if (!strcmp(string, "FR")){
+                //printf("FR");
+                msg.linear.x=FORWARD_SPEED;
+                msg.angular.z=-CURVE_TURNING_SPEED;
+                twist_pub.publish(msg);
+	        }
+	        else if (!strcmp(string, "LE")){
+                //printf("LE");
+                msg.linear.x=0.0f;
+                msg.angular.z=INPLACE_TURNING_SPEED;
+                twist_pub.publish(msg);
+	        }
+	        else if (!strcmp(string, "RI")){
+                //printf("RI");
+                msg.linear.x=0.0f;
+                msg.angular.z=-INPLACE_TURNING_SPEED;
+                twist_pub.publish(msg);
+	        }
+	        else if (!strcmp(string, "BK")){
+                //printf("BK");
+                msg.linear.x=-BACKWARD_SPEED;
+                msg.angular.z=0.0f;
+                twist_pub.publish(msg);
+	        }
+	        else if (!strcmp(string, "ST")){
+                //printf("ST");
+                msg.linear.x=0.0f;
+                msg.angular.z=0.0f;
+                twist_pub.publish(msg);
+	        }
 		}
 	}
 }
@@ -93,7 +98,7 @@ int main(int argc, char **argv){
 	ros::NodeHandle n;
 
 	//Publish motor messages 
-	motor_pub = n.advertise<geometry_msgs::Twist>("cmd_twist_tele", 10);
+	twist_pub = n.advertise<geometry_msgs::Twist>("cmd_twist_tele", 10);
     
     //Subscribe to SysInfo
     ros::Subscriber sysinfo = n.subscribe("sysinfo", 10, sysinfo_cb);
