@@ -97,12 +97,12 @@ def sysinfo():
         info_msg.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
         if use_battery_voltage:
             info_msg.battery_voltage = battery_voltage
-            info_msg.battery_level = voltage_to_perc(battery_voltage)
+            info_msg.battery_percent = voltage_to_perc(battery_voltage)
             info_msg.battery_time = -1
         else:
             battery_status()
             info_msg.battery_voltage = -1
-            info_msg.battery_level = battery_percent
+            info_msg.battery_percent = battery_percent
             info_msg.battery_time = battery_time
         pub.publish(info_msg)
         r.sleep()
