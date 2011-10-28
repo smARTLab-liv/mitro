@@ -18,7 +18,7 @@ void sysinfo_cb(const mitro_diagnostics::SysInfo::ConstPtr& msg) {
     float battery_voltage = msg->battery_voltage;
     float signal_level = msg->wifi_signallevel;
     float signal_percent = 100 - (signal_level - 30) * 100.0 / 65.0;
-    printf("BAT%f:", std::max(battery_voltage, 15.0f) / 15.0);
+    printf("BAT%f:", std::min(battery_voltage, 15.0f) / 15.0);
     printf("SIG%f:", signal_percent / 100.0);
     fflush(stdout);
 }
