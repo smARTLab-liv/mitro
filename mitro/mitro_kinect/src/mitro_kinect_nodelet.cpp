@@ -33,6 +33,12 @@ namespace mitro_kinect
   class MitroKinectNodelet : public nodelet::Nodelet
   {
 
+    // plane constraints
+    static const float MAX_ROLL_ANGLE = 15/180.0f * PI;
+    static const float MAX_PITCH_ANGLE = 15/180.0f * PI;
+    static const float MIN_DIST = 1.55f;
+    static const float MAX_DIST = 1.6f;
+    
     ros::Subscriber sub;
     ros::Publisher pub_obstacles, pub_voxel;
     sensor_msgs::PointCloud2::Ptr last_cloud;
@@ -75,7 +81,7 @@ namespace mitro_kinect
   public:
     virtual void onInit()
     {
-      ros::NodeHandle& private_nh = getPrivateNodeHandle();
+      //      ros::NodeHandle& private_nh = getPrivateNodeHandle();
       ros::NodeHandle& nh = getNodeHandle();
 
       tf_broadcaster = new tf::TransformBroadcaster();
@@ -111,26 +117,41 @@ namespace mitro_kinect
 
     void filter(sensor_msgs::PointCloud2::Ptr cloud_in)
     {
+      if ( 0 == cloud_in->width * cloud_in->height )
+      {
+	ROS_ERROR("Input cloud is empty!");
+	return;
+      }
+      ROS_DEBUG("Input cloud size: %d", cloud_in->width * cloud_in->height );
+      
       sensor_msgs::PointCloud2::Ptr cloud_voxel (new sensor_msgs::PointCloud2);
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor (new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor_filtered(new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+
   
       pcl::VoxelGrid<sensor_msgs::PointCloud2> voxel_filter;
       voxel_filter.setInputCloud (cloud_in);
       voxel_filter.setLeafSize (voxel_size, voxel_size, voxel_size);
       voxel_filter.filter (*cloud_voxel);
 
-      pub_voxel.publish(cloud_voxel);
+      if ( 0 == cloud_voxel->width * cloud_voxel->height )
+      {
+	ROS_ERROR("Voxel cloud is empty!");
+	return;
+      }
+
+      ROS_DEBUG("Voxel cloud size: %d", cloud_voxel->width * cloud_voxel->height );
 
       pcl::fromROSMsg(*cloud_voxel, *pcl_cloud);
 
       if ( 0 == pcl_cloud->points.size() )
-	{
-	  ROS_ERROR("Cloud is empty!");
-	  return;
-	}
+      {
+	ROS_ERROR("PCL cloud is empty!");
+	return;
+      }
 
+      ROS_DEBUG("PCL cloud size: %zd", pcl_cloud->points.size() );
       pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 
@@ -145,23 +166,47 @@ namespace mitro_kinect
       seg.setInputCloud (pcl_cloud);
       seg.segment (*inliers, *coefficients);
 
-      if (inliers->indices.size () == 0)
-	{
-	  ROS_ERROR("Could not estimate a planar model for the given dataset!");
-	  return;
-	}
+      if (inliers->indices.size() == 0)
+      {
+	ROS_ERROR("Could not estimate a planar model for the given dataset!");
+	return;
+      }
+      ROS_DEBUG("Model inliers: %zd", inliers->indices.size() );
 
       // computing transform based on normal vector
-      float x = -coefficients->values[0];
-      float y = -coefficients->values[1];
-      float z = fabs(coefficients->values[2]);
+      float x = coefficients->values[0];
+      float y = coefficients->values[1];
+      float z = coefficients->values[2];
+      float d = coefficients->values[3];
+
+      if ( d > 0 )
+      {
+	x = -x;
+	y = -y;
+	z = -z;
+      } else {
+	d = - d;
+      }
 
       float roll = atan2(z,-x) - PI/2.0f;
       float pitch = atan2(z,y) - PI/2.0f + kinect_pitch_angle;
       roll = wrap_angle(roll);
       pitch = wrap_angle(pitch);
 
-      ROS_DEBUG("roll: %f, pitch: %f", pitch, roll);
+      // ROS_ERROR("roll: %f, pitch: %f", pitch, roll);
+      //      ROS_ERROR("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+
+
+      if ( fabs(roll) > MAX_ROLL_ANGLE || fabs(pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
+      {
+	// ROS_ERROR("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+	pub_obstacles.publish(cloud_voxel);
+	tf::Transform transform;
+	transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+	transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0, 1.0) );
+	tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, tf_frame, tf_target_frame));
+	return;
+      }
 
       // publishing transform
       tf::Transform transform;
@@ -171,21 +216,42 @@ namespace mitro_kinect
       transform.setRotation( quaternion );
       tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, tf_frame, tf_target_frame));
 
+
       pcl::ExtractIndices<pcl::PointXYZ> extract;
       extract.setInputCloud (pcl_cloud);
       extract.setIndices (inliers);
       extract.setNegative (true);
       extract.filter (*cloud_without_floor);
 
+      if ( 0 == cloud_without_floor->points.size() )
+      {
+	ROS_ERROR("Cloud without cloud is empty!");
+	return;
+      }
+
+      ROS_DEBUG("Cloud without floor: %zd", cloud_without_floor->points.size() );
+    
       pcl::RadiusOutlierRemoval<pcl::PointXYZ> outlier_filter;
       outlier_filter.setInputCloud(cloud_without_floor);
       outlier_filter.setRadiusSearch(outlier_radius);
       outlier_filter.setMinNeighborsInRadius(outlier_neighbors);
       outlier_filter.filter(*cloud_without_floor_filtered);
 
+      if ( 0 == cloud_without_floor_filtered->points.size() )
+      {
+	ROS_ERROR("Filtered cloud is empty!");
+	return;
+      }
+
+      ROS_DEBUG("Filtered cloud w/o floor: %zd", cloud_without_floor_filtered->points.size() );
+
       sensor_msgs::PointCloud2::Ptr cloud_obstacles (new sensor_msgs::PointCloud2);
       pcl::toROSMsg(*cloud_without_floor_filtered, *cloud_obstacles);
+
+      // publish 
       pub_obstacles.publish(cloud_obstacles);
+      pub_voxel.publish(cloud_voxel);
+
     }
 
     double wrap_angle(double a)
