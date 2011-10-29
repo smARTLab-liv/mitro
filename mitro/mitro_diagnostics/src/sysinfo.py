@@ -94,7 +94,12 @@ def sysinfo():
         info_msg.cpu_usage = psutil.cpu_percent(interval=0.0)
         info_msg.cpu_usage_detail = psutil.cpu_percent(interval=0.0, percpu=True)
         info_msg.mem_usage = psutil.phymem_usage()[3]
-        info_msg.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
+        info_msg.wifi_signallevel = -1.0
+        try:
+            info_msg.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
+        except:
+            pass
+
         if use_battery_voltage:
             info_msg.battery_voltage = battery_voltage
             info_msg.battery_percent = voltage_to_perc(battery_voltage)
