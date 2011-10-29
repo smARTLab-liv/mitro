@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/Twist.h>
 #include <mitro_base_controller/JointStates.h>
 
 #define PI 3.1415926536
@@ -18,6 +19,8 @@ class Odom {
     int position_left;
     int last_position_right;
     int last_position_left;
+    double cmd_angular;
+    double cmd_linear;
 
     double x, y, th, vx, vth;
 
@@ -27,6 +30,7 @@ class Odom {
 public:
     Odom();
     void js_cb(const mitro_base_controller::JointStates::ConstPtr& msg);
+    void cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg);
     void update();
 
     ros::Publisher odom_pub;
@@ -40,6 +44,7 @@ Odom::Odom () {
     position_right = position_left = 0;
     last_position_right = last_position_left = 0;
     x = y = th = vx = vth = 0;
+    cmd_angular = cmd_linear = 0;
 }
 
 void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
@@ -100,8 +105,8 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
     vth = (velocity_right - velocity_left) / WHEEL_BASE;
 
     odom.child_frame_id = CHILD_FRAME_ID;
-    odom.twist.twist.linear.x = vx;
-    odom.twist.twist.angular.z = vth;
+    odom.twist.twist.linear.x = (vx + cmd_linear) / 2.0;
+    odom.twist.twist.angular.z = (vth + cmd_angular) / 2.0;
 
     //publish the message
     odom_pub.publish(odom);
@@ -112,12 +117,18 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
     last_time = current_time;
 }
 
+void Odom::cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
+    cmd_angular = msg->angular.z;
+    cmd_linear = msg->linear.x;
+}
+
 int main(int argc, char** argv){
     ros::init(argc, argv, "mitro_odom");
     ros::NodeHandle n;
     Odom odom = Odom();
 
     ros::Subscriber js_sub = n.subscribe("joint_states", 10, &Odom::js_cb, &odom);
+    ros::Subscriber cmd_twist_sub = n.subscribe("cmd_twist_mixed", 10, &Odom::cmd_twist_cb, &odom);
 
     odom.odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);;
 
