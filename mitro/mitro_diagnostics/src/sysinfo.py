@@ -14,7 +14,8 @@ battery_name = ''
 battery_max = -1
 battery_percent = -1
 battery_time = -1
-battery_voltage = 0
+battery_voltage = -1
+battery_plugged_in = False
 
 def battery_max():
     global battery_name, battery_max
@@ -31,14 +32,19 @@ def battery_max():
             battery_max = float(el[3])
 
 def battery_status():
-    global battery_name, battery_max, battery_percent, battery_time
+    global battery_name, battery_max, battery_percent, battery_time, battery_plugged_in, battery_voltage
     try:
         f = open( "/proc/acpi/battery/" + battery_name + "/state" )
         contents = f.read().split('\n')
         f.close()
     except:
-        print "Cannot open battery state file: /proc/acpi/battery/" + battery_name + "/state"
-    
+        rospy.logerr("Cannot open battery state file: /proc/acpi/battery/$s/state."%battery_name)
+
+    battery_percent = -1
+    battery_time = -1
+    battery_plugged_in = False
+    battery_voltage = -1
+
     rate = 0
     for line in contents:
         if 'present rate' in line:
@@ -46,31 +52,27 @@ def battery_status():
         if 'remaining capacity' in line:
             cap = float(line.split()[2])
             battery_percent = (cap / battery_max) * 100.0
-            battery_time = cap / rate
+            battery_percent = max(0.0, battery_percent)
+            battery_percent = min(100.0, battery_percent)
+            battery_time = -1
+            if rate > 0:
+                battery_time = cap / rate
+        if 'charging state' in line:
+            state = line.split()[2]
+            if not state == 'discharging':
+                battery_plugged_in = True
+        if 'present voltage' in line:
+            battery_voltage = float(line.split()[2]) / 1000.0
             
 def cb_bat_volt(msg):
     global battery_voltage
     battery_voltage = msg.data
     
-def voltage_to_perc(v):
-    a = -7.87073944428413e-5
-    b = -0.001363457642237
-    c = 12.529846888629164
-
-    if v > c: 
-        return 100
-    
-    if v < 11.77:
-        return 0
-
-    return float(100.0 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2.0 * a))
-
 def sysinfo():
     global battery_name
     
     rospy.init_node('sysinfo')
     pub = rospy.Publisher('sysinfo', SysInfo)
-    rospy.Subscriber('battery_voltage', Float32, cb_bat_volt)
     
     wifi_name = 'wlan0'
     if rospy.has_param('~wifi_name'):
@@ -83,6 +85,10 @@ def sysinfo():
         battery_name = rospy.get_param('~battery_name')
         battery_max()
         use_battery_voltage = False
+
+    if use_battery_voltage:
+        rospy.Subscriber('battery_voltage', Float32, cb_bat_volt)
+
     
     info_msg = SysInfo()
     info_msg.hostname = socket.gethostname()
@@ -102,11 +108,13 @@ def sysinfo():
 
         if use_battery_voltage:
             info_msg.battery_voltage = battery_voltage
-            info_msg.battery_percent = voltage_to_perc(battery_voltage)
+            info_msg.battery_plugged_in = False
+            info_msg.battery_percent = -1
             info_msg.battery_time = -1
         else:
             battery_status()
-            info_msg.battery_voltage = -1
+            info_msg.battery_voltage = battery_voltage
+            info_msg.battery_plugged_in = battery_plugged_in
             info_msg.battery_percent = battery_percent
             info_msg.battery_time = battery_time
         pub.publish(info_msg)
