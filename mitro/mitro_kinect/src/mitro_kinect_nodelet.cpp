@@ -199,7 +199,7 @@ namespace mitro_kinect
 
       if ( fabs(roll) > MAX_ROLL_ANGLE || fabs(pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
       {
-	// ROS_ERROR("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+	ROS_DEBUG("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
 	pub_obstacles.publish(cloud_voxel);
 	tf::Transform transform;
 	transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
