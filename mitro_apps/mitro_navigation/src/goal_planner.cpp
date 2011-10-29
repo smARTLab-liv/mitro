@@ -19,6 +19,7 @@ std::vector<actionlib_msgs::GoalID> current_goals;
 //void done_cb(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseActionResultConstPtr& result);
 //void active_cb();
 //void feedback_cb(const move_base_msgs::MoveBaseActionFeedbackConstPtr& feedback);
+void cancel();
 
 
 void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& msg) {
@@ -48,6 +49,18 @@ void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 }
 
 void cancel_cb(const std_msgs::Bool::ConstPtr& msg) {
+    cancel();
+}
+
+void relais_cb(const std_msgs::Bool::ConstPtr& msg) {
+    if (!msg->data) cancel();
+}
+
+void runstop_cb(const std_msgs::Bool::ConstPtr& msg) {
+    if (msg->data) cancel();
+}
+
+void cancel() {
     for (std::vector<actionlib_msgs::GoalID>::size_type i = 0; i < current_goals.size(); i++) {
         cancel_pub.publish(current_goals[i]);
     }
@@ -95,9 +108,10 @@ int main(int argc, char** argv){
     ros::NodeHandle nh;
      
     ros::Subscriber goal_sub = nh.subscribe<geometry_msgs::PoseStamped>(ns+"/goal", 10, goal_cb);
-    ros::Subscriber cancel_sub = nh.subscribe<std_msgs::Bool>(ns+"/cancel_goal", 10, cancel_cb);
-    ros::Subscriber relais_sub = nh.subscribe<std_msgs::Bool>("relais", 10, cancel_cb);
-    ros::Subscriber runstop_sub = nh.subscribe<std_msgs::Bool>("runstop", 10, cancel_cb);
+    ros::Subscriber cancel_sub = nh.subscribe<std_msgs::Bool>(ns+"/cancel", 10, cancel_cb);
+    ros::Subscriber relais_sub = nh.subscribe<std_msgs::Bool>("relais", 10, relais_cb);
+    ros::Subscriber runstop_sub = nh.subscribe<std_msgs::Bool>("runstop", 10, runstop_cb);
+    ros::Subscriber runstop_wireless_sub = nh.subscribe<std_msgs::Bool>("runstop_wireless", 10, runstop_cb);
     
     status_pub = nh.advertise<std_msgs::Bool>(ns+"/has_goal", 10);
     goal_pub = nh.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 10);
