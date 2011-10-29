@@ -53,6 +53,6 @@ import wx
 import mitro_dashboard
 
 app = wx.App()
-frame = mitro_dashboard.TeleFrame(None)
+frame = mitro_dashboard.Dashboard(None)
 frame.Show()
 app.MainLoop()

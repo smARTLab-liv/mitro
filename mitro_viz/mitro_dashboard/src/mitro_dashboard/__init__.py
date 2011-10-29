@@ -1,1 +1,1 @@
-from tele_frame import *
+from dashboard import *

@@ -86,22 +86,17 @@ class BatteryStateControl(wx.Window):
     h = self._left_bitmap.GetHeight()
     
     color_bitmap = None
-    if (self._pct > 0.5):
+    if (self._pct > 50):
       color_bitmap = self._green
-    elif (self._pct > 0.3):
+    elif (self._pct > 30):
       color_bitmap = self._yellow
     else:
       color_bitmap = self._red
 
-    if self._voltage > 13.0:
-      self._plugged_in = True
-    else:
-      self._plugged_in = False
-    
     dc.DrawBitmap(self._background_bitmap, self._start_x, 0, True)
     
     color_image = color_bitmap.ConvertToImage()
-    scaled_color_image = color_image.Rescale(round(self._width * self._pct), color_bitmap.GetHeight())
+    scaled_color_image = color_image.Rescale(round(self._width * self._pct/100.0), color_bitmap.GetHeight())
     color_bitmap = wx.BitmapFromImage(scaled_color_image)
     dc.DrawBitmap(color_bitmap, self._start_x, 0, True)
     dc.DrawBitmap(self._left_bitmap, 0, 0, True)
@@ -112,52 +107,19 @@ class BatteryStateControl(wx.Window):
                     (self._start_x + self._width) / 2.0 - (self._plug_bitmap.GetWidth() / 2.0), 
                     self.GetSize().GetHeight() / 2.0 - (self._plug_bitmap.GetHeight() / 2.0))
   
-  def voltage_to_perc(self, v):
-    a = -7.87073944428413e-5
-    b = -0.001363457642237
-    c = 12.529846888629164
 
-    if v > c: 
-        return 100.0
-    
-    if v < 11.77:
-        return 0.0
-
-    return 100 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
-
-    
-      
-  def set_state(self, msg):
-    last_pct = self._pct
-    self._voltage = msg.data
-    self._pct = self.voltage_to_perc(self._voltage) / 100.0
-    self.SetToolTip(wx.ToolTip("Battery: %.2f%% (%.2fV)"%(self._pct * 100.0, msg.data)))
-
- #   last_plugged_in = self._plugged_in
- #   last_time_remaining = self._time_remaining
-
- #   self._char_cap = 0.95*self._char_cap +0.05*float(msg['Charge (Ah)'])     
- #   if self._char_cap < float(msg['Capacity (Ah)']):
- #     self._cap = float(msg['Capacity (Ah)'])
- #   else: 
- #     self._cap = self._char_cap
- #   self._power_consumption = float(msg['Current (A)'])*float(msg['Voltage (V)'])
- #   self._time_remaining = 0.9*self._time_remaining + 0.1*((float(msg['Charge (Ah)'])-self._cap)/non_zero(float(msg['Current (A)'])))*60.0
- #   self._pct = float(msg['Charge (Ah)'])/self._cap
- #   self._plugged_in = (float(msg['Current (A)'])>0)
-    
- #   if (last_pct != self._pct or last_plugged_in != self._plugged_in or last_time_remaining != self._time_remaining):
- #       drain_str = "remaining"
- #       if (self._plugged_in):
- #           drain_str = "to full charge"
- #       self.SetToolTip(wx.ToolTip("Battery: %.2f%% (%d minutes %s)"%(self._pct * 100.0, abs(self._time_remaining), drain_str)))
-
-
-
-
-#    self.SetToolTip(wx.ToolTip("Battery: %.2f%% (%d minutes %s)"%(self._pct * 100.0, abs(self._time_remaining), drain_str)))
+  def set_voltage(self, voltage):
+    self._voltage = voltage
   
+  def set_percent(self, percent):
+    self._pct = percent
+    self.SetToolTip(wx.ToolTip("Battery: %.0f%% (%.2fV)"%(self._pct, self._voltage)))
     self.Refresh()
+
+  def set_charging(self, charging):
+    self._plugged_in = charging
+    self.Refresh()
+
     
   def set_stale(self):
     self._plugged_in = 0
