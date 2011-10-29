@@ -14,7 +14,7 @@ ros::Publisher status_pub, goal_pub, cancel_pub;
 //actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> goal_client("move_base", true);
 //actionlib::SimpleActionClient<actionlib_msgs::GoalID> cancel_client("move_base", true);
 std::vector<actionlib_msgs::GoalID> current_goals;
-
+int ID = 0;
 
 //void done_cb(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseActionResultConstPtr& result);
 //void active_cb();
@@ -35,7 +35,8 @@ void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
     actionlib_msgs::GoalID goal_id;
     std::stringstream s;
-    s << "goal_" << current_goals.size();
+    s << "goal_" << ID;
+    ID++;
     goal_id.id = s.str();
     goal_id.stamp = msg->header.stamp;
     
