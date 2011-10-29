@@ -9,6 +9,10 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_navigation</url>
 
+  <depend package="geometry_msgs" />
+  <depend package="std_msgs" />
+  <depend package="move_base_msgs" />
+  <depend package="actionlib_msgs" />
+  <depend package="actionlib" />
+
 </package>
-
-
