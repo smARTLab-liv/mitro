@@ -1,42 +1,28 @@
-// should listen to some PoseStamped goal from RVIZ, publish it as action goal, and be able to cancel this goal.
-
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <move_base_msgs/MoveBaseActionGoal.h>
-#include <move_base_msgs/MoveBaseAction.h>
-#include <actionlib/client/simple_action_client.h>
 #include <actionlib_msgs/GoalID.h>
 #include <std_msgs/Bool.h>
 
-//typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
-
 ros::Publisher status_pub, goal_pub, cancel_pub;
-//actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> goal_client("move_base", true);
-//actionlib::SimpleActionClient<actionlib_msgs::GoalID> cancel_client("move_base", true);
 std::vector<actionlib_msgs::GoalID> current_goals;
 int ID = 0;
 
-//void done_cb(const actionlib::SimpleClientGoalState& state, const move_base_msgs::MoveBaseActionResultConstPtr& result);
-//void active_cb();
-//void feedback_cb(const move_base_msgs::MoveBaseActionFeedbackConstPtr& feedback);
-void cancel();
 
+void cancel() {
+    for (std::vector<actionlib_msgs::GoalID>::size_type i = 0; i < current_goals.size(); i++) {
+        cancel_pub.publish(current_goals[i]);
+    }
+    current_goals.clear();
+}
 
 void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& msg) {
-    /*
-    MoveBaseClient ac("move_base", true);
-    
-    ROS_INFO("Waiting for move_base action server.");
-    ac.waitForServer();
-    ROS_INFO("Action server started.");
-    */
     
     move_base_msgs::MoveBaseActionGoal goal;
 
     actionlib_msgs::GoalID goal_id;
     std::stringstream s;
     s << "goal_" << ID;
-    ID++;
     goal_id.id = s.str();
     goal_id.stamp = msg->header.stamp;
     
@@ -44,9 +30,10 @@ void goal_cb(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     goal.goal_id = goal_id;
     goal.goal.target_pose = *msg;
     
-    //ac.sendGoal(goal, &done_cb, &active_cb, &feedback_cb);
     goal_pub.publish(goal);
     current_goals.push_back(goal_id);
+    
+    ID++;
 }
 
 void cancel_cb(const std_msgs::Bool::ConstPtr& msg) {
@@ -59,13 +46,6 @@ void relais_cb(const std_msgs::Bool::ConstPtr& msg) {
 
 void runstop_cb(const std_msgs::Bool::ConstPtr& msg) {
     if (msg->data) cancel();
-}
-
-void cancel() {
-    for (std::vector<actionlib_msgs::GoalID>::size_type i = 0; i < current_goals.size(); i++) {
-        cancel_pub.publish(current_goals[i]);
-    }
-    current_goals.clear();
 }
 
 void update() {
@@ -85,23 +65,6 @@ void update() {
     }
     status_pub.publish(status_msg);
 }
-
-/*
-// Called once when the goal completes
-void done_cb(const actionlib::SimpleClientGoalState& state, const MoveBaseActionResultConstPtr& result) {
-    ROS_INFO("Move Base finished goal %d",result->goal_id.id);
-}
-
-// Called once when the goal becomes active
-void active_cb() {
-    ROS_INFO("Goal just went active");
-}
-
-// Called every time feedback is received for the goal
-void feedback_cb(const move_base_msgs::MoveBaseActionFeedbackConstPtr& feedback) {
-  ROS_INFO("Got Feedback");
-}
-*/
 
 int main(int argc, char** argv){
     std::string ns = "goal_planner";
