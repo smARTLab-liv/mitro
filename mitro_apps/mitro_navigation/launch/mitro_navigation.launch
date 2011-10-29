@@ -19,5 +19,8 @@
         <rosparam file="$(find mitro_navigation)/config/base_local_planner_params.yaml" command="load" />
         <remap from="cmd_vel" to="cmd_twist_move_base"/>
     </node>
+
+    <!-- start goal_planner -->
+    <node pkg="mitro_navigation" type="goal_planner" name="goal_planner" output="screen"/>
     
 </launch>
