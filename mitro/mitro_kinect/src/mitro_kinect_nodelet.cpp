@@ -36,7 +36,7 @@ namespace mitro_kinect
     // plane constraints
     static const float MAX_ROLL_ANGLE = 15/180.0f * PI;
     static const float MAX_PITCH_ANGLE = 15/180.0f * PI;
-    static const float MIN_DIST = 1.55f;
+    static const float MIN_DIST = 1.5f;
     static const float MAX_DIST = 1.6f;
     
     ros::Subscriber sub;
