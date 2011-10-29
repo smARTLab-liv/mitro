@@ -45,6 +45,7 @@ import rxtools.cppwidgets as rxtools
 
 import std_msgs.msg
 import mitro_diagnostics.msg
+import geometry_msgs.msg
 
 import rospy
 from roslib import rosenv
@@ -154,7 +155,7 @@ class Dashboard(wx.Frame):
         self._home_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
         self._home_ctrl.SetToolTip(wx.ToolTip("Take me home"))
         static_sizer.Add(self._home_ctrl, 0)
-        # self._home_ctrl.Bind(wx.EVT_BUTTON, self.on_home_clicked)
+        self._home_ctrl.Bind(wx.EVT_BUTTON, self.on_home_clicked)
 
         # Assisted teleop
         self._teleop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
@@ -188,6 +189,7 @@ class Dashboard(wx.Frame):
         self._last_runstop_message = 0.0
         self._last_runstop_wireless_message = 0.0
         self._last_goal_message = 0.0
+        self._last_pose = None
 
         self._sub_runstop = rospy.Subscriber('runstop', std_msgs.msg.Bool, self.cb_runstop)
         self._sub_runstop_wireless = rospy.Subscriber('runstop_wireless', std_msgs.msg.Bool, self.cb_runstop_wireless)
@@ -195,10 +197,14 @@ class Dashboard(wx.Frame):
         self._sub_sysinfo = rospy.Subscriber('sysinfo', mitro_diagnostics.msg.SysInfo, self.cb_sysinfo)
         self._pub_relais = rospy.Publisher('cmd_relais', std_msgs.msg.Bool)
 
-        GOAL_TOPIC = "/goal_planner/has_goal"
+        GOAL_HAS_TOPIC = "/goal_planner/has_goal"
         GOAL_CANCEL_TOPIC = "/goal_planner/cancel"
-        self._sub_goal = rospy.Subscriber(GOAL_TOPIC, std_msgs.msg.Bool, self.cb_goal)
+        self._sub_goal = rospy.Subscriber(GOAL_HAS_TOPIC, std_msgs.msg.Bool, self.cb_goal)
         self._pub_goal = rospy.Publisher(GOAL_CANCEL_TOPIC, std_msgs.msg.Bool)
+
+        GOAL_TOPIC = "/goal_planner/goal"
+        self._sub_amcl_pose = rospy.Subscriber('/amcl_pose', geometry_msgs.msg.PoseWithCovarianceStamped, self.cb_pose) 
+        self._pub_set_goal = rospy.Publisher(GOAL_TOPIC, geometry_msgs.msg.PoseStamped) 
 
 
     def __del__(self):
@@ -209,6 +215,37 @@ class Dashboard(wx.Frame):
         self._sub_goal.unregister()
         self._pub_goal.unregister()
         self._pub_relais.unregister()
+
+    def cb_pose(self, msg):
+        self._last_pose = msg.pose.pose
+
+    def update_home_ctrl(self):
+        if self._home_goal == None:
+            self._home_ctrl.set_stale()
+        else:
+            self._home_ctrl.set_ok()
+
+    def set_home_goal(self, evt):
+        self._home_goal = self._last_pose
+        self.update_home_ctrl()
+
+    def sent_home_goal(self, evt):
+        if not self._home_goal == None:
+            msg = geometry_msgs.msg.PoseStamped()
+            msg.header.stamp = rospy.Time.now()
+            msg.header.frame_id = "/map"
+            msg.pose = self._home_goal
+            self._pub_set_goal.publish(msg)
+        else:
+            rospy.logerr("can't send goal, home pose is not set.")
+
+    def on_home_clicked(self, evt):
+        menu = wx.Menu()
+        menu.Bind(wx.EVT_MENU, self.sent_home_goal, menu.Append(wx.ID_ANY, "Take me home!"))
+        menu.Bind(wx.EVT_MENU, self.set_home_goal, menu.Append(wx.ID_ANY, "Set new home location"))
+        self._home_ctrl.toggle(True)
+        self.PopupMenu(menu)
+        self._home_ctrl.toggle(False)
 
         
     def on_timer(self, evt):
