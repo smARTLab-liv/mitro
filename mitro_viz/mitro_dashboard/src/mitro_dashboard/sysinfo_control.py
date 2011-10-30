@@ -5,6 +5,7 @@ import wx
 
 import math
 
+
 from os import path
 
 def non_zero(value):
@@ -177,8 +178,8 @@ class CPUControl(wx.Window):
   def update(self, cpu_usage, cpu_usage_detail):
     self._stall = False
     self._cpu_usage = cpu_usage
-    self._cpu_usage_hist.insert(0, cpu_usage)
-    if len(self._cpu_usage_hist) > 10:
+    self._cpu_usage_hist.insert(0, self._cpu_usage)
+    if len(self._cpu_usage_hist) > 11:
       self._cpu_usage_hist.pop()
     tooltip = "CPU info: %s"%str(cpu_usage_detail)
     self.SetToolTip(wx.ToolTip(tooltip))
@@ -201,7 +202,7 @@ class CPUControl(wx.Window):
             dc.SetPen(wx.Pen(wx.GREEN, 1, wx.SOLID))
           else:
             dc.SetPen(wx.Pen(wx.RED, 1, wx.SOLID))
-          dc.DrawRectangle(37 - x*3, 40 - (y+1)*3, 2, 2)
+          dc.DrawRectangle(38 - x*3, 41 - (y+1)*3, 2, 2)
 
 class SysInfoControl(wx.StaticBoxSizer):
   def __init__(self, parent, id, title, icons_path):
