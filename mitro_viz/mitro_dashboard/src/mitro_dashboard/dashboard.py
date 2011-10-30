@@ -57,6 +57,8 @@ from status_control import StatusControl
 from battery_state_control import BatteryStateControl
 from rosout_frame import RosoutFrame
 
+from sysinfo_control import WifiControl, BatteryControl, SysInfoControl
+
 class Dashboard(wx.Frame):
     _CONFIG_WINDOW_X="/Window/X"
     _CONFIG_WINDOW_Y="/Window/Y"
@@ -70,7 +72,7 @@ class Dashboard(wx.Frame):
 
         # TODO: get from param server
         self._robot_hostname = "bob"
-        self._laptop_hostname = "MacBook-Daan"
+        self._laptop_hostname = "dhsrv"
 
         self.SetTitle('MITRO (%s)'%self._robot_hostname)
 
@@ -123,22 +125,15 @@ class Dashboard(wx.Frame):
 
                                         
         # Robot
-        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Robot"), wx.HORIZONTAL)
-        sizer.Add(static_sizer, 0)
-        
-        # Battery
-        self._robot_battery_ctrl = BatteryStateControl(self, wx.ID_ANY, icons_path)
-        self._robot_battery_ctrl.SetToolTip(wx.ToolTip("Battery: Stale"))
-        static_sizer.Add(self._robot_battery_ctrl, 1, wx.EXPAND)
+        self._robot_sysinfo = SysInfoControl(self, wx.ID_ANY, "Robot", icons_path)
+        sizer.Add(self._robot_sysinfo)
 
 
-        # Laptop                        
-        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Laptop"), wx.HORIZONTAL)
-        sizer.Add(static_sizer, 0)
-        
-        self._laptop_battery_ctrl = BatteryStateControl(self, wx.ID_ANY, icons_path)
-        self._laptop_battery_ctrl.SetToolTip(wx.ToolTip("Laptop battery: Stale"))
-        static_sizer.Add(self._laptop_battery_ctrl, 1, wx.EXPAND)
+
+        # Laptop
+        self._laptop_sysinfo = SysInfoControl(self, wx.ID_ANY, "Laptop", icons_path)
+        sizer.Add(self._laptop_sysinfo)
+
         
 
         # Apps                        
@@ -274,14 +269,11 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 
 
       if (rospy.get_time() - self._last_robot_message > 5.0):
-          msg ='No message received in the last 5 sec from "%s"'%self._robot_hostname
-          self._robot_battery_ctrl.set_stale()
-          self._robot_battery_ctrl.SetToolTip(wx.ToolTip(msg))
-
+          self._robot_sysinfo.set_stall()
+          
       if (rospy.get_time() - self._last_laptop_message > 5.0):
-          msg ='No message received in the last 5 sec from "%s"'%self._laptop_hostname
-          self._laptop_battery_ctrl.set_stale()
-          self._laptop_battery_ctrl.SetToolTip(wx.ToolTip(msg))
+          self._laptop_sysinfo.set_stall()
+
    
       if (rospy.is_shutdown()):
         self.Close()
@@ -323,24 +315,23 @@ s\" in the last 5 seconds"%self._sub_relais.name))
     def cb_sysinfo(self, msg):
         if msg.hostname == self._robot_hostname:
             # update robot status
-            v = msg.battery_voltage
             self._last_robot_message = rospy.get_time()
-            self._robot_battery_ctrl.set_voltage(v)
-            self._robot_battery_ctrl.set_percent(self.voltage_to_perc(v))
-            charging = False
-            if v > 13.0:
-                charging = True
-            self._robot_battery_ctrl.set_charging(charging)
+
+            msg.battery_percent = self.coltage_to_prec(msg.battery_voltage)
+            if msg.battery_voltage > 13.0:
+                msg.batter_plugged_in = True
+
+            self._robot_sysinfo.update(msg)
+
 
         elif msg.hostname == self._laptop_hostname:
             # update laptop status
             self._last_laptop_message = rospy.get_time()
-            self._laptop_battery_ctrl.set_percent(msg.battery_percent)
-            self._laptop_battery_ctrl.set_voltage(msg.battery_voltage)
-            self._laptop_battery_ctrl.set_charging(msg.battery_plugged_in)
+
+            self._laptop_sysinfo.update(msg)
 
         else:
-            rospy.logerr("received msg on %s from unknown host: %s."%(self._sub_sysinfo.topic(), msg.hostname))
+            rospy.logerr("received msg on %s from unknown host: %s."%(self._sub_sysinfo.name, msg.hostname))
         
 
 
