@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-
 import roslib; roslib.load_manifest("mitro_diagnostics")
 import rospy
 from mitro_diagnostics.msg import SysInfo
@@ -30,6 +28,18 @@ def battery_max():
         if 'last full capacity' in line:
             el = line.split()
             battery_max = float(el[3])
+
+def network_up(name):
+    fn = "/sys/class/net/%s/operstate"%name
+    try:
+        f = open( fn )
+        state = f.read().strip()
+        return ( state == "up" )
+    except:
+        rospy.logerr("Can't open file %s"%fn)
+        return False
+
+
 
 def battery_status():
     global battery_name, battery_max, battery_percent, battery_time, battery_plugged_in, battery_voltage
@@ -74,7 +84,7 @@ def sysinfo():
     rospy.init_node('sysinfo')
     pub = rospy.Publisher('sysinfo', SysInfo)
     
-    wifi_name = 'wlan0'
+    wifi_name = 'wlan1'
     if rospy.has_param('~wifi_name'):
         wifi_name = rospy.get_param('~wifi_name')
     wifi = Wireless(wifi_name)
@@ -101,6 +111,9 @@ def sysinfo():
         info_msg.cpu_usage_detail = psutil.cpu_percent(interval=0.0, percpu=True)
         info_msg.mem_usage = psutil.phymem_usage()[3]
         info_msg.wifi_signallevel = -1.0
+
+        info_msg.network_state = network_up("eth0") 
+
         try:
             info_msg.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
         except:
