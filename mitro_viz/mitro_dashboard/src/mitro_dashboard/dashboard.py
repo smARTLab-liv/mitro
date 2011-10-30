@@ -100,8 +100,8 @@ class Dashboard(wx.Frame):
 
 
 
-        # Robot
-        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Robot"), wx.HORIZONTAL)
+        # Runstops
+        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Runstops"), wx.HORIZONTAL)
         sizer.Add(static_sizer, 0)
 
         # Relais
@@ -122,7 +122,8 @@ class Dashboard(wx.Frame):
 
 
                                         
-        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Battery"), wx.HORIZONTAL)
+        # Robot
+        static_sizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, "Robot"), wx.HORIZONTAL)
         sizer.Add(static_sizer, 0)
         
         # Battery
@@ -145,14 +146,14 @@ class Dashboard(wx.Frame):
         sizer.Add(static_sizer, 0)
 
         # Autonomous navigation
-        self._goal_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
+        self._goal_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "nav", True)
         self._goal_ctrl.SetToolTip(wx.ToolTip("Autonomous navigation"))
         static_sizer.Add(self._goal_ctrl, 0)
         self._goal_ctrl.Bind(wx.EVT_BUTTON, self.on_nav_clicked)
 
 
         # Take me home
-        self._home_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
+        self._home_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "home", True)
         self._home_ctrl.SetToolTip(wx.ToolTip("Take me home"))
         static_sizer.Add(self._home_ctrl, 0)
         self._home_ctrl.Bind(wx.EVT_BUTTON, self.on_home_clicked)

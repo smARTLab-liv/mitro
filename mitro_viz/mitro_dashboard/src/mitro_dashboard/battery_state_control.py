@@ -53,6 +53,7 @@ class BatteryStateControl(wx.Window):
 #    self._power_consumption = 0.0
     self._pct = 0
     self._voltage = 0
+    self._stale = True
 #    self._cap = 0
 #    self._char_cap = 0
 #    self._time_remaining = 0.0
@@ -65,8 +66,10 @@ class BatteryStateControl(wx.Window):
     self._green = wx.Bitmap(path.join(icons_path, "battery-green-bar.png"), wx.BITMAP_TYPE_PNG)
     self._yellow = wx.Bitmap(path.join(icons_path, "battery-yellow-bar.png"), wx.BITMAP_TYPE_PNG)
     self._red = wx.Bitmap(path.join(icons_path, "battery-red-bar.png"), wx.BITMAP_TYPE_PNG)
+
+    self._stale_bitmap = wx.Bitmap(path.join(icons_path, "battery-stale.png"), wx.BITMAP_TYPE_PNG)
     
-    self.SetSize(wx.Size(self._left_bitmap.GetWidth() + self._right_bitmap.GetWidth() + self._background_bitmap.GetWidth(), 32))
+    self.SetSize(wx.Size(self._stale_bitmap.GetWidth(), self._stale_bitmap.GetHeight()))
     
     self._start_x = self._left_bitmap.GetWidth()
     self._end_x = self.GetSize().x - self._right_bitmap.GetWidth()
@@ -81,7 +84,11 @@ class BatteryStateControl(wx.Window):
 
     dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
     dc.Clear()
- 
+    
+    if self._stale:
+      dc.DrawBitmap(self._stale_bitmap, 0, 0, True)
+      return
+
     w = self.GetSize().GetWidth()
     h = self._left_bitmap.GetHeight()
     
@@ -109,14 +116,18 @@ class BatteryStateControl(wx.Window):
   
 
   def set_voltage(self, voltage):
+    self._stale = False
     self._voltage = voltage
+    self.Refresh()
   
   def set_percent(self, percent):
+    self._stale = False
     self._pct = percent
     self.SetToolTip(wx.ToolTip("Battery: %.0f%% (%.2fV)"%(self._pct, self._voltage)))
     self.Refresh()
 
   def set_charging(self, charging):
+    self._stale = False
     self._plugged_in = charging
     self.Refresh()
 
@@ -126,6 +137,6 @@ class BatteryStateControl(wx.Window):
     self._pct = 0
     self._time_remaining = 0.0
     self._power_consumption = 0
+    self._stale = True
     self.SetToolTip(wx.ToolTip("Battery: Stale"))
-    
     self.Refresh()

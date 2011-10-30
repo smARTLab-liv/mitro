@@ -43,7 +43,7 @@ class StatusControl(wx.Window):
     wx.Window.__init__(self, parent, id)
     
     self.SetBackgroundColour(parent.GetBackgroundColour())
-    self.SetSize(wx.Size(32, 32))
+    self.SetSize(wx.Size(48, 48))
     
     if (toggleable):
       self._ok = (wx.Bitmap(path.join(icons_path, "%s-green-untoggled.png"%(base_name))),
