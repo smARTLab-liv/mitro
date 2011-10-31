@@ -72,7 +72,7 @@ class Dashboard(wx.Frame):
 
         # TODO: get from param server
         self._robot_hostname = "bob"
-        self._laptop_hostname = "dhsrv"
+        self._laptop_hostname = "MacBook-Daan"
 
         self.SetTitle('MITRO (%s)'%self._robot_hostname)
 
@@ -343,7 +343,7 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 
             msg.battery_percent = self.voltage_to_perc(msg.battery_voltage)
             if msg.battery_voltage > 13.0:
-                msg.batter_plugged_in = True
+                msg.battery_plugged_in = True
 
             self._robot_sysinfo.update(msg)
 

@@ -106,7 +106,7 @@ class BatteryControl(wx.Window):
     dc = wx.BufferedPaintDC(self)
     dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
     dc.Clear()
-    if self._stall or self._pct == -1:
+    if self._stall or self._pct == -1 or self._voltage == -1:
       dc.DrawBitmap(self._bitmap_stall, 0, 0, True)
     else:
       idx = int( (self._pct + 10.0) / 20.0 ) 
