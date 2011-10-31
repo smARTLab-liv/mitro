@@ -1,0 +1,17 @@
+<package>
+  <description brief="tele_remote">
+
+     tele_remote
+
+  </description>
+  <author>Daniel Hennes</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tele_remote</url>
+  
+  <depend package="rospy"/>
+  <depend package="geometry_msgs"/>
+  
+</package>
+
+

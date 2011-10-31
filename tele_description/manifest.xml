@@ -1,0 +1,15 @@
+<package>
+  <description brief="tele_description">
+
+     tele_description
+
+  </description>
+  <author>Daniel Hennes</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tele_description</url>
+  <depend package="urdf"/>
+
+</package>
+
+

@@ -1,0 +1,14 @@
+<package>
+  <description brief="tele_msgs">
+
+     tele_msgs
+
+  </description>
+  <author>swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tele_msgs</url>
+
+</package>
+
+

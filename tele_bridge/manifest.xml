@@ -1,0 +1,16 @@
+<package>
+  <description brief="tele_bridge">
+
+     tele_bridge
+
+  </description>
+  <author>swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/tele_bridge</url>
+  <depend package="avr_bridge"/>
+  <depend package="tele_msgs"/>
+
+</package>
+
+

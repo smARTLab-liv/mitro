@@ -1,0 +1,2 @@
+float32 velocity_right
+float32 velocity_left
