@@ -84,7 +84,7 @@ def sysinfo():
     rospy.init_node('sysinfo')
     pub = rospy.Publisher('sysinfo', SysInfo)
     
-    wifi_name = 'wlan1'
+    wifi_name = 'wlan0'
     if rospy.has_param('~wifi_name'):
         wifi_name = rospy.get_param('~wifi_name')
     wifi = Wireless(wifi_name)
