@@ -74,7 +74,7 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             point.header.frame_id = ODOM_FRAME;
             point.point.x = points[i].x;
             point.point.y = points[i].y;
-            tf_listener->waitForTransform(BASE_FRAME, ODOM_FRAME, point.header.stamp, ros::Duration(0.1));
+            tf_listener->waitForTransform(ODOM_FRAME, BASE_FRAME, point.header.stamp, ros::Duration(0.1));
             try {
                 tf_listener->transformPoint(BASE_FRAME, point, point_trans);
             }
