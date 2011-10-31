@@ -11,11 +11,11 @@ double BASE_RADIUS;
 double CLEARING_DIST;
 std::string BASE_FRAME, ODOM_FRAME;
 
-ros::Publisher twist_pub;
+ros::Publisher twist_pub, status_pub;
 tf::TransformListener *tf_listener;
 bool obst_detected = false;
 bool obst_stop = false;
-ros::Time last_costmap;
+ros::Time last_costmap, last_update;
 
 bool use_assisted_drive = true;
 
@@ -37,16 +37,16 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
             twist_msg.angular.z = msg->angular.z;
         }
         else if (obst_detected && msg->linear.x > 0.0) {
-            ROS_ERROR("Obstacle detected!");
-	    if (obst_stop) {
-		ROS_ERROR("STOP!");
+            ROS_DEBUG("Obstacle detected!");
+            if (obst_stop) {
+                ROS_DEBUG("STOP!");
                 twist_msg.linear.x = 0;
                 twist_msg.angular.z = msg->angular.z;
-	    }
-	    else {
-		twist_msg.linear.x = 0.2;
-		twist_msg.angular.z = msg->angular.z;
-	    }
+            }
+            else {
+                twist_msg.linear.x = 0.2;
+                twist_msg.angular.z = msg->angular.z;
+            }
         }
         else {
             twist_msg.linear.x = msg->linear.x;
@@ -89,8 +89,8 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             //float yaw = atan(y / x);
             //if (x > 0) yaw = modulus(yaw + PI, 2*PI);
             if (dist < BASE_RADIUS + 3 * CLEARING_DIST && x > 0) {
-		obst_detected = true;
-	    }
+                obst_detected = true;
+            }
             if (dist < BASE_RADIUS + CLEARING_DIST && x > 0) {
                 obst_stop = true;
             }
@@ -101,6 +101,14 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
 double modulus(double a, double b) {
     int result = static_cast<int>( a / b );
     return a - static_cast<double>( result ) * b;
+}
+
+void update() {
+    if ((ros::Time::now() - last_update).toSec() > 1.0) {
+        std_msgs::Bool msg;
+        msg.data = use_assisted_drive;
+        status_pub.publish(msg);
+    }
 }
 
 int main(int argc, char** argv){
@@ -116,9 +124,9 @@ int main(int argc, char** argv){
         priv_nh.getParam("costmap_topic", costmap_topic);
         priv_nh.getParam("clearing_dist", CLEARING_DIST);
         priv_nh.getParam("base_frame_id", BASE_FRAME);
-        //double diameter;
-        //nh.getParam("base_diameter", diameter);
-        BASE_RADIUS = 0.225;
+        double diameter;
+        nh.getParam("base_diameter", diameter);
+        BASE_RADIUS = diameter / 2.0;
     }
     catch (ros::Exception e) {
         ROS_ERROR("Parameter not set: %s", e.what());
@@ -129,9 +137,16 @@ int main(int argc, char** argv){
     
     ros::Subscriber twist_sub = nh.subscribe<geometry_msgs::Twist>(source_topic, 10, twist_cb);
     ros::Subscriber costmap_sub = nh.subscribe<nav_msgs::GridCells>(costmap_topic, 10, costmap_cb);
-    ros::Subscriber cmd_ad_sub = nh.subscribe<std_msgs::Bool>("cmd_assisted_drive", 10, cmd_ad_cb);
+    ros::Subscriber cmd_ad_sub = nh.subscribe<std_msgs::Bool>("assisted_drive/set", 10, cmd_ad_cb);
     twist_pub = nh.advertise<geometry_msgs::Twist>(target_topic, 10);
-
-    ros::spin();
+    status_pub = nh.advertise<std_msgs::Bool>("assisted_drive/status", 10);
+    
+    last_update = ros::Time::now();
+    
+    ros::Rate r(50);
+    while (ros::ok()) {
+        update();
+        ros::spinOnce();
+    }
     return 0;
 }
