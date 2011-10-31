@@ -20,6 +20,6 @@
     <include file="$(find mitro_navigation)/launch/mitro_naviagtion.launch" />
     
     <!-- start republisher -->
-    <node pkg="mitro_bringup" type="republisher" name="republisher" output="screen" />
+    <!-- <node pkg="mitro_bringup" type="republisher" name="republisher" output="screen" /> -->
 
 </launch>
