@@ -147,6 +147,7 @@ int main(int argc, char** argv){
     while (ros::ok()) {
         update();
         ros::spinOnce();
+        r.sleep();
     }
     return 0;
 }
