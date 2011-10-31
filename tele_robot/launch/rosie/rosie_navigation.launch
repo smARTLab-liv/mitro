@@ -1,9 +1,0 @@
-<launch>
-  <include file="$(find tele_robot)/launch/rosie/rosie_teleop.launch"/>
-
-  <!-- load robot description -->
-  <param name="robot_description" command="$(find xacro)/xacro.py '$(find tele_description)/urdf/rosie.urdf.xacro'" />
-
-  <include file="$(find tele_robot)/launch/navigation.launch"/>
-
-</launch>

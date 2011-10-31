@@ -1,8 +1,0 @@
-port: /dev/ttyUSB0
-name: tele_bridge
-publish:
- joint_states:
-  type: tele_msgs/JointStates
-subscribe:
- cmd_vel:
-  type: tele_msgs/VelocityCommand
