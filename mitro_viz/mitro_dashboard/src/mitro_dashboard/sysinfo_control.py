@@ -40,7 +40,7 @@ class WifiControl(wx.Window):
   def update(self, signallevel):
     self._stall = False
     self._signallevel = signallevel
-    self.SetToolTip(wx.ToolTip("Wifi signal level: %.1f %%"%signallevel))
+    self.SetToolTip(wx.ToolTip("Wifi signal level: %.1f dBm"%signallevel))
     self.Refresh()
 
 
@@ -48,10 +48,16 @@ class WifiControl(wx.Window):
     dc = wx.BufferedPaintDC(self)
     dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
     dc.Clear()
-    if self._stall:
+    if self._stall or self._signallevel == -1:
       dc.DrawBitmap(self._bitmap_stall, 0, 0, True)
     else:
-      idx = int( (self._signallevel + 12.5) / 25.0 )
+      level = - self._signallevel
+      if level < 30:
+        level = 30
+      if level > 95:
+        level = 95
+      perc = 100 - (level-30) * 100.0/65.0
+      idx = int( (perc + 12.5) / 25.0 )
       dc.DrawBitmap(self._bitmaps[idx], 0, 0, True)
       
 
@@ -100,7 +106,7 @@ class BatteryControl(wx.Window):
     dc = wx.BufferedPaintDC(self)
     dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
     dc.Clear()
-    if self._stall:
+    if self._stall or self._pct == -1:
       dc.DrawBitmap(self._bitmap_stall, 0, 0, True)
     else:
       idx = int( (self._pct + 10.0) / 20.0 ) 

@@ -205,8 +205,8 @@ class Dashboard(wx.Frame):
         self._sub_amcl_pose = rospy.Subscriber('/amcl_pose', geometry_msgs.msg.PoseWithCovarianceStamped, self.cb_pose) 
         self._pub_set_goal = rospy.Publisher(GOAL_TOPIC, geometry_msgs.msg.PoseStamped) 
 
-        self._sub_teleop = rospy.Subscriber("/assisted_teleop/state", std_msgs.msg.Bool, self.cb_teleop)
-        self._pub_teleop = rospy.Publisher("/assisted_teleop/set", std_msgs.msg.Bool)
+        self._sub_teleop = rospy.Subscriber("/assisted_drive/status", std_msgs.msg.Bool, self.cb_teleop)
+        self._pub_teleop = rospy.Publisher("/assisted_drive/set", std_msgs.msg.Bool)
 
 
     def __del__(self):
@@ -222,6 +222,9 @@ class Dashboard(wx.Frame):
 
 
     def cb_pose(self, msg):
+        wx.CallAfter(self.update_pose, msg)
+
+    def update_pose(self, msg):
         self._last_pose = msg.pose.pose
 
     def update_home_ctrl(self):
@@ -331,11 +334,14 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 
 
     def cb_sysinfo(self, msg):
+        wx.CallAfter(self.update_sysinfo, msg)
+
+    def update_sysinfo(self, msg):
         if msg.hostname == self._robot_hostname:
             # update robot status
             self._last_robot_message = rospy.get_time()
 
-            msg.battery_percent = self.coltage_to_prec(msg.battery_voltage)
+            msg.battery_percent = self.voltage_to_perc(msg.battery_voltage)
             if msg.battery_voltage > 13.0:
                 msg.batter_plugged_in = True
 
@@ -369,7 +375,7 @@ s\" in the last 5 seconds"%self._sub_relais.name))
     def update_teleop(self, msg):
         self._teleop = msg.data
         self._last_teleop_message = rospy.get_time()
-        if not msg.data:
+        if msg.data:
             self._teleop_ctrl.SetToolTip(wx.ToolTip("Assisted teleop: on"))
             self._teleop_ctrl.set_ok()
         else:
