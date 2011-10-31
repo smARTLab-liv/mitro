@@ -1,0 +1,10 @@
+<launch>
+    <!-- BNAIC demo launch on bob -->
+    
+    <!-- launch system info publisher -->
+    <include file="$(find mitro_diagnostics)/launch/sysinfo_laptop.launch" />
+    
+    <!-- start kinect -->
+    <include file="$(find mitro_kinect)/launch/mitro_kinect.launch" />
+    
+</launch>
