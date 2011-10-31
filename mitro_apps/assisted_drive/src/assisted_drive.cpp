@@ -14,6 +14,7 @@ std::string BASE_FRAME, ODOM_FRAME;
 ros::Publisher twist_pub;
 tf::TransformListener *tf_listener;
 bool obst_detected = false;
+bool obst_stop = false;
 ros::Time last_costmap;
 
 bool use_assisted_drive = true;
@@ -35,10 +36,17 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
             twist_msg.linear.x = 0;
             twist_msg.angular.z = msg->angular.z;
         }
-        else if (obst_detected and msg->linear.x > 0.0) {
+        else if (obst_detected && msg->linear.x > 0.0) {
             ROS_ERROR("Obstacle detected!");
-            twist_msg.linear.x = 0;
-            twist_msg.angular.z = msg->angular.z;
+	    if (obst_stop) {
+		ROS_ERROR("STOP!");
+                twist_msg.linear.x = 0;
+                twist_msg.angular.z = msg->angular.z;
+	    }
+	    else {
+		twist_msg.linear.x = 0.2;
+		twist_msg.angular.z = msg->angular.z;
+	    }
         }
         else {
             twist_msg.linear.x = msg->linear.x;
@@ -52,6 +60,8 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
 }
 
 void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
+    obst_detected = false;
+    obst_stop = false;
     if (use_assisted_drive) {
         ODOM_FRAME = msg->header.frame_id;
         
@@ -78,16 +88,14 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             float dist = sqrt(pow(x, 2) + pow(y, 2));
             //float yaw = atan(y / x);
             //if (x > 0) yaw = modulus(yaw + PI, 2*PI);
-            
-            if (dist < BASE_RADIUS + CLEARING_DIST and x > 0) {
-                obst_detected = true;
-            }
-            else {
-                obst_detected = false;
+            if (dist < BASE_RADIUS + 3 * CLEARING_DIST && x > 0) {
+		obst_detected = true;
+	    }
+            if (dist < BASE_RADIUS + CLEARING_DIST && x > 0) {
+                obst_stop = true;
             }
         }
     }
-    else obst_detected = false;
 }
 
 double modulus(double a, double b) {
@@ -108,9 +116,9 @@ int main(int argc, char** argv){
         priv_nh.getParam("costmap_topic", costmap_topic);
         priv_nh.getParam("clearing_dist", CLEARING_DIST);
         priv_nh.getParam("base_frame_id", BASE_FRAME);
-        double diameter;
-        nh.getParam("base_diameter", diameter);
-        BASE_RADIUS = diameter / 2;
+        //double diameter;
+        //nh.getParam("base_diameter", diameter);
+        BASE_RADIUS = 0.225;
     }
     catch (ros::Exception e) {
         ROS_ERROR("Parameter not set: %s", e.what());
