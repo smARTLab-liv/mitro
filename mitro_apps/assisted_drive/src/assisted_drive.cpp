@@ -74,6 +74,8 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             point.header.frame_id = ODOM_FRAME;
             point.point.x = points[i].x;
             point.point.y = points[i].y;
+
+	    // Daniel: this transform is the same for all points, should go outside the loop, maybe there is a transformGridCells?
             tf_listener->waitForTransform(ODOM_FRAME, BASE_FRAME, point.header.stamp, ros::Duration(0.1));
             try {
                 tf_listener->transformPoint(BASE_FRAME, point, point_trans);
@@ -83,7 +85,9 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
                 return;
             }
             
-            float x = point_trans.point.x;
+            
+	    // Daniel: not checking the angle to the obstacle, obstacles behind the robot shouldn't matter ...
+	    float x = point_trans.point.x;
             float y = point_trans.point.y;
             float dist = sqrt(pow(x, 2) + pow(y, 2));
             //float yaw = atan(y / x);
