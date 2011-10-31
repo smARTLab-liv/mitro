@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_bringup</url>
 
+  <depend package="roscpp" />
+  <depend package="mitro_diagnostics" />
+  <depend package="sensor_msgs" />
+  
 </package>
-
-
