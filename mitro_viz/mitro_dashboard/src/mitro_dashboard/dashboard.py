@@ -154,10 +154,10 @@ class Dashboard(wx.Frame):
         self._home_ctrl.Bind(wx.EVT_BUTTON, self.on_home_clicked)
 
         # Assisted teleop
-        self._teleop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
+        self._teleop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "teleop", True)
         self._teleop_ctrl.SetToolTip(wx.ToolTip("Assisted teleop"))
         static_sizer.Add(self._teleop_ctrl, 0)
-        # self._teleop_ctrl.Bind(wx.EVT_BUTTON, self.on_teleop_clicked)
+        self._teleop_ctrl.Bind(wx.EVT_BUTTON, self.on_teleop_clicked)
 
 
         self._config = wx.Config("mitro_dashboard")
@@ -185,8 +185,11 @@ class Dashboard(wx.Frame):
         self._last_runstop_message = 0.0
         self._last_runstop_wireless_message = 0.0
         self._last_goal_message = 0.0
+        self._last_teleop_message = 0.0
         self._last_pose = None
-
+        self._relais = False
+        self._teleop = False
+ 
         self._sub_runstop = rospy.Subscriber('runstop', std_msgs.msg.Bool, self.cb_runstop)
         self._sub_runstop_wireless = rospy.Subscriber('runstop_wireless', std_msgs.msg.Bool, self.cb_runstop_wireless)
         self._sub_relais = rospy.Subscriber('relais', std_msgs.msg.Bool, self.cb_relais)
@@ -202,6 +205,9 @@ class Dashboard(wx.Frame):
         self._sub_amcl_pose = rospy.Subscriber('/amcl_pose', geometry_msgs.msg.PoseWithCovarianceStamped, self.cb_pose) 
         self._pub_set_goal = rospy.Publisher(GOAL_TOPIC, geometry_msgs.msg.PoseStamped) 
 
+        self._sub_teleop = rospy.Subscriber("/assisted_teleop/state", std_msgs.msg.Bool, self.cb_teleop)
+        self._pub_teleop = rospy.Publisher("/assisted_teleop/set", std_msgs.msg.Bool)
+
 
     def __del__(self):
         self._sub_runstop.unregister()
@@ -211,6 +217,9 @@ class Dashboard(wx.Frame):
         self._sub_goal.unregister()
         self._pub_goal.unregister()
         self._pub_relais.unregister()
+        self._sub_teleop.unregister()
+        self._pub_teleop.unregister()
+
 
     def cb_pose(self, msg):
         self._last_pose = msg.pose.pose
@@ -268,6 +277,12 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 \" in the last 5 seconds"%self._sub_goal.name))
 
 
+      if (rospy.get_time() - self._last_runstop_message > 5.0):
+          self._teleop_ctrl.set_stale()
+          self._teleop_ctrl.SetToolTip(wx.ToolTip("No message received on \"%s\
+\" in the last 5 seconds"%self._sub_teleop.name))
+
+
       if (rospy.get_time() - self._last_robot_message > 5.0):
           self._robot_sysinfo.set_stall()
           
@@ -287,6 +302,9 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 
     def on_relais_clicked(self, evt):
         self._pub_relais.publish(not self._relais)
+
+    def on_teleop_clicked(self, evt):
+        self._pub_teleop.publish(not self._teleop)
 
     def cb_battery_voltage(self, msg):
         wx.CallAfter(self.update_battery_voltage, msg)
@@ -344,6 +362,20 @@ s\" in the last 5 seconds"%self._sub_relais.name))
         else:
             self._relais_ctrl.set_error()
             self._relais_ctrl.SetToolTip(wx.ToolTip("Relais: off"))
+
+    def cb_teleop(self, msg):
+        wx.CallAfter(self.update_teleop, msg)
+
+    def update_teleop(self, msg):
+        self._teleop = msg.data
+        self._last_teleop_message = rospy.get_time()
+        if not msg.data:
+            self._teleop_ctrl.SetToolTip(wx.ToolTip("Assisted teleop: on"))
+            self._teleop_ctrl.set_ok()
+        else:
+            self._teleop_ctrl.SetToolTip(wx.ToolTip("Assisted teleop: off"))
+            self._teleop_ctrl.set_error()        
+    
 
     def cb_runstop(self, msg):
         wx.CallAfter(self.update_runstop, msg)
