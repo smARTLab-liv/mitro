@@ -104,10 +104,12 @@ double modulus(double a, double b) {
 }
 
 void update() {
-    if ((ros::Time::now() - last_update).toSec() > 1.0) {
+    ros::Time current = ros::Time::now();
+    if ((current - last_update).toSec() > 1.0) {
         std_msgs::Bool msg;
         msg.data = use_assisted_drive;
         status_pub.publish(msg);
+        last_update = current;
     }
 }
 
