@@ -160,17 +160,19 @@ void loop() {
     M2PulseLength = 1500.0;
   } 
   else {
-    M1PulseLength += CalculateSpeedM1(M1SpeedSetpoint,M1ActualSpeed);
-    //M1PulseLength += M1PID(M1SpeedSetpoint,M1ActualSpeed, 0.5, 0.0, 0.0);
-    M1PulseLength = min(max(M1PulseLength, 1000), 2000);
+   // M1PulseLength += CalculateSpeedM1(M1SpeedSetpoint,M1ActualSpeed);
+    M1PulseLength = (M1SpeedSetpoint + 145.27) / 0.093757;
+    M1PulseLength += M1PID(M1SpeedSetpoint,M1ActualSpeed, 10, 1, 0.0);
+    M1PulseLength = min(max(M1PulseLength, 1000), 1950);
     if (M1SpeedSetpoint == 0 && abs(M1PulseLength - 1500) < 75) {
       M1PulseLength = 1500;
     }
     M1Control.write((int) M1PulseLength);
 
-    M1PulseLength += CalculateSpeedM2(M2SpeedSetpoint,M2ActualSpeed);
-   // M2PulseLength += M2PID(M2SpeedSetpoint,M2ActualSpeed, 0.5, 0.0, 0.0);
-    M2PulseLength = min(max(M2PulseLength, 1000), 2000);
+    //M1PulseLength += CalculateSpeedM2(M2SpeedSetpoint,M2ActualSpeed);
+    M2PulseLength = (M2SpeedSetpoint + 137.64) / 0.089217;
+    M2PulseLength += M2PID(M2SpeedSetpoint,M2ActualSpeed, 10, 1, 0.0);
+    M2PulseLength = min(max(M2PulseLength, 1000), 1950);
     if (M2SpeedSetpoint == 0 && abs(M2PulseLength - 1500) < 75) {
       M2PulseLength = 1500;
     }
