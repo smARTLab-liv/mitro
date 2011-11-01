@@ -6,6 +6,7 @@
         <param name="port" value="/dev/ttyUSB0"/>
 		<param name="baud" value="115200" />
     </node>  
+
     
     <!-- launch base controller -->
     <node pkg="mitro_base_controller" type="mitro_base_controller" name="mitro_base_controller" output="screen" >

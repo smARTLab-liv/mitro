@@ -17,7 +17,7 @@
     <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
     
     <!-- start navigation -->
-    <include file="$(find mitro_navigation)/launch/mitro_naviagtion.launch" />
+    <include file="$(find mitro_navigation)/launch/mitro_navigation.launch" />
     
     <!-- start republisher -->
     <!-- <node pkg="mitro_bringup" type="republisher" name="republisher" output="screen" /> -->

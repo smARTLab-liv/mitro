@@ -105,8 +105,8 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
     vth = (velocity_right - velocity_left) / WHEEL_BASE;
 
     odom.child_frame_id = CHILD_FRAME_ID;
-    odom.twist.twist.linear.x = (vx + cmd_linear) / 2.0;
-    odom.twist.twist.angular.z = (vth + cmd_angular) / 2.0;
+    odom.twist.twist.linear.x = vx;//cmd_linear;//(vx + cmd_linear) / 2.0;
+    odom.twist.twist.angular.z = vth;//cmd_angular;//(vth + cmd_angular) / 2.0;
 
     //publish the message
     odom_pub.publish(odom);
