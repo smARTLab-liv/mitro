@@ -6,6 +6,8 @@
 
 #include <pcl/point_types.h>
 
+#include <pcl/io/pcd_io.h>
+
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>
 
@@ -128,6 +130,7 @@ namespace mitro_kinect
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor (new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor_filtered(new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+      pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
   
       pcl::VoxelGrid<sensor_msgs::PointCloud2> voxel_filter;
@@ -144,6 +147,7 @@ namespace mitro_kinect
       ROS_DEBUG("Voxel cloud size: %d", cloud_voxel->width * cloud_voxel->height );
 
       pcl::fromROSMsg(*cloud_voxel, *pcl_cloud);
+      pcl::fromROSMsg(*cloud_voxel, *temp_cloud);
 
       if ( 0 == pcl_cloud->points.size() )
       {
@@ -152,70 +156,105 @@ namespace mitro_kinect
       }
 
       ROS_DEBUG("PCL cloud size: %zd", pcl_cloud->points.size() );
+
+
+      // prepare identity transform
+      tf::Transform transform;
+      transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+      transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0, 1.0) );
+      bool found = false;
       pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
       pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 
-      // Create the segmentation object
-      pcl::SACSegmentation<pcl::PointXYZ> seg;
-      // Optional
-      seg.setOptimizeCoefficients (true);
-      // Mandatory
-      seg.setModelType (pcl::SACMODEL_PLANE);
-      seg.setMethodType (pcl::SAC_RANSAC);
-      seg.setDistanceThreshold (plane_tresh);
-      seg.setInputCloud (pcl_cloud);
-      seg.segment (*inliers, *coefficients);
 
-      if (inliers->indices.size() == 0)
+      int it;
+      for (it = 0; it < 2; it ++)
       {
-	ROS_ERROR("Could not estimate a planar model for the given dataset!");
-	return;
-      }
-      ROS_DEBUG("Model inliers: %zd", inliers->indices.size() );
 
-      // computing transform based on normal vector
-      float x = coefficients->values[0];
-      float y = coefficients->values[1];
-      float z = coefficients->values[2];
-      float d = coefficients->values[3];
+	// pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
+	// pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
 
-      if ( d > 0 )
-      {
-	x = -x;
-	y = -y;
-	z = -z;
-      } else {
-	d = - d;
-      }
+	// Create the segmentation object
+	pcl::SACSegmentation<pcl::PointXYZ> seg;
+	// Optional
+	seg.setOptimizeCoefficients (true);
+	// Mandatory
+	seg.setModelType (pcl::SACMODEL_PLANE);
+	seg.setMethodType (pcl::SAC_RANSAC);
+	seg.setDistanceThreshold (plane_tresh);
+	seg.setInputCloud (pcl_cloud);
+	seg.segment (*inliers, *coefficients);
 
-      float roll = atan2(z,-x) - PI/2.0f;
-      float pitch = atan2(z,y) - PI/2.0f + kinect_pitch_angle;
-      roll = wrap_angle(roll);
-      pitch = wrap_angle(pitch);
+	if (inliers->indices.size() == 0)
+	{
+	  ROS_ERROR("Could not estimate a planar model for the given dataset!");
+	  pub_obstacles.publish(*cloud_voxel);
+	  return;
+	}
+	ROS_DEBUG("Model inliers: %zd", inliers->indices.size() );
 
-      // ROS_ERROR("roll: %f, pitch: %f", pitch, roll);
-      //      ROS_ERROR("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+	// computing transform based on normal vector
+	float x = coefficients->values[0];
+	float y = coefficients->values[1];
+	float z = coefficients->values[2];
+	float d = coefficients->values[3];
+
+	if ( d > 0 )
+	{
+	  x = -x;
+	  y = -y;
+	  z = -z;
+	} else {
+	  d = - d;
+	}
+
+	float roll = atan2(z,-x) - PI/2.0f;
+	float pitch = atan2(z,y) - PI/2.0f + kinect_pitch_angle;
+	roll = wrap_angle(roll);
+	pitch = wrap_angle(pitch);
 
 
-      if ( fabs(roll) > MAX_ROLL_ANGLE || fabs(pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
-      {
-	ROS_DEBUG("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
-	pub_obstacles.publish(cloud_voxel);
-	tf::Transform transform;
-	transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
-	transform.setRotation( tf::Quaternion(0.0, 0.0, 0.0, 1.0) );
-	tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, tf_frame, tf_target_frame));
-	return;
+	if ( fabs(roll) > MAX_ROLL_ANGLE || fabs(pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
+	{
+	  ROS_DEBUG("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+	  // prepare for second iteration
+	  pcl::ExtractIndices<pcl::PointXYZ> extract;
+	  extract.setInputCloud (pcl_cloud);
+	  extract.setIndices (inliers);
+	  extract.setNegative (true);
+	  pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud (new pcl::PointCloud<pcl::PointXYZ>);
+	  extract.filter(*filtered_cloud);
+
+	  extract.setNegative (false);
+	  extract.filter(*temp_cloud);
+
+	  pcl_cloud = filtered_cloud;
+	  continue;
+	} else {
+	  // found floor, set transform
+	  ROS_DEBUG("found floor in %d iteration! (pitch: %f, roll: %f, height: %f)", (it+1), pitch, roll, d);
+	  transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
+	  tf::Quaternion quaternion;
+	  quaternion.setEuler(pitch, roll, 0.0d);
+	  transform.setRotation( quaternion );
+	  found = true;
+	  break;
+	}
       }
 
       // publishing transform
-      tf::Transform transform;
-      transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
-      tf::Quaternion quaternion;
-      quaternion.setEuler(pitch, roll, 0.0d);
-      transform.setRotation( quaternion );
       tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, tf_frame, tf_target_frame));
 
+      if (!found)
+      {
+	// publish everything as obstacles
+	pub_obstacles.publish(cloud_voxel);
+	return; 
+      }
+
+      if (it > 0)
+	*pcl_cloud += *temp_cloud;
+	//	pcl::concatenateFields(pcl_cloud, temp_cloud, pcl_cloud);
 
       pcl::ExtractIndices<pcl::PointXYZ> extract;
       extract.setInputCloud (pcl_cloud);
