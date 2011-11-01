@@ -17,8 +17,10 @@ float INPLACE_TURNING_SPEED = 0.5;
 void sysinfo_cb(const mitro_diagnostics::SysInfo::ConstPtr& msg) {
     if (!msg->hostname.compare("bob")) {
         float battery_voltage = msg->battery_voltage;
-        float signal_level = msg->wifi_signallevel;
+        float signal_level = - msg->wifi_signallevel;
         float signal_percent = 100 - (signal_level - 30) * 100.0 / 65.0;
+	signal_percent = min(signal_percent, 100);
+	signal_percent = max(signal_percent, 0);
         printf("BAT%f:", std::min(battery_voltage, 15.0f) / 15.0);
         printf("SIG%f:", signal_percent / 100.0);
         fflush(stdout);
