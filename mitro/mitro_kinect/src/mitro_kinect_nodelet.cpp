@@ -288,6 +288,7 @@ namespace mitro_kinect
       pcl::toROSMsg(*cloud_without_floor_filtered, *cloud_obstacles);
 
       // publish 
+      //      cloud_obstacles->msg.header = cloud_in->msg.header;
       pub_obstacles.publish(cloud_obstacles);
       pub_voxel.publish(cloud_voxel);
 
