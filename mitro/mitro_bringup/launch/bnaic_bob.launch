@@ -14,7 +14,10 @@
     <include file="$(find mitro_teleop)/launch/ps3_teleop.launch" />
     
     <!-- start assisted drive -->
+
+<!--
     <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
+    -->
     
     <!-- start navigation -->
     <include file="$(find mitro_navigation)/launch/mitro_navigation.launch" />
