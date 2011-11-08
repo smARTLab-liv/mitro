@@ -61,6 +61,8 @@ double status_delay = 1000; // 1Hz
 double maxPIDError = 6;
 double LinSumValue = 3;
 
+boolean relais = false;
+
 // int last_vel_cmd_time = 0;
 
 void vc_cb( const mitro_base_controller::VelocityCommand& cmd_vel_msg) {
@@ -72,10 +74,12 @@ void cmd_rel_cb( const std_msgs::Bool& cmd_rel_msg) {
   if (cmd_rel_msg.data == true) {
     digitalWrite(Relais, LOW);
     relais_msg.data = true;
+    relais = true;
   }
   else {
     digitalWrite(Relais, HIGH);
     relais_msg.data = false;
+    relais = false;
   }
 }
 
@@ -153,7 +157,7 @@ void loop() {
 
   boolean runstop = !digitalRead(EmergencyDetect);
 
-  if (runstop) { // || millis() - last_vel_cmd_time > 200 ) {
+  if (runstop || !relais) { // || millis() - last_vel_cmd_time > 200 ) {
     M1Control.write(1500);
     M2Control.write(1500);
     M1PulseLength = 1500.0;
