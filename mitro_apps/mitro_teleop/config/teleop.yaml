@@ -9,11 +9,11 @@ axis_pan: 0
 axis_tilt: 3
 
 # base velocities
-max_vw: 1.5
-max_vx: 0.5
+max_vw: 1.0
+max_vx: 0.3
 max_vy: 0.0
-max_vw_run: 2.5
-max_vx_run: 0.75
+max_vw_run: 2.0
+max_vx_run: 0.5
 max_vy_run: 0.0
 
 # Buttons have changed for PS3 controller mapping 
