@@ -107,29 +107,29 @@ def sysinfo():
     
     while not rospy.is_shutdown():
         info_msg.header.stamp = rospy.Time.now()
-        info_msg.cpu_usage = psutil.cpu_percent(interval=0.0)
-        info_msg.cpu_usage_detail = psutil.cpu_percent(interval=0.0, percpu=True)
-        info_msg.mem_usage = psutil.phymem_usage()[3]
-        info_msg.wifi_signallevel = -1.0
+        info_msg.system.cpu_usage_average = psutil.cpu_percent(interval=0.0)
+        info_msg.system.cpu_usage_detail = psutil.cpu_percent(interval=0.0, percpu=True)
+        info_msg.system.mem_usage = psutil.phymem_usage()[3]
+        info_msg.network.wifi_signallevel = -1.0
 
-        info_msg.network_state = network_up("eth0") 
+        info_msg.network.ethernet_status = network_up("eth0") 
 
         try:
-            info_msg.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
+            info_msg.network.wifi_signallevel = wifi.getStatistics()[1].getSignallevel()
         except:
             pass
 
         if use_battery_voltage:
-            info_msg.battery_voltage = battery_voltage
-            info_msg.battery_plugged_in = False
-            info_msg.battery_percent = -1
-            info_msg.battery_time = -1
+            info_msg.battery.voltage = battery_voltage
+            info_msg.battery.plugged_in = False
+            info_msg.battery.percent = -1
+            info_msg.battery.time = -1
         else:
             battery_status()
-            info_msg.battery_voltage = battery_voltage
-            info_msg.battery_plugged_in = battery_plugged_in
-            info_msg.battery_percent = battery_percent
-            info_msg.battery_time = battery_time
+            info_msg.battery.voltage = battery_voltage
+            info_msg.battery.plugged_in = battery_plugged_in
+            info_msg.battery.percent = battery_percent
+            info_msg.battery.time = battery_time
         pub.publish(info_msg)
         r.sleep()
         

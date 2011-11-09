@@ -1,6 +1,8 @@
 python-wifi:
-    ubuntu: |
-        sudo pip install -U python-wifi
+    ubuntu: 
+        pip: 
+            packages: [python-wifi]
 psutil:
-    ubuntu:  |
-        sudo pip install -U psutil
+    ubuntu: 
+        pip: 
+            packages: [psutil]
