@@ -23,5 +23,9 @@
     
     <!-- launch twist mixer -->
     <include file="$(find twist_mixer)/launch/twist_mixer.launch" />
+
+    <!-- launch ps3_teleop -->
+    <include file="$(find mitro_teleop)/launch/ps3_teleop.launch" />
+
     
 </launch>

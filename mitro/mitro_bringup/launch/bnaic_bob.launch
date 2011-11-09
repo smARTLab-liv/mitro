@@ -2,8 +2,10 @@
     <!-- BNAIC demo launch on bob -->
     
     <!-- start basic nodes -->
-    <include file="$(find mitro_bringup)/launch/minimal.launch" />
 
+<!--
+    <include file="$(find mitro_bringup)/launch/minimal.launch" />
+-->
     <!-- start odom -->
     <include file="$(find mitro_odom)/launch/mitro_odom_kinect.launch" />
     
@@ -11,8 +13,9 @@
     <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
     
     <!-- start ps3 teleop -->
+<!--
     <include file="$(find mitro_teleop)/launch/ps3_teleop.launch" />
-    
+    -->
     <!-- start assisted drive -->
 
 <!--
