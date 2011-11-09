@@ -234,10 +234,10 @@ class SysInfoControl(wx.StaticBoxSizer):
 
 
   def update(self, msg):
-    self._battery_ctrl.update(msg.battery_percent, msg.battery_voltage, msg.battery_time, msg.battery_plugged_in)
-    self._wifi_ctrl.update(msg.wifi_signallevel)
-    self._net_ctrl.update(msg.network_state)
-    self._cpu_ctrl.update(msg.cpu_usage, msg.cpu_usage_detail)
+    self._battery_ctrl.update(msg.battery.percent, msg.battery.voltage, msg.battery.time, msg.battery.plugged_in)
+    self._wifi_ctrl.update(msg.network.wifi_signallevel)
+    self._net_ctrl.update(msg.network.ethernet_status)
+    self._cpu_ctrl.update(msg.system.cpu_usage_average, msg.system.cpu_usage_detail)
 
   def set_stall(self):
     self._battery_ctrl.set_stall()
