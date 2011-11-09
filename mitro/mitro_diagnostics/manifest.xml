@@ -11,6 +11,8 @@
   
   <depend package="rospy" />
   <depend package="std_msgs" />
+   
+  <rosdep name="python-wifi" />
+  <rosdep name="psutil" />
+  
 </package>
-
-
