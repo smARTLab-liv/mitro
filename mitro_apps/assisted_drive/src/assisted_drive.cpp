@@ -54,9 +54,6 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
         }
         twist_pub.publish(twist_msg);
     }
-    else {
-        twist_pub.publish(*msg);
-    }
 }
 
 void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
@@ -68,15 +65,15 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
         last_costmap = msg->header.stamp;
         std::vector<geometry_msgs::Point> points = msg->cells;
         
+        tf_listener->waitForTransform(ODOM_FRAME, BASE_FRAME, msg->header.stamp, ros::Duration(0.2));
+        
         for (std::vector<std::string>::size_type i = 0; i < points.size(); i++) {
             geometry_msgs::PointStamped point, point_trans;
             point.header.stamp = msg->header.stamp;
             point.header.frame_id = ODOM_FRAME;
             point.point.x = points[i].x;
             point.point.y = points[i].y;
-
-	    // Daniel: this transform is the same for all points, should go outside the loop, maybe there is a transformGridCells?
-            tf_listener->waitForTransform(ODOM_FRAME, BASE_FRAME, point.header.stamp, ros::Duration(0.1));
+            
             try {
                 tf_listener->transformPoint(BASE_FRAME, point, point_trans);
             }
@@ -85,9 +82,7 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
                 return;
             }
             
-            
-	    // Daniel: not checking the angle to the obstacle, obstacles behind the robot shouldn't matter ...
-	    float x = point_trans.point.x;
+            float x = point_trans.point.x;
             float y = point_trans.point.y;
             float dist = sqrt(pow(x, 2) + pow(y, 2));
             //float yaw = atan(y / x);
