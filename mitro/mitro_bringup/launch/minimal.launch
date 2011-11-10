@@ -13,8 +13,6 @@
         <param name="tf_prefix" type="string" value="" />
     </node>
 
-
-
     <!-- launch base controller -->
     <include file="$(find mitro_base_controller)/launch/mitro_base_controller.launch" />
 
@@ -26,6 +24,5 @@
 
     <!-- launch ps3_teleop -->
     <include file="$(find mitro_teleop)/launch/ps3_teleop.launch" />
-
     
 </launch>
