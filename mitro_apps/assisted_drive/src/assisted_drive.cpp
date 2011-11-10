@@ -87,10 +87,10 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             float dist = sqrt(pow(x, 2) + pow(y, 2));
             //float yaw = atan(y / x);
             //if (x > 0) yaw = modulus(yaw + PI, 2*PI);
-            if (dist < BASE_RADIUS + 3 * CLEARING_DIST && x > 0) {
+            if (dist < BASE_RADIUS + 2 * CLEARING_DIST && x > 0) {
                 obst_detected = true;
             }
-            if (dist < BASE_RADIUS + CLEARING_DIST && x > 0) {
+            if (dist < BASE_RADIUS + CLEARING_DIST && x > 0 && abs(y) < BASE_RADIUS + 0.05) {
                 obst_stop = true;
             }
         }
