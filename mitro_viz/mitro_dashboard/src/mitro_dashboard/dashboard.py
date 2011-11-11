@@ -341,9 +341,9 @@ s\" in the last 5 seconds"%self._sub_relais.name))
             # update robot status
             self._last_robot_message = rospy.get_time()
 
-            msg.battery_percent = self.voltage_to_perc(msg.battery_voltage)
-            if msg.battery_voltage > 13.0:
-                msg.battery_plugged_in = True
+            msg.battery.percent = self.voltage_to_perc(msg.battery.voltage)
+            if msg.battery.voltage > 13.0:
+                msg.battery.plugged_in = True
 
             self._robot_sysinfo.update(msg)
 
