@@ -90,7 +90,7 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
             if (dist < BASE_RADIUS + 2 * CLEARING_DIST && x > 0) {
                 obst_detected = true;
             }
-            if (dist < BASE_RADIUS + CLEARING_DIST && x > 0 && abs(y) < BASE_RADIUS + 0.05) {
+            if (dist < BASE_RADIUS + CLEARING_DIST && x > 0 && abs(y) < BASE_RADIUS) {
                 obst_stop = true;
             }
         }
