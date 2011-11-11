@@ -91,6 +91,7 @@ void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
                 obst_detected = true;
             }
             if (dist < BASE_RADIUS + CLEARING_DIST && x > 0 && abs(y) < BASE_RADIUS) {
+                ROS_DEBUG("Obstacle: %f, %f",x,y);
                 obst_stop = true;
             }
         }
