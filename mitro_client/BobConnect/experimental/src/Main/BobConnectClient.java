@@ -44,7 +44,7 @@ public class BobConnectClient {
 
     private static CameraProxy cam; //Captures images from camera
 
-    private static AudioCapturePlayer audio; //Capture and playback audio
+    //private static AudioCapturePlayer audio; //Capture and playback audio
 
     private static BufferedImage owncam=null; //Buffers image from own camera
     //private static BufferedImage prev=null; //Buffers previous image
@@ -125,10 +125,10 @@ public class BobConnectClient {
         s2.setTrafficClass(254);
         //Create audio module
         if (Constants.AUDIO_COMPRESS_STREAMS){
-            audio=new AudioCapturePlayer(new BufferedInputStream(s2.getInputStream(),4*Constants.AUDIO_BUFFER_SIZE),new BufferedOutputStream(s2.getOutputStream(),Constants.AUDIO_BUFFER_SIZE));
+            //audio=new AudioCapturePlayer(new BufferedInputStream(s2.getInputStream(),4*Constants.AUDIO_BUFFER_SIZE),new BufferedOutputStream(s2.getOutputStream(),Constants.AUDIO_BUFFER_SIZE));
         }
         else{
-            audio=new AudioCapturePlayer(new BufferedInputStream(s2.getInputStream(),20000),new BufferedOutputStream(s2.getOutputStream(),Constants.AUDIO_BUFFER_SIZE));
+            //audio=new AudioCapturePlayer(new BufferedInputStream(s2.getInputStream(),20000),new BufferedOutputStream(s2.getOutputStream(),Constants.AUDIO_BUFFER_SIZE));
         }
 
         //Open data connection
@@ -234,7 +234,7 @@ public class BobConnectClient {
                             if (cam!=null)cam.stop();
 
                             //If audio is running we sto it...
-                            if (audio!=null)audio.stop();
+                            //if (audio!=null)audio.stop();
 
                             //...and exit
                             System.exit(0);
@@ -549,7 +549,7 @@ public class BobConnectClient {
         }
 
         //Start audio module
-        audio.start();
+        //audio.start();
 
     }
 

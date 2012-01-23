@@ -34,7 +34,7 @@ public class Constants {
     public static final int CAPTURE_FRAMERATE=10;
     public static final float LOW_FRAMERATE_QUALITY=0.999f;
     public static final float LOW_CHANGE_QUALITY=0.990f;
-    public static final float HIGH_CHANGE_QUALITY=0.999f;
+    public static final float HIGH_CHANGE_QUALITY=1.0f;
     public static final double MIN_DIFFERENCE=15.0;
     public static final double MAX_LOW_CHANGE_DIFFERENCE=40.0;
     public static final String VIDEO_CAPTURE_DRIVER="video4linux2";
