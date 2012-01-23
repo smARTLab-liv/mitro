@@ -34,7 +34,7 @@ import java.util.Locale;
 
 public class ImageStreamEncoder {
     private ImageWriteParam iwparam=new MyImageWriteParam();
-	private ImageWriter writer=null;
+	private ImageWriter writer=null, writer2=null;
 	private final byte BASIS_B1=125;
 	private final byte BASIS_B2=126;
 	private final byte BASIS_TERM=127;
@@ -52,6 +52,11 @@ public class ImageStreamEncoder {
         if (iter.hasNext()) {
             writer = iter.next();
         }
+        iter = ImageIO.getImageWritersByFormatName("png");
+        if (iter.hasNext()) {
+            writer2 = iter.next();
+        }
+
 	    ImageIO.setUseCache(false);
 
         bufferImage=new BufferedImage(Constants.CAPUTRE_WIDTH,Constants.CAPUTRE_HEIGHT,BufferedImage.TYPE_3BYTE_BGR);
@@ -71,7 +76,7 @@ public class ImageStreamEncoder {
 
             boolean keyframe=false;
             //System.out.println(diff);
-            if (diff>100 || keyframecounter>50 || lastimg==null){
+            if (diff>100 || keyframecounter>25 || lastimg==null){
                 System.out.print(":EK:");
                 out.write(new byte[]{1});
                 keyframecounter=0;
@@ -120,9 +125,14 @@ public class ImageStreamEncoder {
                         }
                     }
                 });
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(in, null, null), iwparam);
-
+                /*if (keyframe){
+                    writer2.setOutput(ios);
+                    writer2.write(null, new IIOImage(in, null, null), iwparam);
+                }
+                else{*/
+                    writer.setOutput(ios);
+                    writer.write(null, new IIOImage(in, null, null), iwparam);
+                //}
                 try{
                     out.write(new byte[]{BASIS_TERM,BASIS_TERM,BASIS_TERM});
                     out.flush();
