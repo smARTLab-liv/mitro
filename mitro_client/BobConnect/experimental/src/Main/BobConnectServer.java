@@ -56,7 +56,7 @@ public class BobConnectServer {
 
     private Userdb userdb; //User database
 
-    private static final boolean DEBUG=false;
+    private static final boolean DEBUG=true;
 
     private String lastping=null;
     private long lastpingtime=0;
@@ -103,6 +103,9 @@ public class BobConnectServer {
             //If login invalid
             if (!userdb.checkCredentials(username,password,salt)){
 
+                writer.write("0\n");
+                writer.flush();
+
                 //Close connection
                 s1.close();
 
@@ -112,6 +115,8 @@ public class BobConnectServer {
                 //Stop
                 return;
             }
+            writer.write("1\n");
+            writer.flush();
 
             System.out.println("["+now()+"] "+username+" logged in");
         }
