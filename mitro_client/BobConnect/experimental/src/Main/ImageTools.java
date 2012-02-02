@@ -38,6 +38,27 @@ public class ImageTools {
         return (double)(25*diff)/(img.getWidth()*img.getHeight());
     }
 
+    public static void cropImage(BufferedImage in, BufferedImage out){
+        int xoffset=(in.getWidth()-out.getWidth())/2;
+        int yoffset=(in.getHeight()-out.getHeight())/2;
+        for (int x=0;x<out.getWidth();x++){
+            for (int y=0;y<out.getHeight();y++){
+                int ox=x+xoffset;
+                int oy=y+yoffset;
+                if (ox>=0&&ox<in.getWidth()&&oy>=0&&oy<in.getHeight())
+                    out.setRGB(x,y,in.getRGB(ox,oy));
+            }
+        }
+    }
+
+    public static BufferedImage cropImage(BufferedImage in, int width, int height){
+
+        int xoffset=(in.getWidth()-width)/2;
+        int yoffset=(in.getHeight()-height)/2;
+        return in.getSubimage(xoffset,yoffset,width,height);
+    }
+
+    
     public static void substract(BufferedImage newImage, BufferedImage lastImage,BufferedImage res){
         for (int x=0;x<newImage.getWidth();x++){
             for (int y=0;y<newImage.getHeight();y++){

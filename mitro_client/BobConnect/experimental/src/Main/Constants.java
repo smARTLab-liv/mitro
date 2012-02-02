@@ -38,8 +38,8 @@ public class Constants {
     public static final double MIN_DIFFERENCE=15.0;
     public static final double MAX_LOW_CHANGE_DIFFERENCE=40.0;
     public static final String VIDEO_CAPTURE_DRIVER="video4linux2";
-    public static final int CAPUTRE_WIDTH=320;
-    public static final int CAPUTRE_HEIGHT=240;
+    public static final int CAPUTRE_WIDTH=640;
+    public static final int CAPUTRE_HEIGHT=480;
 
     //AUDIO
     public static final float AUDIO_SAMPLE_RATE=22050;

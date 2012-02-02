@@ -59,19 +59,36 @@ public class BobConnectClient {
         //Parse command line parameters
         String host,dev=null;
         int port=0;
-        if (args.length<2){
-            printInstructionsAndExit();
+        if (args.length==0){
+
+
+
+            dev="/dev/video0";  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< DEFAULT DEVICE
+
+
+
+            host="swarmlab-srv02.unimaas.nl";
+            port=50000;
         }
-        try{
-            port=Integer.parseInt(args[1]);
+        else{
+            if (args.length==1){
+                dev=args[0];
+                host="swarmlab-srv02.unimaas.nl";
+                port=50000;
+            }
+            else{
+                try{
+                    port=Integer.parseInt(args[1]);
+                }
+                catch(Exception ex){
+                    System.out.println("\""+args[1]+"\" does not seem to be a valid port number");
+                    printInstructionsAndExit();
+                }
+                host=args[0];
+                if (args.length>2&&!args[2].trim().isEmpty())
+                    dev=args[2];
+            }
         }
-        catch(Exception ex){
-            System.out.println("\""+args[1]+"\" does not seem to be a valid port number");
-            printInstructionsAndExit();
-        }
-        host=args[0];
-        if (args.length>2&&!args[2].trim().isEmpty())
-            dev=args[2];
 
         JFrame loginframe=new JFrame("MITRO");
         loginframe.setSize(640,480);

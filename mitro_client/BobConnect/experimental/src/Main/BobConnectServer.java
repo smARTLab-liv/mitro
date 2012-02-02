@@ -56,7 +56,7 @@ public class BobConnectServer {
 
     private Userdb userdb; //User database
 
-    private static final boolean DEBUG=true;
+    private static final boolean DEBUG=false;
 
     private String lastping=null;
     private long lastpingtime=0;

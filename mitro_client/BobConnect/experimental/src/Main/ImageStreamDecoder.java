@@ -44,7 +44,8 @@ public class ImageStreamDecoder {
         this.list = list;
         this.keyframe=false;
         ImageIO.setUseCache(false);
-        bufferImage=new BufferedImage(Constants.CAPUTRE_WIDTH,Constants.CAPUTRE_HEIGHT,BufferedImage.TYPE_3BYTE_BGR);
+        int captureHeight=9*Constants.CAPUTRE_WIDTH/16;
+        bufferImage=new BufferedImage(Constants.CAPUTRE_WIDTH,captureHeight,BufferedImage.TYPE_3BYTE_BGR);
     }
 
     public void start(){

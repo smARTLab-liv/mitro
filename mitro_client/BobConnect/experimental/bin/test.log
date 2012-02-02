@@ -80,3 +80,9 @@
 2012-01-23 11:06:04,506 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f9498241f30] error dc
 2012-01-23 11:06:04,509 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f9498241f30] error y=29 x=19
 2012-01-24 13:58:45,611 [main] ERROR org.ffmpeg - [video4linux2 @ 0x7fe93c18ba20] Cannot open video device /dev/video0 : No such file or directory
+2012-02-02 11:33:24,854 [Thread-6] ERROR org.ffmpeg - [mjpeg @ 0x7f990c2a7130] error count: 65
+2012-02-02 11:33:24,857 [Thread-6] ERROR org.ffmpeg - [mjpeg @ 0x7f990c2a7130] error y=21 x=29
+2012-02-02 12:31:06,646 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fddf8347b40] error count: 68
+2012-02-02 12:31:06,649 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fddf8347b40] error y=21 x=29
+2012-02-02 12:37:14,780 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fd024340fe0] error count: 64
+2012-02-02 12:37:14,783 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fd024340fe0] error y=21 x=29
