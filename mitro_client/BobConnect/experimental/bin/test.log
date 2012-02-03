@@ -86,3 +86,9 @@
 2012-02-02 12:31:06,649 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fddf8347b40] error y=21 x=29
 2012-02-02 12:37:14,780 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fd024340fe0] error count: 64
 2012-02-02 12:37:14,783 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fd024340fe0] error y=21 x=29
+2012-02-02 14:07:12,069 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error count: 76
+2012-02-02 14:07:12,073 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error y=25 x=34
+2012-02-02 14:08:55,605 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error count: 69
+2012-02-02 14:08:55,605 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error y=28 x=28
+2012-02-02 14:14:00,310 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error dc
+2012-02-02 14:14:00,310 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error y=52 x=5
