@@ -36,6 +36,8 @@ public class CameraProxy {
     private IVideoResampler resampler;
     private WebcamThread thread;
     private CameraProxyListener list;
+    private int captureWidth,captureHeight;
+
 
     public CameraProxy(String driver, String device, int iWidth, int iHeight, CameraProxyListener list) throws RuntimeException, IllegalArgumentException, IOException {
 
@@ -44,6 +46,10 @@ public class CameraProxy {
 		this.iWidth=iWidth;
 		this.iHeight=iHeight;
         this.list=list;
+
+        captureWidth=iWidth;
+        captureHeight=9*captureWidth/16;
+
 
 		container = IContainer.make();
 
@@ -124,7 +130,14 @@ public class CameraProxy {
     }
 
 	public class WebcamThread extends Thread{
-        boolean stop=false;
+        //private BufferedImage cropBuffer;
+        private boolean stop=false;
+
+        /*public WebcamThread() {
+            int captureHeight=9*Constants.CAPUTRE_WIDTH/16;
+            cropBuffer=new BufferedImage(Constants.CAPUTRE_WIDTH,captureHeight,BufferedImage.TYPE_3BYTE_BGR);
+        } */
+
         public void stopIt(){
             stop=true;
         }
@@ -178,9 +191,12 @@ public class CameraProxy {
 
 	                    // Convert the BGR24 to an Java buffered image
 	                    final BufferedImage javaImage = conv.toImage(newPic);
+
                         new Thread(){
                             public void run(){
-                                list.nextImage(javaImage);
+
+                                //BufferedImage cropBuffer=new BufferedImage(Constants.CAPUTRE_WIDTH,captureHeight,BufferedImage.TYPE_3BYTE_BGR);
+                                list.nextImage(ImageTools.cropImage(javaImage,captureWidth,captureHeight));
                             }
                         }.start();
 

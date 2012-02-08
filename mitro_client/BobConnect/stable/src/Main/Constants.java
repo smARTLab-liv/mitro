@@ -32,14 +32,14 @@ public class Constants {
     //VIDEO
 
     public static final int CAPTURE_FRAMERATE=10;
-    public static final float LOW_FRAMERATE_QUALITY=1.0f;
+    public static final float LOW_FRAMERATE_QUALITY=0.999f;
     public static final float LOW_CHANGE_QUALITY=0.990f;
-    public static final float HIGH_CHANGE_QUALITY=1.0f;
+    public static final float HIGH_CHANGE_QUALITY=0.999f;
     public static final double MIN_DIFFERENCE=15.0;
     public static final double MAX_LOW_CHANGE_DIFFERENCE=40.0;
     public static final String VIDEO_CAPTURE_DRIVER="video4linux2";
-    public static final int CAPUTRE_WIDTH=320;
-    public static final int CAPUTRE_HEIGHT=240;
+    public static final int CAPUTRE_WIDTH=640;
+    public static final int CAPUTRE_HEIGHT=480;
 
     //AUDIO
     public static final float AUDIO_SAMPLE_RATE=22050;

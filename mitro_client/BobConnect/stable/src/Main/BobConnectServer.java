@@ -103,6 +103,9 @@ public class BobConnectServer {
             //If login invalid
             if (!userdb.checkCredentials(username,password,salt)){
 
+                writer.write("0\n");
+                writer.flush();
+
                 //Close connection
                 s1.close();
 
@@ -112,6 +115,8 @@ public class BobConnectServer {
                 //Stop
                 return;
             }
+            writer.write("1\n");
+            writer.flush();
 
             System.out.println("["+now()+"] "+username+" logged in");
         }
