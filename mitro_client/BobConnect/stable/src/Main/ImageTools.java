@@ -58,6 +58,13 @@ public class ImageTools {
         return in.getSubimage(xoffset,yoffset,width,height);
     }
 
+    public static BufferedImage copyImage(BufferedImage in){
+        BufferedImage out=new BufferedImage(in.getWidth(),in.getHeight(),in.getType());
+        Graphics g=out.getGraphics();
+        g.drawImage(in,0,0,null);
+        return out;
+    }
+
     
     public static void substract(BufferedImage newImage, BufferedImage lastImage,BufferedImage res){
         for (int x=0;x<newImage.getWidth();x++){

@@ -24,19 +24,23 @@ import LZ77.LZ77Compressor;
 import LZ77.LZ77Decompressor;
 import Ros.RosWrapper;
 
+import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.swing.*;
+import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageFilter;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.security.MessageDigest;
-
+import javax.swing.filechooser.FileFilter;
 
 public class BobConnectClient {
     private static JFrame frame;
@@ -49,6 +53,7 @@ public class BobConnectClient {
     //private static AudioCapturePlayer audio; //Capture and playback audio
 
     private static BufferedImage owncam=null; //Buffers image from own camera
+    private static BufferedImage stillIMG=null; //Buffers image from own camera
     //private static BufferedImage prev=null; //Buffers previous image
 
     private static long lastframe=0;
@@ -246,6 +251,7 @@ public class BobConnectClient {
 
                                 long lastframe=0;
                                 public void nextImage(BufferedImage img) {
+                                    if (stillIMG!=null)img=ImageTools.copyImage(stillIMG);
                                     //If we haven't processed the previous frame yet, we drop the new one
                                     //Buffer own camera image
                                     try{
@@ -525,6 +531,54 @@ public class BobConnectClient {
                                     dataout.flush();
                                 }catch(Exception ex){
                                     ex.printStackTrace();
+                                }
+                            }
+
+                            public void loadImage() {
+                                if (stillIMG!=null){
+                                    stillIMG=null;
+                                }
+                                else{
+                                    final JFileChooser fc=new JFileChooser();
+                                    fc.setFileFilter(new FileFilter(){
+                                        public boolean accept(File f) {
+                                            if (f.isHidden())return false;
+                                            if (f.isDirectory())return true;
+                                            int i=f.getName().lastIndexOf('.');
+                                            if (i>=0){
+                                                String fn=f.getName().substring(i+1).toLowerCase();
+                                                if (fn.compareTo("png")==0||
+                                                    fn.compareTo("jpg")==0||
+                                                    fn.compareTo("bmp")==0||
+                                                    fn.compareTo("gif")==0||
+                                                    fn.compareTo("jpeg")==0)
+                                                    return true;
+                                            }
+                                            return false;
+                                        }
+
+                                        public String getDescription() {
+                                            return "Images";
+                                        }
+                                    });
+                                    int res=fc.showOpenDialog(frame);
+                                    if (res==JFileChooser.APPROVE_OPTION){
+                                        new Thread(){
+                                            public void run(){
+                                                try{
+                                                    BufferedImage img= ImageIO.read(fc.getSelectedFile());
+                                                    img=ImageTools.scaleImageToRectangle(img,Constants.CAPUTRE_WIDTH,9*Constants.CAPUTRE_WIDTH/16,BufferedImage.TYPE_INT_RGB);
+                                                    BufferedImage img2=new BufferedImage(Constants.CAPUTRE_WIDTH,9*Constants.CAPUTRE_WIDTH/16,BufferedImage.TYPE_INT_RGB);
+                                                    Graphics g=img2.getGraphics();
+                                                    g.drawImage(img,(img2.getWidth()-img.getWidth())/2,(img2.getHeight()-img.getHeight())/2,null);
+                                                    stillIMG=img2;
+                                                }
+                                                catch(Exception ex){
+                                                    JOptionPane.showMessageDialog(frame,"Error loading image");
+                                                }
+                                            }
+                                        }.start();
+                                    }
                                 }
                             }
                         }

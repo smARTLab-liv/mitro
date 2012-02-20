@@ -38,7 +38,7 @@ public class ImagePanel extends JComponent {
     private boolean lock=false;
     private boolean client;
     private long lastmousemove=0;
-    private int[] dimGaugeWifi,dimGaugeBatt,dimGaugeSpeed,dimControls,dimPanel,dimOwncam,dimArrows,dimCam;
+    private int[] dimGaugeWifi,dimGaugeBatt,dimGaugeSpeed,dimControls,dimPanel,dimOwncam,dimArrows,dimCam,dimImgButton;
     private ImagePanelListener list;
 
     private double sigWifi=0,sigBatt=0,sigSpeed=0,sigDelay=0;
@@ -49,9 +49,10 @@ public class ImagePanel extends JComponent {
     private static final int[] DIM_GAUGE_SPEED={1306,375,1268,410,1344,410};
     private static final int[] DIM_CONTROLS={959,376,20,53};
     private static final int[] DIM_PANEL={173};
-    private static final int[] DIM_OWN_CAM={6,10,382,289};
+    private static final int[] DIM_OWN_CAM={6,47,375,210};//{6,10,382,289};
     private static final int[] DIM_ARROWS={906,323,108,108};//867,357,184,184};
     private static final int[] DIM_CAM={1073,326,108,108};//1156,365,176,176};
+    private static final int[] DIM_IMGBUTTON={6,10,377,289};
 
     private ReentrantLock imageLock;
 
@@ -154,7 +155,8 @@ public class ImagePanel extends JComponent {
     }
 
     public void setImage(BufferedImage in){
-        setImage(in,null);
+        this.in=in;
+        updateImage();
     }
 
     private double counter=0;
@@ -187,6 +189,9 @@ public class ImagePanel extends JComponent {
                 int oy=(h-ihn)/2;
                 Graphics2D g=(Graphics2D)img.getGraphics();
                 g.drawImage(in,ox,oy,iwn,ihn,null);
+                if (owncam!=null)g.drawImage(owncam,0,0,240,135,null);
+
+
             }
             else{
                 if (img==null||img.getWidth()!=this.getWidth()||img.getHeight()!=this.getHeight()){
@@ -201,6 +206,7 @@ public class ImagePanel extends JComponent {
                     dimOwncam=scaleArray(DIM_OWN_CAM,scale);
                     dimArrows=scaleArray(DIM_ARROWS,scale);
                     dimCam=scaleArray(DIM_CAM,scale);
+                    dimImgButton=scaleArray(DIM_IMGBUTTON,scale);
                     arrowssized=new BufferedImage[6];
                     for (int x=0;x<6;x++){
                         arrowssized[x]=ImageTools.scaleImage(arrows[x],scale,BufferedImage.TYPE_3BYTE_BGR);
@@ -372,7 +378,13 @@ public class ImagePanel extends JComponent {
         }
 
         public void mouseClicked(MouseEvent e) {
-
+            int mx=e.getX();
+            int my=e.getY()-(getHeight()-panelsized.getHeight());
+            if (mx>=dimImgButton[0]&&mx<=dimImgButton[0]+dimImgButton[2]){
+                if (my>=dimImgButton[1]&&my<=dimImgButton[1]+dimImgButton[3]){
+                    list.loadImage();
+                }
+            }
         }
 
         public void mousePressed(MouseEvent e) {

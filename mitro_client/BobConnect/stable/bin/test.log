@@ -92,3 +92,13 @@
 2012-02-02 14:08:55,605 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error y=28 x=28
 2012-02-02 14:14:00,310 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error dc
 2012-02-02 14:14:00,310 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7fbaf0326850] error y=52 x=5
+2012-02-20 13:07:38,685 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f0ff0343cb0] error dc
+2012-02-20 13:07:38,688 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f0ff0343cb0] error y=59 x=39
+2012-02-20 13:09:06,063 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f4758339790] error count: 64
+2012-02-20 13:09:06,066 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f4758339790] error y=5 x=17
+2012-02-20 13:13:55,922 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f8438369740] error dc
+2012-02-20 13:13:55,926 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f8438369740] error y=6 x=28
+2012-02-20 13:16:57,728 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f842c331c60] error count: 72
+2012-02-20 13:16:57,732 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f842c331c60] error y=38 x=27
+2012-02-20 13:17:19,303 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f842c331c60] error count: 64
+2012-02-20 13:17:19,304 [Thread-5] ERROR org.ffmpeg - [mjpeg @ 0x7f842c331c60] error y=6 x=26

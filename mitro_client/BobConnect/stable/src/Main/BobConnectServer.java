@@ -339,6 +339,8 @@ public class BobConnectServer {
 
             public void nextImage(BufferedImage img) {
 
+                if (panel!=null)panel.setOwnImage(img);
+                
                 //If we are still processing the previous image, drop this one
                 if (lock)return;
                 lock=true;
@@ -484,6 +486,7 @@ public class BobConnectServer {
                 long lastframe=0;
 
                 public void nextImage(BufferedImage img) {
+
                     //If we are still processing the previous image, drop this one
                     if (lock)return;
                     lock=true;
