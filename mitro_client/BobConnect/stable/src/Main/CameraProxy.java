@@ -37,7 +37,7 @@ public class CameraProxy {
     private WebcamThread thread;
     private CameraProxyListener list;
     private int captureWidth,captureHeight;
-
+    private boolean flipImage;
 
     public CameraProxy(String driver, String device, int iWidth, int iHeight, CameraProxyListener list) throws RuntimeException, IllegalArgumentException, IOException {
 
@@ -46,6 +46,7 @@ public class CameraProxy {
 		this.iWidth=iWidth;
 		this.iHeight=iHeight;
         this.list=list;
+        this.flipImage=false;
 
         captureWidth=iWidth;
         captureHeight=9*captureWidth/16;
@@ -196,7 +197,7 @@ public class CameraProxy {
                             public void run(){
 
                                 //BufferedImage cropBuffer=new BufferedImage(Constants.CAPUTRE_WIDTH,captureHeight,BufferedImage.TYPE_3BYTE_BGR);
-                                list.nextImage(ImageTools.cropImage(javaImage,captureWidth,captureHeight));
+                                list.nextImage(ImageTools.cropImage(javaImage,captureWidth,captureHeight,flipImage));
                             }
                         }.start();
 
@@ -238,4 +239,9 @@ public class CameraProxy {
     public int getiHeight() {
         return iHeight;
     }
+
+    public void flipImage() {
+        flipImage=!flipImage;
+    }
+
 }

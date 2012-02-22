@@ -10,4 +10,5 @@ package Main;
 public interface ImagePanelListener {
     public void sendCommand(String command);
     public void loadImage();
+    public void flipImage();
 }

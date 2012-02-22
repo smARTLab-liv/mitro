@@ -378,19 +378,26 @@ public class ImagePanel extends JComponent {
         }
 
         public void mouseClicked(MouseEvent e) {
-            int mx=e.getX();
-            int my=e.getY()-(getHeight()-panelsized.getHeight());
-            if (mx>=dimImgButton[0]&&mx<=dimImgButton[0]+dimImgButton[2]){
-                if (my>=dimImgButton[1]&&my<=dimImgButton[1]+dimImgButton[3]){
-                    list.loadImage();
-                }
-            }
+
         }
 
         public void mousePressed(MouseEvent e) {
             int mx=e.getX();
             int my=e.getY()-(getHeight()-panelsized.getHeight());
-            if (mx>=dimCam[0]&&mx<=dimCam[0]+dimCam[2]/2){
+            if (e.getButton()==MouseEvent.BUTTON3){
+                if (mx>=dimImgButton[0]&&mx<=dimImgButton[0]+dimImgButton[2]){
+                    if (my>=dimImgButton[1]&&my<=dimImgButton[1]+dimImgButton[3]){
+                        list.flipImage();
+                        return;
+                    }
+                }
+            }
+            if (mx>=dimImgButton[0]&&mx<=dimImgButton[0]+dimImgButton[2]){
+                if (my>=dimImgButton[1]&&my<=dimImgButton[1]+dimImgButton[3]){
+                    list.loadImage();
+                }
+            }
+            else if (mx>=dimCam[0]&&mx<=dimCam[0]+dimCam[2]/2){
                 if (my>=dimCam[1]&&my<=dimCam[1]+dimCam[3]/2){
                     list.sendCommand(Constants.DATA_MSG_CAM+"0");
                     camMode=0;

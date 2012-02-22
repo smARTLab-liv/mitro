@@ -59,6 +59,7 @@ public class BobConnectClient {
     private static long lastframe=0;
 
 
+
     public static void main(String[] args) throws Exception{
 
         //Parse command line parameters
@@ -252,6 +253,8 @@ public class BobConnectClient {
                                 long lastframe=0;
                                 public void nextImage(BufferedImage img) {
                                     if (stillIMG!=null)img=ImageTools.copyImage(stillIMG);
+
+
                                     //If we haven't processed the previous frame yet, we drop the new one
                                     //Buffer own camera image
                                     try{
@@ -580,6 +583,10 @@ public class BobConnectClient {
                                         }.start();
                                     }
                                 }
+                            }
+
+                            public void flipImage() {
+                                cam.flipImage();
                             }
                         }
                         );

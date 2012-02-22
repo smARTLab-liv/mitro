@@ -22,6 +22,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package Main;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 public class ImageTools {
@@ -57,6 +59,21 @@ public class ImageTools {
         int yoffset=(in.getHeight()-height)/2;
         return in.getSubimage(xoffset,yoffset,width,height);
     }
+
+    public static BufferedImage cropImage(BufferedImage in, int width, int height, boolean flip){
+
+        int xoffset=(in.getWidth()-width)/2;
+        int yoffset=(in.getHeight()-height)/2;
+
+        if (flip){
+            AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+            tx.translate(0, -height);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            return op.filter(in.getSubimage(xoffset,yoffset,width,height), null);
+        }
+        return in.getSubimage(xoffset,yoffset,width,height);
+    }
+
 
     public static BufferedImage copyImage(BufferedImage in){
         BufferedImage out=new BufferedImage(in.getWidth(),in.getHeight(),in.getType());
