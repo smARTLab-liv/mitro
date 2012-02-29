@@ -1,0 +1,36 @@
+<launch>
+    <!-- BNAIC demo launch on bob -->
+    
+    <!-- start basic nodes -->
+    <include file="$(find mitro_bringup)/launch/minimal.launch" />
+
+    <!-- start odom -->
+    <include file="$(find mitro_odom)/launch/mitro_odom.launch" />
+    
+    <!-- start hokuyo -->
+    <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
+    
+    <!-- start ps3 teleop -->
+    <include file="$(find mitro_teleop)/launch/ps3_teleop.launch" />
+    
+    <!-- start assisted drive -->
+
+<!--
+    <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
+    -->
+    
+    <!-- start navigation -->
+    <!-- <include file="$(find mitro_navigation)/launch/mitro_navigation.launch" /> -->
+    
+    <!-- start republisher -->
+    <!-- <node pkg="mitro_bringup" type="republisher" name="republisher" output="screen" /> -->
+<!-- start SLAM -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping">
+        <remap from="scan" to="base_scan"/>
+        <param name="xmin" value="-20"/>
+        <param name="xmax" value="20"/>
+        <param name="ymin" value="-20"/>
+        <param name="ymax" value="20"/>
+    </node>
+
+</launch>
