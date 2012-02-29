@@ -72,7 +72,7 @@ class Dashboard(wx.Frame):
 
         # TODO: get from param server
         self._robot_hostname = "bob"
-        self._laptop_hostname = "MacBook-Daan"
+        self._laptop_hostname = "acer"
 
         self.SetTitle('MITRO (%s)'%self._robot_hostname)
 
