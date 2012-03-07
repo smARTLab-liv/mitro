@@ -339,11 +339,12 @@ public class BobConnectServer {
 
             public void nextImage(BufferedImage img) {
 
-                if (panel!=null)panel.setOwnImage(img);
+
                 
                 //If we are still processing the previous image, drop this one
                 if (lock)return;
                 lock=true;
+
                 try{
                     switch(camMode){
                         case 0:
@@ -369,6 +370,8 @@ public class BobConnectServer {
                             }
                             break;
                     }
+
+                    if (panel!=null)panel.setOwnImage(img);
 
                     //Draw status bars
 
