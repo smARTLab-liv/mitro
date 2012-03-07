@@ -3,6 +3,7 @@
     <node name="sysinfo_laptop" pkg="mitro_diagnostics" type="sysinfo.py" output="screen">
       <!-- optional -->
       <param name="battery_name" value="BAT0" />
+      <param name="wifi_name" value="wlan1" />
     </node>
     
 </launch>
