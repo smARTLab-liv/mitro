@@ -1,5 +1,8 @@
 <launch>
     <!-- BNAIC demo launch on bob -->
+
+    <!-- start minimal -->
+    <include file="$(find mitro_bringup)/launch/minimal.launch" />
     
     <!-- start odom -->
     <include file="$(find mitro_odom)/launch/mitro_odom_kinect.launch" />

@@ -1,5 +1,5 @@
 <launch>
-    <!-- BNAIC demo launch on bob -->
+    <!-- launch file for mitro laptop -->
     
     <!-- launch system info publisher -->
     <include file="$(find mitro_diagnostics)/launch/sysinfo_laptop.launch" />
