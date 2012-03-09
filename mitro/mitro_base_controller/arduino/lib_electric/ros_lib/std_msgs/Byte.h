@@ -1,10 +1,11 @@
-#ifndef ros_Byte_h
-#define ros_Byte_h
+#ifndef _ROS_std_msgs_Byte_h
+#define _ROS_std_msgs_Byte_h
 
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../ros/msg.h"
+#include "ros/msg.h"
+#include "std_msgs/byte.h"
 
 namespace std_msgs
 {
@@ -12,36 +13,24 @@ namespace std_msgs
   class Byte : public ros::Msg
   {
     public:
-      unsigned char data;
+      std_msgs::byte data;
 
-    virtual int serialize(unsigned char *outbuffer)
+    virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
-      union {
-        unsigned char real;
-        unsigned char base;
-      } u_data;
-      u_data.real = this->data;
-      *(outbuffer + offset + 0) = (u_data.base >> (8 * 0)) & 0xFF;
-      offset += sizeof(this->data);
+      offset += this->data.serialize(outbuffer + offset);
       return offset;
     }
 
     virtual int deserialize(unsigned char *inbuffer)
     {
       int offset = 0;
-      union {
-        unsigned char real;
-        unsigned char base;
-      } u_data;
-      u_data.base = 0;
-      u_data.base |= ((typeof(u_data.base)) (*(inbuffer + offset + 0))) << (8 * 0);
-      this->data = u_data.real;
-      offset += sizeof(this->data);
+      offset += this->data.deserialize(inbuffer + offset);
      return offset;
     }
 
     const char * getType(){ return "std_msgs/Byte"; };
+    const char * getMD5(){ return "ad736a2e8818154c487bb80fe42ce43b"; };
 
   };
 

@@ -1,8 +1,10 @@
-#ifndef ros_VelocityCommand_h
-#define ros_VelocityCommand_h
+#ifndef _ROS_mitro_base_controller_VelocityCommand_h
+#define _ROS_mitro_base_controller_VelocityCommand_h
 
-#include "WProgram.h"
-#include "ros.h"
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ros/msg.h"
 
 namespace mitro_base_controller
 {
@@ -13,12 +15,12 @@ namespace mitro_base_controller
       float velocity_right;
       float velocity_left;
 
-    virtual int serialize(unsigned char *outbuffer)
+    virtual int serialize(unsigned char *outbuffer) const
     {
       int offset = 0;
       union {
         float real;
-        unsigned long base;
+        uint32_t base;
       } u_velocity_right;
       u_velocity_right.real = this->velocity_right;
       *(outbuffer + offset + 0) = (u_velocity_right.base >> (8 * 0)) & 0xFF;
@@ -28,7 +30,7 @@ namespace mitro_base_controller
       offset += sizeof(this->velocity_right);
       union {
         float real;
-        unsigned long base;
+        uint32_t base;
       } u_velocity_left;
       u_velocity_left.real = this->velocity_left;
       *(outbuffer + offset + 0) = (u_velocity_left.base >> (8 * 0)) & 0xFF;
@@ -44,30 +46,31 @@ namespace mitro_base_controller
       int offset = 0;
       union {
         float real;
-        unsigned long base;
+        uint32_t base;
       } u_velocity_right;
       u_velocity_right.base = 0;
-      u_velocity_right.base |= ((typeof(u_velocity_right.base)) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_velocity_right.base |= ((typeof(u_velocity_right.base)) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_velocity_right.base |= ((typeof(u_velocity_right.base)) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_velocity_right.base |= ((typeof(u_velocity_right.base)) (*(inbuffer + offset + 3))) << (8 * 3);
+      u_velocity_right.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_velocity_right.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_velocity_right.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_velocity_right.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
       this->velocity_right = u_velocity_right.real;
       offset += sizeof(this->velocity_right);
       union {
         float real;
-        unsigned long base;
+        uint32_t base;
       } u_velocity_left;
       u_velocity_left.base = 0;
-      u_velocity_left.base |= ((typeof(u_velocity_left.base)) (*(inbuffer + offset + 0))) << (8 * 0);
-      u_velocity_left.base |= ((typeof(u_velocity_left.base)) (*(inbuffer + offset + 1))) << (8 * 1);
-      u_velocity_left.base |= ((typeof(u_velocity_left.base)) (*(inbuffer + offset + 2))) << (8 * 2);
-      u_velocity_left.base |= ((typeof(u_velocity_left.base)) (*(inbuffer + offset + 3))) << (8 * 3);
+      u_velocity_left.base |= ((uint32_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_velocity_left.base |= ((uint32_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      u_velocity_left.base |= ((uint32_t) (*(inbuffer + offset + 2))) << (8 * 2);
+      u_velocity_left.base |= ((uint32_t) (*(inbuffer + offset + 3))) << (8 * 3);
       this->velocity_left = u_velocity_left.real;
       offset += sizeof(this->velocity_left);
      return offset;
     }
 
     const char * getType(){ return "mitro_base_controller/VelocityCommand"; };
+    const char * getMD5(){ return "fb58ce72c36d928c50040f6da68a7e12"; };
 
   };
 

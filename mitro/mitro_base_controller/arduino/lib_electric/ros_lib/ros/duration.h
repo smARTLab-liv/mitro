@@ -32,16 +32,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * Author: Michael Ferguson
- */
+#ifndef _ROS_DURATION_H_
+#define _ROS_DURATION_H_
 
-#ifndef ros_duration_h_included
-#define ros_duration_h_included
+namespace ros {
 
-
-namespace ros
-{
   void normalizeSecNSecSigned(long& sec, long& nsec);
 
   class Duration
@@ -58,7 +53,6 @@ namespace ros
       Duration& operator+=(const Duration &rhs);
       Duration& operator-=(const Duration &rhs);
       Duration& operator*=(double scale);
-      
   };
 
 }

@@ -32,12 +32,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * Author: Michael Ferguson
- */
-
-#ifndef ros_tf_h
-#define ros_tf_h
+#ifndef ROS_TRANSFORM_BROADCASTER_H_
+#define ROS_TRANSFORM_BROADCASTER_H_
 
 #include "tfMessage.h"
 
@@ -47,7 +43,9 @@ namespace tf
   class TransformBroadcaster
   {
     public:
-      TransformBroadcaster() : publisher_("tf", &internal_msg)
+      TransformBroadcaster() : publisher_("tf", &internal_msg) {}
+
+      void init(ros::NodeHandle &nh)
       {
         nh.advertise(publisher_);
       }
