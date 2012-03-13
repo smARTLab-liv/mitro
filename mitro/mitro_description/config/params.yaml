@@ -6,3 +6,5 @@ base_diameter: 0.4572
 #hardware related stuff
 #arduino_port: /dev/ttyUSB0 #set in mitro_base_controller launch file
 wifi: wlan0
+hostname_base: bob
+hostname_laptop: mitro-laptop
