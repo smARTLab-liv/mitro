@@ -182,7 +182,7 @@ int main(int argc, char**argv)
       exit(1);
     }
   }
-  fifofd = open(FIFO_FILE, O_RDONLY);
+  fifofd = open(FIFO_FILE, O_RDONLY | O_NONBLOCK);
 
 
   // start video streams
