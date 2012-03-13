@@ -46,6 +46,7 @@ import rxtools.cppwidgets as rxtools
 import std_msgs.msg
 import mitro_diagnostics.msg
 import geometry_msgs.msg
+from std_srvs.srv import Empty
 
 import rospy
 from roslib import rosenv
@@ -69,10 +70,16 @@ class Dashboard(wx.Frame):
         wx.InitAllImageHandlers()
         
         self.SetBackgroundColour(wx.Colour(242,241,240,255))
-
-        # TODO: get from param server
-        self._robot_hostname = "bob"
-        self._laptop_hostname = "mitro-laptop"
+        
+        if (rospy.has_param('/hostname_base')):
+            self._robot_hostname = rospy.get_param('/hostname_base')
+        else:
+            self._robot_hostname = "bob"
+        
+        if (rospy.has_param('/hostname_laptop')):
+            self._laptop_hostname = rospy.get_param('/hostname_laptop')
+        else:
+            self._laptop_hostname = "mitro-laptop"
 
         self.SetTitle('MITRO (%s)'%self._robot_hostname)
 
@@ -95,7 +102,7 @@ class Dashboard(wx.Frame):
         sizer.Add(static_sizer, 0)
         
         # Rosout
-        self._rosout_button = StatusControl(self, wx.ID_ANY, icons_path, "rosout", True)
+        self._rosout_button = StatusControl(self, wx.ID_ANY, icons_path, "rosout", True, True, True, True, False)
         self._rosout_button.SetToolTip(wx.ToolTip("Rosout"))
         static_sizer.Add(self._rosout_button, 0)
 
@@ -107,20 +114,20 @@ class Dashboard(wx.Frame):
         sizer.Add(static_sizer, 0)
 
         # Relais
-        self._relais_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True)
+        self._relais_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "motor", True, True, False, True, True)
         self._relais_ctrl.SetToolTip(wx.ToolTip("Relais"))
         static_sizer.Add(self._relais_ctrl, 0)
         self._relais_ctrl.Bind(wx.EVT_BUTTON, self.on_relais_clicked)
         
         # Run-stop
-        self._runstop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "runstop", False)
+        self._runstop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "runstop", False, True, False, True, True)
         self._runstop_ctrl.SetToolTip(wx.ToolTip("Runstop: Unknown"))
         static_sizer.Add(self._runstop_ctrl, 0)
 
         # Wireless run-stop
-        self._runstop_wireless_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "runstop-wireless", False)
-        self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless runstop: Unknown"))
-        static_sizer.Add(self._runstop_wireless_ctrl, 0)
+        # self._runstop_wireless_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "runstop-wireless", False, True, True, True, True)
+        # self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless runstop: Unknown"))
+        # static_sizer.Add(self._runstop_wireless_ctrl, 0)
 
 
                                         
@@ -141,20 +148,25 @@ class Dashboard(wx.Frame):
         sizer.Add(static_sizer, 0)
 
         # Autonomous navigation
-        self._goal_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "nav", True)
+        self._goal_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "nav", True, True, False, True, True)
         self._goal_ctrl.SetToolTip(wx.ToolTip("Autonomous navigation"))
         static_sizer.Add(self._goal_ctrl, 0)
         self._goal_ctrl.Bind(wx.EVT_BUTTON, self.on_nav_clicked)
 
+        # Clear costmap
+        self._costmap_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "costmap", True, True, False, False, True)
+        self._costmap_ctrl.SetToolTip(wx.ToolTip("Clear costmap"))
+        static_sizer.Add(self._costmap_ctrl, 0)
+        self._costmap_ctrl.Bind(wx.EVT_BUTTON, self.on_costmap_clicked)
 
         # Take me home
-        self._home_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "home", True)
+        self._home_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "home", True, True, True, False, True)
         self._home_ctrl.SetToolTip(wx.ToolTip("Take me home"))
         static_sizer.Add(self._home_ctrl, 0)
         self._home_ctrl.Bind(wx.EVT_BUTTON, self.on_home_clicked)
 
         # Assisted teleop
-        self._teleop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "teleop", True)
+        self._teleop_ctrl = StatusControl(self, wx.ID_ANY, icons_path, "teleop", True, True, False, True, True)
         self._teleop_ctrl.SetToolTip(wx.ToolTip("Assisted teleop"))
         static_sizer.Add(self._teleop_ctrl, 0)
         self._teleop_ctrl.Bind(wx.EVT_BUTTON, self.on_teleop_clicked)
@@ -187,6 +199,7 @@ class Dashboard(wx.Frame):
         self._last_goal_message = 0.0
         self._last_teleop_message = 0.0
         self._last_pose = None
+        self._home_goal = None
         self._relais = False
         self._teleop = False
  
@@ -207,6 +220,13 @@ class Dashboard(wx.Frame):
 
         self._sub_teleop = rospy.Subscriber("/assisted_drive/status", std_msgs.msg.Bool, self.cb_teleop)
         self._pub_teleop = rospy.Publisher("/assisted_drive/set", std_msgs.msg.Bool)
+        
+        rospy.wait_for_service('/move_base/clear_costmaps')
+        try:
+            self._srv_costmap = rospy.ServiceProxy('/move_base/clear_costmaps', Empty)
+            self._costmap_ctrl.set_ok()
+        except rospy.ServiceException, e:
+            print "Service call failed: %s"%e
 
 
     def __del__(self):
@@ -219,6 +239,7 @@ class Dashboard(wx.Frame):
         self._pub_relais.unregister()
         self._sub_teleop.unregister()
         self._pub_teleop.unregister()
+        self._srv_costmap.unregister()
 
 
     def cb_pose(self, msg):
@@ -226,10 +247,13 @@ class Dashboard(wx.Frame):
 
     def update_pose(self, msg):
         self._last_pose = msg.pose.pose
+        self.update_home_ctrl()
 
     def update_home_ctrl(self):
-        if self._home_goal == None:
+        if self._last_pose == None:
             self._home_ctrl.set_stale()
+        elif self._home_goal == None:
+            self._home_ctrl.set_warn()
         else:
             self._home_ctrl.set_ok()
 
@@ -269,10 +293,10 @@ s\" in the last 5 seconds"%self._sub_relais.name))
           self._runstop_ctrl.SetToolTip(wx.ToolTip("No message received on \"%s\
 \" in the last 5 seconds"%self._sub_runstop.name))
 
-      if (rospy.get_time() - self._last_runstop_wireless_message > 5.0):
-          self._runstop_wireless_ctrl.set_stale()
-          self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("No message received on \"%s\
-\" in the last 5 seconds"%self._sub_runstop_wireless.name))
+      #if (rospy.get_time() - self._last_runstop_wireless_message > 5.0):
+      #    self._runstop_wireless_ctrl.set_stale()
+      #    self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("No message received on \"%s\
+#\" in the last 5 seconds"%self._sub_runstop_wireless.name))
 
       if (rospy.get_time() - self._last_goal_message > 5.0):
           self._goal_ctrl.set_stale()
@@ -302,6 +326,9 @@ s\" in the last 5 seconds"%self._sub_relais.name))
 
     def on_nav_clicked(self, evt):
         self._pub_goal.publish(True)
+
+    def on_costmap_clicked(self, evt):
+        self._srv_costmap()
 
     def on_relais_clicked(self, evt):
         self._pub_relais.publish(not self._relais)
@@ -412,14 +439,14 @@ s\" in the last 5 seconds"%self._sub_relais.name))
             self._goal_ctrl.SetToolTip(wx.ToolTip("Autonomous navigation: off"))
             self._goal_ctrl.set_error()
 
-    def update_runstop_wireless(self, msg):
-        self._last_runstop_wireless_message = rospy.get_time()
-        if not msg.data:
-            self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless Runstop: on"))
-            self._runstop_wireless_ctrl.set_ok()
-        else:
-            self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless Runstop: pressed"))
-            self._runstop_wireless_ctrl.set_error()
+#    def update_runstop_wireless(self, msg):
+#        self._last_runstop_wireless_message = rospy.get_time()
+#        if not msg.data:
+#            self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless Runstop: on"))
+#            self._runstop_wireless_ctrl.set_ok()
+#        else:
+#            self._runstop_wireless_ctrl.SetToolTip(wx.ToolTip("Wireless Runstop: pressed"))
+#            self._runstop_wireless_ctrl.set_error()
 
           
     def update_rosout(self):

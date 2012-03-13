@@ -39,33 +39,52 @@ import wx
 from os import path
 
 class StatusControl(wx.Window):
-  def __init__(self, parent, id, icons_path, base_name, toggleable):
+  def __init__(self, parent, id, icons_path, base_name, toggleable, can_ok, can_warn, can_error, can_stale):
     wx.Window.__init__(self, parent, id)
     
     self.SetBackgroundColour(parent.GetBackgroundColour())
     self.SetSize(wx.Size(48, 48))
     
     if (toggleable):
-      self._ok = (wx.Bitmap(path.join(icons_path, "%s-green-untoggled.png"%(base_name))),
+      if (can_ok):
+        self._ok = (wx.Bitmap(path.join(icons_path, "%s-green-untoggled.png"%(base_name))),
                   wx.Bitmap(path.join(icons_path, "%s-green-toggled.png"%(base_name)), wx.BITMAP_TYPE_PNG))
-      self._warn = (wx.Bitmap(path.join(icons_path, "%s-yellow-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
+      if (can_warn):
+        self._warn = (wx.Bitmap(path.join(icons_path, "%s-yellow-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
                     wx.Bitmap(path.join(icons_path, "%s-yellow-toggled.png"%(base_name)), wx.BITMAP_TYPE_PNG))
-      self._error = (wx.Bitmap(path.join(icons_path, "%s-red-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
+      if (can_error):
+        self._error = (wx.Bitmap(path.join(icons_path, "%s-red-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
                    wx.Bitmap(path.join(icons_path, "%s-red-toggled.png"%(base_name)), wx.BITMAP_TYPE_PNG))
-      self._stale = (wx.Bitmap(path.join(icons_path, "%s-grey-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
+      if (can_stale):
+        self._stale = (wx.Bitmap(path.join(icons_path, "%s-grey-untoggled.png"%(base_name)), wx.BITMAP_TYPE_PNG),
                      wx.Bitmap(path.join(icons_path, "%s-grey-toggled.png"%(base_name)), wx.BITMAP_TYPE_PNG))
     else:
-      ok = wx.Bitmap(path.join(icons_path, "%s-green.png"%(base_name)))
-      warn = wx.Bitmap(path.join(icons_path, "%s-yellow.png"%(base_name)))
-      error = wx.Bitmap(path.join(icons_path, "%s-red.png"%(base_name)))
-      stale = wx.Bitmap(path.join(icons_path, "%s-grey.png"%(base_name)))
-      self._ok = (ok, ok)
-      self._warn = (warn, warn)
-      self._error = (error, error)
-      self._stale = (stale, stale)
+      if (can_ok):
+        ok = wx.Bitmap(path.join(icons_path, "%s-green.png"%(base_name)))
+        self._ok = (ok, ok)
+      if (can_warn):
+        warn = wx.Bitmap(path.join(icons_path, "%s-yellow.png"%(base_name)))
+        self._warn = (warn, warn)
+      if (can_error):
+        error = wx.Bitmap(path.join(icons_path, "%s-red.png"%(base_name)))
+        self._error = (error, error)
+      if (can_stale):
+        stale = wx.Bitmap(path.join(icons_path, "%s-grey.png"%(base_name)))
+        self._stale = (stale, stale)
     
     self._color = None
-    self.set_stale()
+    
+    if (can_stale):
+      self.set_stale()
+    elif (can_ok):
+      self.set_ok()
+    elif (can_warn): # this does not make any sense 
+      self.set_warn()
+    elif (can_error):
+      self.set_error()
+    else:
+      rospy.logerr("you are extremely stupid")
+      return
     
     self.Bind(wx.EVT_PAINT, self.on_paint)
     self.Bind(wx.EVT_LEFT_UP, self.on_left_up)

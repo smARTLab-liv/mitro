@@ -14,5 +14,6 @@
   <depend package="rospy"/>
   <depend package="mitro_diagnostics"/>
   <depend package="geometry_msgs"/>
+  <depend package="std_srvs" />
 
 </package>
