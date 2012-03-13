@@ -13,10 +13,10 @@ $(V4L2LDIR):
 	git clone git://github.com/umlaeute/v4l2loopback.git $(V4L2LDIR)
 	$(MAKE) -f $(V4L2LDIR)/Makefile
 	sudo $(MAKE) -f $(V4L2LDIR)/Makefile install 
+	sudo modprobe v4l2loopback
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
 
 clean: 
 	rm -rf $(BUILDDIR)
-	rm -rf $(V4L2LDIR)
