@@ -9,10 +9,6 @@
 #include <fcntl.h>
 #include <assert.h>
 
-#define DEV_IN1 "/dev/video0"
-#define DEV_IN2 "/dev/video1"
-#define DEV_OUT "/dev/video2"
-
 #define WIDTH_SMALL 320
 #define HEIGHT_SMALL 240
 
@@ -174,8 +170,14 @@ int main(int argc, char**argv)
 {
 
   if ( argc < 4 ) {
-    printf("usage: %s video_in_1 video_in_2 video_out", argv[0]);
+    printf("usage: %s video_in_1 video_in_2 video_out\n", argv[0]);
+    exit(EXIT_FAILURE);
   }
+
+  char* devin1_name = argv[1];
+  char* devin2_name = argv[2];
+  char* devout_name = argv[3];
+
 
   // open fifo pipe
 
@@ -195,7 +197,7 @@ int main(int argc, char**argv)
   int devin1, devin2, devout;
 
   // input 1
-  devin1 = open_device(DEV_IN1);
+  devin1 = open_device(devin1_name);
  
   // TODO this is a hack to get the standart values in the format
   struct v4l2_format vid_format;
@@ -211,7 +213,7 @@ int main(int argc, char**argv)
   start_streamin(devin1);
 
   // input 2
-  devin2 = open_device(DEV_IN2);
+  devin2 = open_device(devin2_name);
   vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   set_resolution(devin2, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
   //set_resolution(devin2, WIDTH, HEIGHT, vid_format);
@@ -221,7 +223,7 @@ int main(int argc, char**argv)
   start_streamin(devin2);
 
   // output
-  devout = open_device(DEV_OUT);
+  devout = open_device(devout_name);
   vid_format.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
   set_resolution(devout, WIDTH, HEIGHT, vid_format);
   
@@ -263,8 +265,8 @@ int main(int argc, char**argv)
 
 	  usleep(100);
 
-	  devin1 = open_device(DEV_IN1);
-	  devin2 = open_device(DEV_IN2);
+	  devin1 = open_device(devin1_name);
+	  devin2 = open_device(devin2_name);
 
 
 	  memset(&vid_format, 0, sizeof(vid_format));
@@ -293,8 +295,8 @@ int main(int argc, char**argv)
 
 	  usleep(100);
 
-	  devin1 = open_device(DEV_IN1);
-	  devin2 = open_device(DEV_IN2);
+	  devin1 = open_device(devin1_name);
+	  devin2 = open_device(devin2_name);
 
 	  memset(&vid_format, 0, sizeof(vid_format));
 	  vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
