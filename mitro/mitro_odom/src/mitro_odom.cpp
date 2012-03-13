@@ -13,14 +13,14 @@ std::string FRAME_ID;
 std::string CHILD_FRAME_ID;
 
 class Odom {
-    double velocity_right;
-    double velocity_left;
+    //double velocity_right;
+    //double velocity_left;
     int position_right;
     int position_left;
     int last_position_right;
     int last_position_left;
-    double cmd_angular;
-    double cmd_linear;
+    //double cmd_angular;
+    //double cmd_linear;
 
     double x, y, th, vx, vth;
 
@@ -30,7 +30,7 @@ class Odom {
 public:
     Odom();
     void js_cb(const mitro_base_controller::JointStates::ConstPtr& msg);
-    void cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg);
+    //void cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg);
     void update();
 
     ros::Publisher odom_pub;
@@ -40,16 +40,16 @@ Odom::Odom () {
     current_time = ros::Time::now();
     last_time = ros::Time::now();
 
-    velocity_right = velocity_left = 0.0d;
+    //velocity_right = velocity_left = 0.0d;
     position_right = position_left = 0;
     last_position_right = last_position_left = 0;
     x = y = th = vx = vth = 0;
-    cmd_angular = cmd_linear = 0;
+    //cmd_angular = cmd_linear = 0;
 }
 
 void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
-    velocity_right = msg->velocity_right * 2.0 * TICKS_TO_DIST;
-    velocity_left = msg->velocity_left * 2.0 * TICKS_TO_DIST;
+    //velocity_right = msg->velocity_right * 2.0 * TICKS_TO_DIST;
+    //velocity_left = msg->velocity_left * 2.0 * TICKS_TO_DIST;
     position_right = msg->position_right;
     position_left = msg->position_left;
 
@@ -57,6 +57,7 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
 
     double dt = (current_time - last_time).toSec();
 
+    // as long as we don't drive 300km straight, this should be fine.
     double vl = (double)(position_left - last_position_left) * TICKS_TO_DIST;
     double vr = (double)(position_right - last_position_right) * TICKS_TO_DIST;
 
@@ -101,8 +102,10 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
     odom.pose.pose.orientation = odom_quat;
 
     //get filtered velocity for twist
-    vx = (velocity_right + velocity_left) / 2.0;
-    vth = (velocity_right - velocity_left) / WHEEL_BASE;
+    //vx = (velocity_right + velocity_left) / 2.0;
+    //vth = (velocity_right - velocity_left) / WHEEL_BASE;
+    vx = vx / dt;
+    vth = vth / dt;
 
     odom.child_frame_id = CHILD_FRAME_ID;
     odom.twist.twist.linear.x = vx;//cmd_linear;//(vx + cmd_linear) / 2.0;
@@ -117,10 +120,10 @@ void Odom::js_cb(const mitro_base_controller::JointStates::ConstPtr& msg) {
     last_time = current_time;
 }
 
-void Odom::cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
-    cmd_angular = msg->angular.z;
-    cmd_linear = msg->linear.x;
-}
+//void Odom::cmd_twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
+//    cmd_angular = msg->angular.z;
+//    cmd_linear = msg->linear.x;
+//}
 
 int main(int argc, char** argv){
     ros::init(argc, argv, "mitro_odom");
@@ -128,7 +131,7 @@ int main(int argc, char** argv){
     Odom odom = Odom();
 
     ros::Subscriber js_sub = n.subscribe("joint_states", 10, &Odom::js_cb, &odom);
-    ros::Subscriber cmd_twist_sub = n.subscribe("cmd_twist_mixed", 10, &Odom::cmd_twist_cb, &odom);
+    //ros::Subscriber cmd_twist_sub = n.subscribe("cmd_twist_mixed", 10, &Odom::cmd_twist_cb, &odom);
 
     odom.odom_pub = n.advertise<nav_msgs::Odometry>("odom", 10);;
 
