@@ -172,6 +172,11 @@ void q_buffer(int device, struct v4l2_buffer *buf) {
 
 int main(int argc, char**argv)
 {
+
+  if ( argc < 4 ) {
+    printf("usage: %s video_in_1 video_in_2 video_out", argv[0]);
+  }
+
   // open fifo pipe
 
   char fifobuf[MAX_BUF_SIZE];
