@@ -4,9 +4,9 @@ BUILDDIR = build
 V4L2LDIR = v4l2loopback
 CC = gcc
 
-all: $(BUILDDIR)/multicam
+all: multicam
 
-$(BUILDDIR)/multicam: $(BUILDDIR) $(V4L2LDIR)
+multicam: $(BUILDDIR) $(V4L2LDIR)
 	$(CC) $(SRCDIR)/multicam.c -o $(BUILDDIR)/multicam
 
 $(V4L2LDIR):
