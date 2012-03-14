@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- 
 import argparse
 import random
 import os
@@ -10,12 +10,18 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 from ws4py.messaging import TextMessage
 
+import Skype4Py
+from Skype4Py import SkypeError
+
+import roslib;
+roslib.load_manifest('geometry_msgs')
+import rospy
+from geometry_msgs.msg import Twist
+
 class ChatWebSocketHandler(WebSocket):
-    filename = '/tmp/multicam-fifo'
     
     def __init__(self, *args, **kwargs):
         super(ChatWebSocketHandler, self).__init__(*args, **kwargs)
-        self.fd = open(self.filename, 'w');
 
     def received_message(self, m):
         if not m.is_text:
@@ -27,15 +33,53 @@ class ChatWebSocketHandler(WebSocket):
             response = TextMessage('connected')
             cherrypy.engine.publish('websocket-broadcast', response)
             
+        if text.startswith('cmd:'):
+            r = text.split(':')
+            cmdstr = str(r[1]);
+            cmd = cmdstr.split(',')
+            linear = float(cmd[0])
+            angular = float(cmd[1])
+
+            data = Twist()
+            data.linear.x = linear
+            data.angular.z = angular
+
+            pub.publish(data)
+
+            response = TextMessage('cmd twist: %f %f'%(linear, angular))
+            cherrypy.engine.publish('websocket-broadcast', response)
+
 
         if text.startswith('view:'):
             r = text.split(':')
             view = int(r[1])
             if view < 5 and view > 0:
-                self.fd.write(str(view + 1) + '\n')
-                self.fd.flush()
+                fd.write(str(view) + '\n')
+                fd.flush()
                 response = TextMessage('switched to view: %d'%view)
                 cherrypy.engine.publish('websocket-broadcast', response)
+
+        if text.startswith('skype:'):
+            r = text.split(':')
+            user = str(r[1])
+
+            response = TextMessage('trying to call: %s'%user)
+            cherrypy.engine.publish('websocket-broadcast', response)
+
+
+            try:
+                # Add a user (send request)
+                uprofile = skype.User(Username=user)
+                if uprofile.BuddyStatus != Skype4Py.budFriend:
+                    uprofile.SetBuddyStatusPendingAuthorization('hello %s'%user)
+
+                # Call the user
+                skype.PlaceCall(user)
+            except SkypeError as details:
+                response = TextMessage('skype failed: %s'%details.args[1])
+                cherrypy.engine.publish('websocket-broadcast', response)
+                
+            
 
     def closed(self, code, reason="A client left the room without a proper explanation."):
         cherrypy.engine.publish('websocket-broadcast', TextMessage(reason))
@@ -111,6 +155,27 @@ class Root(object):
         cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
 
 if __name__ == '__main__':
+
+
+
+
+    global fd
+
+    filename = '/tmp/multicam-fifo'
+    fd = open(filename, 'w');
+
+    global skype
+    # Create an instance of the Skype class.
+    skype = Skype4Py.Skype(Transport='x11')
+    # Connect the Skype object to the Skype client.
+    skype.Attach()
+
+
+
+    rospy.init_node('web_control', anonymous=True)
+    global pub
+    pub = rospy.Publisher("cmd_twist_tele", Twist)
+    
     parser = argparse.ArgumentParser(description='Echo CherryPy Server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('-p', '--port', default=9000, type=int)
