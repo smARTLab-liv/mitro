@@ -17,7 +17,7 @@
 
 #define NUM_BUFFERS 2
 
-#define FIFO_FILE "fifo-file"
+#define FIFO_FILE "/tmp/multicam-fifo"
 #define MAX_BUF_SIZE 255
 
 
