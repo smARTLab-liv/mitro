@@ -1,6 +1,6 @@
 <launch>
     <!-- launch file for mitro dashboard -->
     
-    <node pkg="mitro_dashboard" type="mitro_dashboard.py" name="mitro_dashboard" output="screen"/>
+    <node pkg="mitro_dashboard" type="mitro_dashboard.py" name="$(anon mitro_dashboard)" output="screen"/>
 
 </launch>
