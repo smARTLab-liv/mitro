@@ -18,7 +18,7 @@ class MultiCam:
             self.pressed = data.buttons[self.idx]
             if not self.pressed:
                 self.view = (self.view + 1) % 4
-                rospy.loginfo("swuitching to view %d",self.view)
+                rospy.logdebug("Switching to view %d.",self.view)
                 self.fd.write(str(self.view + 1) + '\n')
                 self.fd.flush()
 
