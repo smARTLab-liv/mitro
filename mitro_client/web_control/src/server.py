@@ -149,6 +149,11 @@ class Root(object):
              $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');  
           };
 
+          $('#skype').click(function() {
+             ws.send('skype:' + $('#skypeuser').val());
+             return false;
+          });
+
           $('#view1').click(function() {
              ws.send('view:1');
              return false;
@@ -224,6 +229,9 @@ class Root(object):
     <body>
     <form action='#' id='chatform' method='get'>
       <textarea id='chat' cols='35' rows='10'></textarea>
+      <br />
+      <input id='skypeuser' type='text'/>
+      <input id='skype' type='submit' value='Call' />
       <br />
       <input id='view1' type='submit' value='View 1' />
       <input id='view2' type='submit' value='View 2' />
