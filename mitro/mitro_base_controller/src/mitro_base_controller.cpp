@@ -11,8 +11,8 @@ double WHEEL_RADIUS;
 double TICKS_PER_REV;
 
 // these are acceleration in m/(s*s)
-//double MAX_ACC_LIN = 0.25;
-//double MAX_ACC_ROT = 1.0;
+double MAX_ACC_LIN = 0.5;
+double MAX_ACC_ROT = 1.5;
 
 ros::Publisher cmd_vel_pub;
 double vel_rot;
@@ -36,10 +36,10 @@ void update() {
   double dt = (ros::Time::now() - last_time).toSec();
   if ( dt < 0.5 ) {
 
-//    double limit_vel_rot = last_vel_rot + std::min(std::max((vel_rot - last_vel_rot), -MAX_ACC_ROT * dt), MAX_ACC_ROT * dt); 
-//    double limit_vel_linear = last_vel_linear + std::min(std::max((vel_linear - last_vel_linear), -MAX_ACC_LIN * dt), MAX_ACC_LIN * dt);
-    double limit_vel_rot = vel_rot;
-    double limit_vel_linear = vel_linear;
+    double limit_vel_rot = last_vel_rot + std::min(std::max((vel_rot - last_vel_rot), -MAX_ACC_ROT * dt), MAX_ACC_ROT * dt); 
+    double limit_vel_linear = last_vel_linear + std::min(std::max((vel_linear - last_vel_linear), -MAX_ACC_LIN * dt), MAX_ACC_LIN * dt);
+//    double limit_vel_rot = vel_rot;
+//    double limit_vel_linear = vel_linear;
 
     vc.velocity_left = limit_vel_linear / WHEEL_RADIUS - 0.5 * limit_vel_rot * WHEEL_BASE / WHEEL_RADIUS; 
     vc.velocity_right = limit_vel_linear / WHEEL_RADIUS  + 0.5 * limit_vel_rot * WHEEL_BASE / WHEEL_RADIUS;
