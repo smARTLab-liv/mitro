@@ -6,5 +6,8 @@
     
     <!-- start kinect -->
     <include file="$(find mitro_kinect)/launch/mitro_kinect.launch" />
+
+    <!-- start ps3multicam -->
+    <node pkg="mitro_teleop" type="ps3multicam.py" name="ps3_multicam" output="screen" />
     
 </launch>
