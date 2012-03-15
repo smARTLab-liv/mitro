@@ -1,6 +1,6 @@
-wheel_base: 0.394 #0.393
-wheel_radius: 0.075286 #0.07475
-ticks_per_revolution: 3200 #36
+wheel_base: 0.393 # check this again
+wheel_radius: 0.075286 # check this again
+ticks_per_revolution: 3200
 base_diameter: 0.4572
 
 #hardware related stuff
