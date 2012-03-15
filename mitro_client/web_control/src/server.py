@@ -221,6 +221,10 @@ class Root(object):
             };
           };
 
+          document.onblur = function(e) {
+            keys = Array(0, 0, 0, 0);
+          };
+
           setTimeout("send_cmds()", 100);
 
         });
