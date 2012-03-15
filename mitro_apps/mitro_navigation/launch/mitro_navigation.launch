@@ -2,7 +2,7 @@
     <!-- launch file for navigation -->
     
     <!-- optional: specify map -->
-    <arg name="map" value="swarmlab" />
+    <arg name="map" value="map" />
 
     <!-- start map server -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find mitro_navigation)/maps/$(arg map).yaml" output="screen" />
