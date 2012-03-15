@@ -18,6 +18,15 @@ roslib.load_manifest('geometry_msgs')
 import rospy
 from geometry_msgs.msg import Twist
 
+from subprocess import Popen, PIPE
+
+skype_sequence = '''key F
+'''
+
+def keypress(sequence):
+    p = Popen(['xte'], stdin=PIPE)
+    p.communicate(input=sequence)
+
 class ChatWebSocketHandler(WebSocket):
     
     def __init__(self, *args, **kwargs):
@@ -66,7 +75,6 @@ class ChatWebSocketHandler(WebSocket):
             response = TextMessage('trying to call: %s'%user)
             cherrypy.engine.publish('websocket-broadcast', response)
 
-
             try:
                 # Add a user (send request)
                 uprofile = skype.User(Username=user)
@@ -74,7 +82,18 @@ class ChatWebSocketHandler(WebSocket):
                     uprofile.SetBuddyStatusPendingAuthorization('hello %s'%user)
 
                 # Call the user
-                skype.PlaceCall(user)
+                a = skype.PlaceCall(user)
+
+                t = rospy.get_time()
+                while not a.Status == 'INPROGRESS':
+                    rospy.sleep(1)
+                    if rospy.get_time() - t > 60:
+                        break
+
+                rospy.sleep(5)
+                keypress(skype_sequence)
+
+
             except SkypeError as details:
                 response = TextMessage('skype failed: %s'%details.args[1])
                 cherrypy.engine.publish('websocket-broadcast', response)
@@ -252,9 +271,6 @@ class Root(object):
         cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
 
 if __name__ == '__main__':
-
-
-
 
     global fd
 
