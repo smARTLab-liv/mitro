@@ -95,6 +95,27 @@ class Root(object):
     <head>
       <script type='application/javascript' src='/js/jquery-1.6.2.min.js'></script>
       <script type='application/javascript'>
+        function send_cmds() {
+          if (keys[0] | keys[1] | keys[2] | keys[3]) {
+            linear = 0;
+            angular = 0;
+            if (keys[0] & !keys[1]) {
+              linear = 0.3;
+            }
+            if (keys[1] & !keys[0]) {
+              linear = -0.15;
+            }
+            if (keys[2] & !keys[3]) {
+              angular = 1;
+            }
+            if (keys[3] & !keys[2]) {
+              angular = -1;
+            }
+            ws.send('cmd:' + linear + ',' + angular);
+          } 
+          setTimeout("send_cmds()", 100);
+        };          
+
         $(document).ready(function() {
 
           websocket = 'ws://%(host)s:%(port)s/ws';
@@ -113,7 +134,7 @@ class Root(object):
              ws.send("connect");
           };
           window.onbeforeunload = function(e) {
-            $('#chat').val($('#chat').val() + 'bye bye...\\n');
+            $('#chat').val('bye bye...\\n' + $('#chat').val());
             ws.close(1000, 'disconnect');
                
             if(!e) e = window.event;
@@ -121,20 +142,82 @@ class Root(object):
             e.preventDefault();
           };
           ws.onmessage = function (evt) {
-             $('#chat').val($('#chat').val() + '<< ' + evt.data + '\\n');
+             $('#chat').val('<< ' + evt.data + '\\n' + $('#chat').val());
           };
           ws.onclose = function(evt) {
 
              $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');  
           };
 
-          $('#send').click(function() {
-             // console.log($('#message').val());
-             $('#chat').val($('#chat').val() + '>> ' + $('#message').val()  + '\\n');
-             ws.send($('#message').val());
-             $('#message').val("");
+          $('#view1').click(function() {
+             ws.send('view:1');
              return false;
           });
+
+          $('#view2').click(function() {
+             ws.send('view:2');
+             return false;
+          });
+
+          $('#view3').click(function() {
+             ws.send('view:3');
+             return false;
+          });
+
+          $('#view4').click(function() {
+             ws.send('view:4');
+             return false;
+          });
+
+
+          keys = new Array(0, 0, 0, 0);
+
+          document.onkeydown = function(e){
+            keyCode = ('which' in event) ? event.which : event.keyCode;
+            switch(keyCode) {
+              case 38:
+                // up
+                keys[0] = 1;
+                break;
+              case 40:
+                // down
+                keys[1] = 1;
+                break;
+              case 37:
+                // left
+                keys[2] = 1;
+                break;
+              case 39:
+                // right
+                keys[3] = 1;
+                break;
+            };
+          };
+
+          document.onkeyup = function(e){
+            keyCode = ('which' in event) ? event.which : event.keyCode;
+            switch(keyCode) {
+              case 38:
+                // up
+                keys[0] = 0;
+                break;
+              case 40:
+                // down
+                keys[1] = 0;
+                break;
+              case 37:
+                // left
+                keys[2] = 0;
+                break;
+              case 39:
+                // right
+                keys[3] = 0;
+                break;
+            };
+          };
+
+          setTimeout("send_cmds()", 100);
+
         });
       </script>
     </head>
@@ -142,8 +225,10 @@ class Root(object):
     <form action='#' id='chatform' method='get'>
       <textarea id='chat' cols='35' rows='10'></textarea>
       <br />
-      <label for='message'>Command</label><input type='text' id='message' />
-      <input id='send' type='submit' value='Send' />
+      <input id='view1' type='submit' value='View 1' />
+      <input id='view2' type='submit' value='View 2' />
+      <input id='view3' type='submit' value='View 3' />
+      <input id='view4' type='submit' value='View 4' />
       </form>
     </body>
     </html>
