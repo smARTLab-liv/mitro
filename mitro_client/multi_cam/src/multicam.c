@@ -234,15 +234,10 @@ int main(int argc, char**argv)
   buffer=(__u8*)malloc(sizeimage);
   memset(buffer, 0, sizeimage);
 
-  int counter;
-  counter = 0;
-
   int view;
   view = 0;
 
   while (1) {
-    counter++;
-
     // read fifo pipe
     int numread;
     numread = read(fifofd, fifobuf, MAX_BUF_SIZE);
