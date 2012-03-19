@@ -35,7 +35,9 @@ def test_process():
 def test_ros():
     print '-'*80
     ros_tests = []
-    add_test(ros_tests, ros.roscore, )
+    add_test(ros_tests, ros.rostopichz, '/kinect/depth/points', 20)
+    add_test(ros_tests, ros.rostopichz, '/cloud_obstacles', 10)
+    add_test(ros_tests, ros.rostopichz, '/test', 10)
     group_test(ros_tests)
 
 if __name__ == '__main__':
