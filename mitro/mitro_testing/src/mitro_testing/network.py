@@ -3,20 +3,20 @@ from utils import *
 import netifaces
 import subprocess
 
-def check_interface(name):
+def interface(name):
     return name in netifaces.interfaces()
 
-def check_connected(name):
-    if test(check_interface, name):
+def connected(name):
+    if test(interface, name):
         return netifaces.AF_INET in netifaces.ifaddresses(name)
     else:
         return False
 
-def check_unconnected(name):
-    return not check_connected(name)
+def unconnected(name):
+    return not connected(name)
     
-def check_ip(name, ip):
-    if test(check_connected, name):
+def ip(name, ip):
+    if test(connected, name):
         return ip == netifaces.ifaddresses(name)[netifaces.AF_INET][0]['addr']
     else:
         return False
