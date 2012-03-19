@@ -3,7 +3,7 @@ from mitro_testing.utils import *
 from mitro_testing import network, video, process, ros
 
 def test_network():
-    print "\n".join(("-"*80, 'test network'.rjust(40 + 6), '-'*80))
+    print '-'*80
     network_tests = []
     add_test(network_tests, network.ip, 'eth0', '10.10.14.2')
     add_test(network_tests, network.unconnected, 'wlan0')
@@ -15,7 +15,7 @@ def test_network():
     group_test(network_tests)
 
 def test_video():
-    print "\n".join(("-"*80, 'test video'.rjust(40 + 5), '-'*80))
+    print '-'*80
     video_tests = []
     add_test(video_tests, video.device, '/dev/video1')
     add_test(video_tests, video.device, '/dev/video2')
@@ -26,14 +26,14 @@ def test_video():
     group_test(video_tests)
 
 def test_process():
-    print "\n".join(("-"*80, 'test processes'.rjust(40 + 7), '-'*80))
+    print '-'*80
     process_tests = []
     add_test(process_tests, process.running, 'multicam')
     add_test(process_tests, process.running, 'skype')
     group_test(process_tests)
 
 def test_ros():
-    print "\n".join(("-"*80, 'test ROS'.rjust(40 + 4), '-'*80))
+    print '-'*80
     ros_tests = []
     add_test(ros_tests, ros.roscore, )
     group_test(ros_tests)
