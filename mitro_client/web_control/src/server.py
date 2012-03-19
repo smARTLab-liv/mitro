@@ -285,7 +285,7 @@ if __name__ == '__main__':
 
 
 
-    rospy.init_node('web_control', anonymous=True)
+    rospy.init_node('web_control', anonymous=False, disable_signals=True)
     global pub
     pub = rospy.Publisher("cmd_twist_tele", Twist)
     

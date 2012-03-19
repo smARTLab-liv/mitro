@@ -1,0 +1,1 @@
+export DISPLAY=:0.0 && src/server.py --host 0.0.0.0 
