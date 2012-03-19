@@ -15,8 +15,7 @@ def test_video():
     video_tests = []
     add_test( video_tests , video.check_device, '/dev/video0' )
     add_test( video_tests , video.check_device, '/dev/video1' )
-    add_test( video_tests , video.check_device, '/dev/video2' )
-    add_test( video_tests , video.check_v4l_info, '/dev/video0', 'uvccamera' )
+    add_test( video_tests , video.check_v4l_info, '/dev/video0', 'uvcvideo' )
     group_test(video_tests)
 
 if __name__ == '__main__':
