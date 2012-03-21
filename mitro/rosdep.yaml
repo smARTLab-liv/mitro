@@ -1,13 +1,14 @@
 netifaces:
-    ubuntu:
-        pip:
-	    packages: [netifaces]
+  ubuntu:
+    pip:
+      packages: [netifaces]
 
 python-wifi:
-    ubuntu: 
-        pip: 
-            packages: [python-wifi]
+  ubuntu: 
+    pip: 
+      packages: [python-wifi]
+
 psutil:
-    ubuntu: 
-        pip: 
-            packages: [psutil]
+  ubuntu: 
+    pip: 
+      packages: [psutil]
