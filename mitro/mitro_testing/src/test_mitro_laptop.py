@@ -47,4 +47,3 @@ if __name__ == '__main__':
     test_process()
     test_ros()
 
-    test( network.ip, 'wlan0', '0.0.0.0')
