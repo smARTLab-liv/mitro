@@ -21,7 +21,7 @@ def rostopic(name):
 def rostopichz(name, hz):
     if not test(rostopic, name):
         return False
-    p = subprocess.Popen(["rostopic", "hz", "/test"],
+    p = subprocess.Popen(["rostopic", "hz", name],
                           shell=False,
                           stdout=subprocess.PIPE,
                           stderr=subprocess.STDOUT)
@@ -31,6 +31,7 @@ def rostopichz(name, hz):
     for l in out.split('\n'):
         if "average" in l:
             rate = float(l.split(" ")[-1])
+            debug('%s published with rate: %dhz'%(name, rate))
             if rate >= hz:
                 return True
     return False

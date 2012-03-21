@@ -13,37 +13,15 @@ def test_network():
     add_test(network_tests, network.ping, 'www.google.com')
     group_test(network_tests)
 
-def test_video():
-    print '-'*80
-    video_tests = []
-    add_test(video_tests, video.device, '/dev/video1')
-    add_test(video_tests, video.device, '/dev/video2')
-    add_test(video_tests, video.device, '/dev/video3')
-    add_test(video_tests, video.v4l_info, '/dev/video1', '046d:0821')
-    add_test(video_tests, video.v4l_info, '/dev/video2', '046d:08ce')
-    add_test(video_tests, video.v4l_info, '/dev/video3', 'Dummy')
-    group_test(video_tests)
-
-def test_process():
-    print '-'*80
-    process_tests = []
-    add_test(process_tests, process.running, 'multicam')
-    add_test(process_tests, process.running, 'skype')
-    group_test(process_tests)
-
 def test_ros():
     print '-'*80
     ros_tests = []
     add_test(ros_tests, ros.roscore, )
-    add_test(ros_tests, ros.rostopichz, '/kinect/depth/points', 20)
-    add_test(ros_tests, ros.rostopichz, '/cloud_obstacles', 10)
+    add_test(ros_tests, ros.rostopichz, '/base_scan', 10)
+#    add_test(ros_tests, ros.rostopichz, '/cloud_obstacles', 10)
     group_test(ros_tests)
 
 if __name__ == '__main__':
 
     test_network()
-    test_video()
-    test_process()
     test_ros()
-
-    test( network.ip, 'wlan0', '0.0.0.0')
