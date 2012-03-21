@@ -12,7 +12,7 @@ set -e
 case "$1" in
     start)
         echo -n "Starting $DESC: "
-        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --make-pidfile --pidfile $PID_FILE --exec $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --pidfile $PID_FILE --exec $DAEMON -- $DAEMON_OPTS
         echo "$NAME."
         ;;
     stop)
@@ -24,7 +24,7 @@ case "$1" in
         echo -n "Restarting $DESC: "
         start-stop-daemon --stop --pidfile $PID_FILE
         sleep 2
-        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --make-pidfile --pidfile $PID_FILE  --exec $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --pidfile $PID_FILE  --exec $DAEMON -- $DAEMON_OPTS
         echo "$NAME."
         ;;
     *)
