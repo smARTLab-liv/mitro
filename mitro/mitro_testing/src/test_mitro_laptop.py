@@ -20,8 +20,8 @@ def test_video():
     add_test(video_tests, video.device, '/dev/video1')
     add_test(video_tests, video.device, '/dev/video2')
     add_test(video_tests, video.device, '/dev/video3')
-    add_test(video_tests, video.v4l_info, '/dev/video1', 'uvcvideo')
-    add_test(video_tests, video.v4l_info, '/dev/video2', 'uvcvideo')
+    add_test(video_tests, video.v4l_info, '/dev/video1', '046d:0821')
+    add_test(video_tests, video.v4l_info, '/dev/video2', '046d:08ce')
     add_test(video_tests, video.v4l_info, '/dev/video3', 'Dummy')
     group_test(video_tests)
 
@@ -41,7 +41,10 @@ def test_ros():
     group_test(ros_tests)
 
 if __name__ == '__main__':
+
     test_network()
     test_video()
     test_process()
     test_ros()
+
+    test( network.ip, 'wlan0', '0.0.0.0')
