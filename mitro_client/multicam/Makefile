@@ -20,3 +20,7 @@ $(BUILDDIR):
 
 clean: 
 	rm -rf $(BUILDDIR)
+
+install:
+	sudo cp daemon/multicam /etc/init.d/multicam
+	sudo update-rc.d multicam defaults

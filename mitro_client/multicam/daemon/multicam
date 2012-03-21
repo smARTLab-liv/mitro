@@ -1,5 +1,5 @@
 #!/bin/bash
-DAEMON_PATH=/home/swarmlab/ros/mitro_client/multi_cam/build
+DAEMON_PATH=/home/swarmlab/ros/mitro_client/multicam/build
 DAEMON=$DAEMON_PATH/multicam
 DAEMON_OPTS="/dev/video1 /dev/video2 /dev/video3"
 NAME=multicam
