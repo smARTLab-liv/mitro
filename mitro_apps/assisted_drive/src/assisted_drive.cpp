@@ -17,7 +17,7 @@ bool obst_detected = false;
 bool obst_stop = false;
 ros::Time last_costmap, last_update;
 
-bool use_assisted_drive = true;
+bool use_assisted_drive = false;
 
 double modulus(double a, double b);
 
