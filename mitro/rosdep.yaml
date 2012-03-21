@@ -1,3 +1,8 @@
+netifaces:
+    ubuntu:
+        pip:
+	    packages: [netifaces]
+
 python-wifi:
     ubuntu: 
         pip: 
