@@ -10,8 +10,8 @@ def test_network():
     add_test(network_tests, network.ping, 'localhost')
     add_test(network_tests, network.ping, 'mitro-laptop')
     add_test(network_tests, network.ping, 'bob')
+    add_test(network_tests, network.ping, '10.10.10.1')
     add_test(network_tests, network.ping, 'www.google.com')
-    add_test(network_tests, network.ping, 'root')
     group_test(network_tests)
 
 def test_video():
