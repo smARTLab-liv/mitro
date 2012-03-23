@@ -136,8 +136,8 @@ class Root(object):
         };          
 
         $(document).ready(function() {
-
-          websocket = 'ws://%(host)s:%(port)s/ws';
+          websocket = 'ws://' + window.location.host + '/ws';
+          // websocket = 'ws://%(host)s:%(port)s/ws';
           if (window.WebSocket) {
             ws = new WebSocket(websocket);
           }
