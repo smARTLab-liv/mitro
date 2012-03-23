@@ -119,7 +119,7 @@ class Root(object):
             linear = 0;
             angular = 0;
             if (keys[0] & !keys[1]) {
-              linear = 0.3;
+              linear = 0.7;
             }
             if (keys[1] & !keys[0]) {
               linear = -0.15;
