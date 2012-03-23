@@ -30,6 +30,7 @@ def test_process():
     process_tests = []
     add_test(process_tests, process.running, 'multicam')
     add_test(process_tests, process.running, 'skype')
+    add_test(process_tests, process.running, 'webcontrol.py')
     group_test(process_tests)
 
 def test_ros():
