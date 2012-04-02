@@ -1,7 +1,7 @@
 /*
 Copyright (C) 2011
 
-This file is part of JLZ77
+This file is part of BobConnect
 written by Max Bügler
 http://www.maxbuegler.eu/
 

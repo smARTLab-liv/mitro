@@ -1,7 +1,7 @@
 /*
 Copyright (C) 2011
 
-This file is part of JLZ77
+This file is part of BobConnect
 written by Max Bügler
 http://www.maxbuegler.eu/
 
@@ -372,37 +372,6 @@ public class BobConnectClient {
                                 catch(Exception ex){
                                     ex.printStackTrace();
                                 }
-                                /*try{
-                                    switch(e.getKeyCode()){
-                                        case KeyEvent.VK_UP:
-                                            dataout.write(RosWrapper.CMDS_FORWARD);
-                                            dataout.flush();
-                                            //ros.sendCommand(RosWrapper.CMD_FORWARD);
-                                            break;
-                                        case KeyEvent.VK_LEFT:
-                                            dataout.write(RosWrapper.CMDS_LEFT);
-                                            dataout.flush();
-                                            //ros.sendCommand(RosWrapper.CMD_LEFT);
-                                            break;
-                                        case KeyEvent.VK_RIGHT:
-                                            dataout.write(RosWrapper.CMDS_RIGHT);
-                                            dataout.flush();
-                                            //ros.sendCommand(RosWrapper.CMD_RIGHT);
-                                            break;
-                                        case KeyEvent.VK_DOWN:
-                                            dataout.write(RosWrapper.CMDS_BACK);
-                                            dataout.flush();
-                                            //ros.sendCommand(RosWrapper.CMD_BACK);
-                                            break;
-                                        case KeyEvent.VK_SPACE:
-                                            dataout.write(RosWrapper.CMDS_STOP);
-                                            dataout.flush();
-                                            //ros.sendCommand(RosWrapper.CMD_STOP);
-                                            break;
-                                    }
-                                }catch(Exception ex){
-                                    ex.printStackTrace();
-                                }*/
                             }
                             public void keyPressed(KeyEvent e) {
 

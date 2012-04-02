@@ -1,16 +1,16 @@
 /*
 Copyright (C) 2011
 
-This file is part of JHuffman
+This file is part of BobConnect
 written by Max Bügler
 http://www.maxbuegler.eu/
 
-JHuffman is free software; you can redistribute it and/or modify it
+BobConnect is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
 Free Software Foundation; either version 2, or (at your option) any
 later version.
 
-JHuffman is distributed in the hope that it will be useful,
+BobConnect is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
