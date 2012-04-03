@@ -34,6 +34,17 @@ typedef struct {
   size_t length;
 } buffer;
 
+typedef struct {
+  int x;
+  int y;
+} Point2D;
+
+typedef struct {
+  int Y;
+  int U;
+  int V;
+} ColorYUV;
+
 
 int open_device(char* name) {
   int device;
@@ -171,25 +182,117 @@ void q_buffer(int device, struct v4l2_buffer *buf) {
   }
 }
 
-void set_overlay_line(int* buffer, int x1, int x2, int y, int Y, int U, int V) {
+
+
+Point2D proj(float x, float y, float z) {
+  // ROS to OpenCV
+  float temp = x;
+  x = -(y - 0.051);
+  y = -(z - 1.290);
+  z = temp;
+  
+  float th = 63.9 / 180.0 * M_PI;
+  float t_y = y;
+  float t_z = z;
+  // rotation
+  y = cos(th) * t_y - sin(th) * t_z;
+  z = sin(th) * t_y + cos(th) * t_z;
+  
+  float k1 = -0.286767;
+  float k2 = 0.059882;
+  float k3 = 0;
+  float p1 = 0.000601;
+  float p2 = -0.001703;
+
+  float fx = 355.027391;
+  float fy = 353.784702;
+  float cx = 306.290598;
+  float cy = 260.086688;
+
+  float x_p, y_p, x_pp, y_pp;
+  x_p = x / z;
+  y_p = y / z;
+  float r2 = x_p * x_p + y_p * y_p;
+
+  x_pp = x_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + 2 * p1 * x_p * y_p + p2 * (r2 + 2 * x_p * x_p);
+  y_pp = y_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + p1 * (r2 + 2 * y_p * y_p) + 2 * p2 * x_p * y_p;
+  
+  Point2D p;
+  p.x = fx * x_pp + cx;
+  p.y = fy * y_pp + cy;
+  return p;
+}
+
+void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
+  if (x2 < x1) {
+    int t = x1;
+    x1 = x2;
+    x2 = 1;
+  }
   int x;
   for (x = x1/2; x <= x2/2; x++) {
     int Y0 = buffer[y*WIDTH/2 + x] & 0x000000ff;
     int U0 = buffer[y*WIDTH/2 + x]>>8 & 0x000000ff;
     int Y1 = buffer[y*WIDTH/2 + x]>>16 & 0x000000ff;
     int V0 = buffer[y*WIDTH/2 + x]>>24 & 0x000000ff;
-    U0 = (U + U0) / 2;
-    V0 = (V + V0) / 2;
+    U0 = (color.U + U0) / 2;
+    V0 = (color.V + V0) / 2;
     if (x*2 < x1)
-       Y1 = (Y + Y0) / 2;
+       Y1 = (color.Y + Y0) / 2;
     else if (x*2 >= x2)
-       Y0 = (Y + Y1) / 2;
+       Y0 = (color.Y + Y1) / 2;
     else {
-      Y0 = (Y + Y0) / 2;
-      Y1 = (Y + Y1) / 2;
+      Y0 = (color.Y + Y0) / 2;
+      Y1 = (color.Y + Y1) / 2;
     }
     buffer[y*WIDTH/2 + x] = V0 << 24 | Y1 << 16 | U0 << 8 | Y0; 
   }
+}
+
+void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
+  int n = points.size();
+  points.push_back(points[0]);
+  int dx, dy;
+  float slope[n];
+  int xi[n];
+  for (int i = 0; i < n; i ++) {
+    dy = points[i+1].y - points[i].y;
+    dx = points[i+1].x - points[i].x;
+    if (dy == 0)
+      slope[i] = 1.0;
+    if (dx == 0)
+      slope[i] = 0.0;
+    if((dy!=0)&&(dx!=0)) {
+      slope[i]=(float) dx/dy;
+    }
+  }
+  for(int y=0;y<HEIGHT;y++) {
+    int k=0;
+    for(int i=0;i<n;i++) {
+      if( ((points[i].y<=y)&&(points[i+1].y>y))||
+	  ((points[i].y>y)&&(points[i+1].y<=y)) )
+	{
+	  xi[k]=(int)(points[i].x+slope[i]*(y-points[i].y));
+	  k++;
+	}
+    }
+    
+    
+    for(int j=0;j<k-1;j++) /*- Arrange x-intersections in order -*/
+      for(int i=0;i<k-1;i++)
+	{
+	  if(xi[i]>xi[i+1])
+	    {
+	      int temp=xi[i];
+	      xi[i]=xi[i+1];
+	      xi[i+1]=temp;
+	    }
+	}
+    
+    for(int i=0;i<k;i+=2)
+      line(buffer, xi[i],xi[i+1]+1,y, color);
+  }      
+
 }
 
 void view_callback(const std_msgs::Int16::ConstPtr& msg)
@@ -199,6 +302,40 @@ void view_callback(const std_msgs::Int16::ConstPtr& msg)
 
 int main(int argc, char**argv)
 {
+
+  std::vector<Point2D> points;
+  std::vector<Point2D> points_temp;
+  Point2D p;
+
+  float v_lin = 0.6;
+  float v_ang = -0.;
+  int steps = 25;
+  float t_end = 5.0;
+
+  float th = 0;
+  float x = 0;
+  float y = 0;
+  float r = 0.21;
+  points.push_back(proj(x + r * sin(-(M_PI-th)), y - r * cos(-(M_PI-th)), 0));
+  points_temp.insert(points_temp.begin(), proj(x - r * sin(-(M_PI-th)), y + r * cos(-(M_PI-th)), 0));
+  for (float t=0.0; t <= t_end; t+=t_end/steps) {
+    x += v_lin * cos(th) * t_end/steps;
+    y += v_lin * sin(th) * t_end/steps;
+    th += v_ang * t_end/steps;
+    points.push_back(proj(x + r * sin(-(M_PI-th)), y - r * cos(-(M_PI-th)), 0));
+    points_temp.insert(points_temp.begin(), proj(x - r * sin(-(M_PI-th)), y + r * cos(-(M_PI-th)), 0));
+  }
+  // points.push_back(proj(0.5, -0.25, 0));
+  // points.push_back(proj(0.5, 0.25, 0));
+  // points.push_back(proj(1.0, 0.25, 0));
+  // points.push_back(proj(1.0, -0.25, 0));
+
+  points.insert(points.end(), points_temp.begin(), points_temp.end());
+
+
+  for (int i=0; i<points.size(); i++) {
+    printf("%d %d\n", points[i].x, points[i].y);
+  }
 
   if ( argc < 4 ) {
     printf("usage: %s video_in_1 video_in_2 video_out\n", argv[0]);
@@ -393,16 +530,17 @@ int main(int argc, char**argv)
     int U = ((-38 * R + -74 * G + 112 * B + 128) >> 8) + 128;
     int V = ((112 * R + -94 * G + -18 * B + 128) >> 8) + 128;
 
-    int x, y;
-    for (y = 50; y < 300; y ++) {
-	set_overlay_line((int*) buffer, y, y+100, y, Y, U, V);
-    }
+    ColorYUV color;
+    color.Y = Y;
+    color.U = U;
+    color.V = V;
+
+    fill_poly((int*) buffer, points, color);
+
     write(devout, buffer, sizeimage);
 
     q_buffer(devin1, &buf1);
     q_buffer(devin2, &buf2);
-
-
 
     ros::spinOnce();
   }
