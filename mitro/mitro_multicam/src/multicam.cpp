@@ -11,6 +11,9 @@
 #include <assert.h>
 #include <unistd.h>
 
+#include "ros/ros.h"
+#include "std_msgs/Int16.h"
+
 #define WIDTH_SMALL 320
 #define HEIGHT_SMALL 240
 
@@ -22,6 +25,9 @@
 #define FIFO_FILE "/tmp/multicam-fifo"
 #define MAX_BUF_SIZE 255
 
+
+int view = 0;
+int new_view = -1;
 
 typedef struct {
   void *start;
@@ -89,8 +95,6 @@ buffer* create_buffers(int device, unsigned int num,  size_t size) {
       perror ("VIDIOC_QUERYBUF");
       exit (EXIT_FAILURE);
     }
-
-    // printf("buffer length: %d", buf.length);
 
     buffers[i].length = buf.length; /* remember for munmap() */
 
@@ -188,6 +192,11 @@ void set_overlay_line(int* buffer, int x1, int x2, int y, int Y, int U, int V) {
   }
 }
 
+void view_callback(const std_msgs::Int16::ConstPtr& msg)
+{
+  new_view = msg->data;
+}
+
 int main(int argc, char**argv)
 {
 
@@ -200,22 +209,12 @@ int main(int argc, char**argv)
   char* devin2_name = argv[2];
   char* devout_name = argv[3];
 
+  ros::init(argc, argv, "multicam");
+  ros::NodeHandle n("~");
 
-  // open fifo pipe
-
-  char fifobuf[MAX_BUF_SIZE];
-  int fifofd;
-  if ( -1 ==  mkfifo(FIFO_FILE, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH)) {
-    if (errno != EEXIST) {
-      perror("mkfifo");
-      exit(1);
-    }
-  }
-  fifofd = open(FIFO_FILE, O_RDONLY | O_NONBLOCK);
-
+  ros::Subscriber sub = n.subscribe("view", 1, view_callback);
 
   // start video streams
-
   int devin1, devin2, devout;
 
   // input 1
@@ -248,112 +247,84 @@ int main(int argc, char**argv)
   devout = open_device(devout_name);
   vid_format.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
   set_resolution(devout, WIDTH, HEIGHT, vid_format);
-  
 
   // output buffer
-  __u8*buffer; 
+  void* buffer; 
   size_t sizeimage = WIDTH*HEIGHT*2; //vid_format.fmt.pix.sizeimage;
-  buffer=(__u8*)malloc(sizeimage);
+  buffer = malloc(sizeimage);
   memset(buffer, 0, sizeimage);
 
-  int view;
-  view = 0;
-
-  while (1) {
-    // read fifo pipe
-    int numread;
-    numread = read(fifofd, fifobuf, MAX_BUF_SIZE);
-    if ( numread >  0 )
-      printf("read %d bytes from fifo.\n", numread);
-
-    if ( numread == 2 ) {
-      int t;
-      t = fifobuf[0] - 49;
-      if (t > -1 && t < 4 && t != view) {
-	if ( t < 2 && view >= 2 ) {
-	  stop_streamin(devin1);
-	  stop_streamin(devin2);
-
-	  kill_buffers(buffers1, NUM_BUFFERS);
-	  kill_buffers(buffers2, NUM_BUFFERS);
-
-	  close(devin1);
-	  close(devin2);
-
-	  usleep(100);
-
-	  devin1 = open_device(devin1_name);
-	  devin2 = open_device(devin2_name);
 
 
-	  memset(&vid_format, 0, sizeof(vid_format));
-	  vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	  if (-1 == ioctl(devin1, VIDIOC_G_FMT, &vid_format)) {
-	    perror("VIDIOC_G_FMT");
-	    exit(EXIT_FAILURE);
-	  }
 
-	  set_resolution(devin1, WIDTH, HEIGHT, vid_format);
-	  buffers1 = create_buffers(devin1, NUM_BUFFERS, WIDTH*HEIGHT*2);
+  while (ros::ok()) {
+    int t = new_view;
+    if (t > -1 && t < 4 && t != view) {
+      if ( t < 2 && view >= 2 ) {
+	stop_streamin(devin1);
+	stop_streamin(devin2);
+
+	kill_buffers(buffers1, NUM_BUFFERS);
+	kill_buffers(buffers2, NUM_BUFFERS);
+
+	close(devin1);
+	close(devin2);
+
+	usleep(100);
+
+	devin1 = open_device(devin1_name);
+	devin2 = open_device(devin2_name);
+
+
+	memset(&vid_format, 0, sizeof(vid_format));
+	vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (-1 == ioctl(devin1, VIDIOC_G_FMT, &vid_format)) {
+	  perror("VIDIOC_G_FMT");
+	  exit(EXIT_FAILURE);
+	}
+
+	set_resolution(devin1, WIDTH, HEIGHT, vid_format);
+	buffers1 = create_buffers(devin1, NUM_BUFFERS, WIDTH*HEIGHT*2);
  
-	  set_resolution(devin2, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
-	  buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH_SMALL*HEIGHT_SMALL*2);
+	set_resolution(devin2, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
+	buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH_SMALL*HEIGHT_SMALL*2);
 	  
-	  start_streamin(devin1);
-	  start_streamin(devin2);
-	} else if ( t >= 2 && view < 2) {
-	  stop_streamin(devin1);
-	  stop_streamin(devin2);
-	  kill_buffers(buffers1, NUM_BUFFERS);
-	  kill_buffers(buffers2, NUM_BUFFERS);
+	start_streamin(devin1);
+	start_streamin(devin2);
+      } else if ( t >= 2 && view < 2) {
+	stop_streamin(devin1);
+	stop_streamin(devin2);
+	kill_buffers(buffers1, NUM_BUFFERS);
+	kill_buffers(buffers2, NUM_BUFFERS);
 
-	  close(devin1);
-	  close(devin2);
+	close(devin1);
+	close(devin2);
 
-	  usleep(100);
+	usleep(100);
 
-	  devin1 = open_device(devin1_name);
-	  devin2 = open_device(devin2_name);
+	devin1 = open_device(devin1_name);
+	devin2 = open_device(devin2_name);
 
-	  memset(&vid_format, 0, sizeof(vid_format));
-	  vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	  if (-1 == ioctl(devin1, VIDIOC_G_FMT, &vid_format)) {
-	    perror("VIDIOC_G_FMT");
-	    exit(EXIT_FAILURE);
-	  }
+	memset(&vid_format, 0, sizeof(vid_format));
+	vid_format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (-1 == ioctl(devin1, VIDIOC_G_FMT, &vid_format)) {
+	  perror("VIDIOC_G_FMT");
+	  exit(EXIT_FAILURE);
+	}
 
-	  set_resolution(devin1, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
-	  buffers1 = create_buffers(devin1, NUM_BUFFERS, WIDTH_SMALL*HEIGHT_SMALL*2);
+	set_resolution(devin1, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
+	buffers1 = create_buffers(devin1, NUM_BUFFERS, WIDTH_SMALL*HEIGHT_SMALL*2);
 
-	  set_resolution(devin2, WIDTH, HEIGHT, vid_format);
-	  buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH*HEIGHT*2);
+	set_resolution(devin2, WIDTH, HEIGHT, vid_format);
+	buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH*HEIGHT*2);
 	  
-	  start_streamin(devin1);
-	  start_streamin(devin2);
-	}
-	view = t;
-/*
-	if ( 0 == view ) {
-	  largeframe = buffers1[buf1.index].start;
-	  smallframe = buffers2[buf2.index].start;
-	} else if ( 1 == view ) {
-	  largeframe = buffers2[buf2.index].start;
-	  smallframe = buffers1[buf1.index].start;
-	} else if ( 2 == view ) {
-	  largeframe = buffers1[buf1.index].start;
-	  smallframe = NULL;
-	} else if ( 3 == view ) {
-	  largeframe = buffers2[buf2.index].start;
-	  smallframe = NULL;
-	}
-*/
-
-	printf("Switched to view: %d.\n", view);
+	start_streamin(devin1);
+	start_streamin(devin2);
       }
+      view = t;
+      printf("Switched to view: %d.\n", view);
+      new_view = -1;
     }
-    
-
-
 
     // deque buffers
     struct v4l2_buffer buf1;
@@ -426,12 +397,14 @@ int main(int argc, char**argv)
     for (y = 50; y < 300; y ++) {
 	set_overlay_line((int*) buffer, y, y+100, y, Y, U, V);
     }
-    write(devout, buffer, sizeof(__u8) * sizeimage);
+    write(devout, buffer, sizeimage);
 
     q_buffer(devin1, &buf1);
     q_buffer(devin2, &buf2);
 
 
+
+    ros::spinOnce();
   }
 
   /* Cleanup. */
@@ -445,8 +418,6 @@ int main(int argc, char**argv)
   close(devin2);  
 
   close(devout);
-
-  close(fifofd);
 
   return 0;
 }
