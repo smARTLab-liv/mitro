@@ -15,46 +15,10 @@ from numpy import matrix, array
 from numpy import linspace
 
 def ROS2OpenCV(x, y, z):
-    # height
-    x = x + 0.2
     h = 1.29
     z = z - h    
     return (-y, -z, x)
 
-def proj(x, y, z):
-    (x, y, z) = ROS2OpenCV(x, y, z)
-    # rotation                                                                                                         
-    th = 59.82 #+ 10.7
-    th = th / 180.0 * pi
-    R = matrix("1 0 0; 0 %f %f; 0 %f %f"%(cos(th), -sin(th), sin(th), cos(th)))
-    P = matrix([x, y, z]).transpose()
-    (x, y, z) = R*P
-
-    # distortion                                                                                                       
-    (k1, k2, p1, p2, k3) = (-0.296318, 0.059088, -0.002461, -0.005495, 0.000000)
-    #(-0.296318, 0.059088, -0.002461, -0.005495, 0.000000)
-
-
-    # projection                                                                                                       
-    (fx, fy, cx, cy) = (249.548508, 308.791107, 319.078339, 272.168663)
-    fx = fx * 1.5
-    fy = fy * 1.3
-
-    x_p = x / z
-    y_p = y / z
-
-    r2 = x_p * x_p + y_p * y_p
-
-    x_pp = x_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + 2 * p1 * x_p * y_p + p2 * (r2 + 2 * x_p * x_p)
-    y_pp = y_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + p1 * (r2 + 2 * y_p * y_p) + 2 * p2 * x_p * y_p
-
-    #x_pp = x_p
-    #y_pp = y_p
-
-    u = fx * x_pp + cx
-    v = fy * y_pp + cy
-    #print "%f %f %f -> %d %d"%(x, y, z, u, v)
-    return (int(u),int(v))
 
 class test_vision_node:
 
@@ -67,11 +31,52 @@ class test_vision_node:
         """ Create the window and make it re-sizeable (second parameter = 0) """
         cv.NamedWindow(self.cv_window_name, 0)
 
+        self.alpha = 63.8 / 180.0 * pi;
+        cv.CreateTrackbar('angle', self.cv_window_name, 638, 900, self.change_alpha)
+        self.yoff = -0.051;
+        cv.CreateTrackbar('y offset', self.cv_window_name, 49, 200, self.change_yoff)
+
         """ Create the cv_bridge object """
         self.bridge = CvBridge()
 
         """ Subscribe to the raw camera image topic """
         self.image_sub = rospy.Subscriber("/gscam/image_raw", Image, self.callback)
+
+    def change_yoff(self, yoff):
+        self.yoff = (yoff - 100) / 1000.0
+
+    def change_alpha(self, alpha):
+        self.alpha = alpha / 1800.0 * pi
+
+
+    def proj(self, x, y, z):
+        (x, y, z) = ROS2OpenCV(x, y + self.yoff, z)
+        # rotation                                                                                                         
+        #th = 59.82 + 10.7
+        #th = th / 180.0 * pi
+        th = self.alpha
+        R = matrix("1 0 0; 0 %f %f; 0 %f %f"%(cos(th), -sin(th), sin(th), cos(th)))
+        P = matrix([x, y, z]).transpose()
+        (x, y, z) = R*P
+
+        # distortion
+        (k1, k2, p1, p2) = (-0.286767, 0.059882, 0.000601, -0.001703)
+        k3 = 0
+
+        # projection
+        (fx, fy, cx, cy) = (355.027391, 353.784702, 306.290598, 260.086688)
+        
+        x_p = x / z
+        y_p = y / z
+
+        r2 = x_p * x_p + y_p * y_p
+
+        x_pp = x_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + 2 * p1 * x_p * y_p + p2 * (r2 + 2 * x_p * x_p)
+        y_pp = y_p * (1 + k1 * r2 + k2 * (r2 * r2) + k3 * (r2 * r2 * r2)) + p1 * (r2 + 2 * y_p * y_p) + 2 * p2 * x_p * y_p
+        u = fx * x_pp + cx
+        v = fy * y_pp + cy
+        return (int(u),int(v))
+
 
     def projline(self,image, x1, y1, z1, x2, y2, z2, count=20):
         x = linspace(x1, x2, count)
@@ -79,9 +84,9 @@ class test_vision_node:
         z = linspace(z1, z2, count)
         points = zip(x,y,z)
         h = 0.735
-        p_last = proj(points[0][0], points[0][1], points[0][2])
+        p_last = self.proj(points[0][0], points[0][1], points[0][2])
         for i in range(1,len(points)):
-            p = proj(points[i][0], points[i][1], points[i][2])
+            p = self.proj(points[i][0], points[i][1], points[i][2])
             cv.Line(image, p_last, p, cv.RGB(0, 255, 0))
             p_last = p
 
@@ -106,9 +111,11 @@ class test_vision_node:
         #cv.Line(cv_image, (0, height/2), (width, height/2), cv.RGB(255, 0, 0))
 
 
-        (fx, fy, cx, cy) = (249.548508, 308.791107, 319.078339, 272.168663)
+        
+        (fx, fy, cx, cy) = (355.027391, 353.784702, 306.290598, 260.086688)
         cx = int(cx)
         cy = int(cy)
+
         cv.Line(cv_image, (cx, 0), (cx, height), cv.RGB(255, 0, 0))
         cv.Line(cv_image, (0, cy), (width, cy), cv.RGB(255, 0, 0))
 

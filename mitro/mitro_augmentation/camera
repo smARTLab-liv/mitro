@@ -1,4 +1,4 @@
 #!/bin/bash
 source /opt/ros/electric/setup.bash
-export GSCAM_CONFIG="v4l2src device=/dev/video3 ! video/x-raw-rgb,width=640,height=480 ! ffmpegcolorspace"
+export GSCAM_CONFIG="v4l2src device=/dev/video2 ! video/x-raw-rgb,width=640,height=480 ! ffmpegcolorspace"
 rosrun gscam gscam
