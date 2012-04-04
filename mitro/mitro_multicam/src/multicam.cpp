@@ -14,6 +14,7 @@
 #include "ros/ros.h"
 #include "std_msgs/Int16.h"
 #include "geometry_msgs/Twist.h"
+#include "nav_msgs/Odometry.h"
 
 #define WIDTH_SMALL 320
 #define HEIGHT_SMALL 240
@@ -335,6 +336,11 @@ void twist_callback(const geometry_msgs::Twist::ConstPtr& msg) {
   points = twist2poly(msg->linear.x, msg->angular.z);
 }
 
+void odom_callback(const nav_msgs::Odometry::ConstPtr& msg) {
+  points = twist2poly(msg->twist.twist.linear.x, msg->twist.twist.angular.z);
+}
+
+
 int main(int argc, char**argv)
 {
   // overlay
@@ -365,8 +371,11 @@ int main(int argc, char**argv)
 
   ros::Subscriber sub_view = private_n.subscribe("view", 1, view_callback);
 
+  // ros::NodeHandle n;
+  // ros::Subscriber sub_twist = n.subscribe("cmd_twist_mixed", 1, twist_callback);
+
   ros::NodeHandle n;
-  ros::Subscriber sub_twist = n.subscribe("twist_mixed", 1, twist_callback);
+  ros::Subscriber sub_odom = n.subscribe("odom", 1, odom_callback);
 
   // start video streams
   int devin1, devin2, devout;
@@ -424,7 +433,7 @@ int main(int argc, char**argv)
 	close(devin1);
 	close(devin2);
 
-	usleep(100);
+	usleep(1000);
 
 	devin1 = open_device(devin1_name);
 	devin2 = open_device(devin2_name);
@@ -442,6 +451,8 @@ int main(int argc, char**argv)
  
 	set_resolution(devin2, WIDTH_SMALL, HEIGHT_SMALL, vid_format);
 	buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH_SMALL*HEIGHT_SMALL*2);
+
+	usleep(1000);
 	  
 	start_streamin(devin1);
 	start_streamin(devin2);
@@ -454,7 +465,7 @@ int main(int argc, char**argv)
 	close(devin1);
 	close(devin2);
 
-	usleep(100);
+	usleep(1000);
 
 	devin1 = open_device(devin1_name);
 	devin2 = open_device(devin2_name);
@@ -471,6 +482,8 @@ int main(int argc, char**argv)
 
 	set_resolution(devin2, WIDTH, HEIGHT, vid_format);
 	buffers2 = create_buffers(devin2, NUM_BUFFERS, WIDTH*HEIGHT*2);
+
+	usleep(1000);
 	  
 	start_streamin(devin1);
 	start_streamin(devin2);
