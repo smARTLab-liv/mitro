@@ -13,6 +13,7 @@
 
 #include "ros/ros.h"
 #include "std_msgs/Int16.h"
+#include "geometry_msgs/Twist.h"
 
 #define WIDTH_SMALL 320
 #define HEIGHT_SMALL 240
@@ -45,6 +46,7 @@ typedef struct {
   int V;
 } ColorYUV;
 
+std::vector<Point2D> points;
 
 int open_device(char* name) {
   int device;
@@ -251,6 +253,8 @@ void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
 
 void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
   int n = points.size();
+  if (n < 2) 
+    return;
   points.push_back(points[0]);
   int dx, dy;
   float slope[n];
@@ -295,22 +299,14 @@ void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
 
 }
 
-void view_callback(const std_msgs::Int16::ConstPtr& msg)
-{
-  new_view = msg->data;
-}
-
-int main(int argc, char**argv)
-{
-
+std::vector<Point2D> twist2poly(float lin, float ang) {
+  // computing the polygon
   std::vector<Point2D> points;
   std::vector<Point2D> points_temp;
   Point2D p;
 
-  float v_lin = 0.6;
-  float v_ang = -0.;
   int steps = 25;
-  float t_end = 5.0;
+  float t_end = 3.0;
 
   float th = 0;
   float x = 0;
@@ -319,23 +315,41 @@ int main(int argc, char**argv)
   points.push_back(proj(x + r * sin(-(M_PI-th)), y - r * cos(-(M_PI-th)), 0));
   points_temp.insert(points_temp.begin(), proj(x - r * sin(-(M_PI-th)), y + r * cos(-(M_PI-th)), 0));
   for (float t=0.0; t <= t_end; t+=t_end/steps) {
-    x += v_lin * cos(th) * t_end/steps;
-    y += v_lin * sin(th) * t_end/steps;
-    th += v_ang * t_end/steps;
+    x += lin * cos(th) * t_end/steps;
+    y += lin * sin(th) * t_end/steps;
+    th += ang * t_end/steps;
     points.push_back(proj(x + r * sin(-(M_PI-th)), y - r * cos(-(M_PI-th)), 0));
     points_temp.insert(points_temp.begin(), proj(x - r * sin(-(M_PI-th)), y + r * cos(-(M_PI-th)), 0));
   }
-  // points.push_back(proj(0.5, -0.25, 0));
-  // points.push_back(proj(0.5, 0.25, 0));
-  // points.push_back(proj(1.0, 0.25, 0));
-  // points.push_back(proj(1.0, -0.25, 0));
-
   points.insert(points.end(), points_temp.begin(), points_temp.end());
+  return points;
+}
 
 
-  for (int i=0; i<points.size(); i++) {
-    printf("%d %d\n", points[i].x, points[i].y);
-  }
+void view_callback(const std_msgs::Int16::ConstPtr& msg)
+{
+  new_view = msg->data;
+}
+
+void twist_callback(const geometry_msgs::Twist::ConstPtr& msg) {
+  points = twist2poly(msg->linear.x, msg->angular.z);
+}
+
+int main(int argc, char**argv)
+{
+  // overlay
+  int R = 200; //122;
+  int G = 255; //189;
+  int B = 200; //255;
+
+  int Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
+  int U = ((-38 * R + -74 * G + 112 * B + 128) >> 8) + 128;
+  int V = ((112 * R + -94 * G + -18 * B + 128) >> 8) + 128;
+
+  ColorYUV color;
+  color.Y = Y;
+  color.U = U;
+  color.V = V;
 
   if ( argc < 4 ) {
     printf("usage: %s video_in_1 video_in_2 video_out\n", argv[0]);
@@ -347,9 +361,12 @@ int main(int argc, char**argv)
   char* devout_name = argv[3];
 
   ros::init(argc, argv, "multicam");
-  ros::NodeHandle n("~");
+  ros::NodeHandle private_n("~");
 
-  ros::Subscriber sub = n.subscribe("view", 1, view_callback);
+  ros::Subscriber sub_view = private_n.subscribe("view", 1, view_callback);
+
+  ros::NodeHandle n;
+  ros::Subscriber sub_twist = n.subscribe("twist_mixed", 1, twist_callback);
 
   // start video streams
   int devin1, devin2, devout;
@@ -489,7 +506,10 @@ int main(int argc, char**argv)
     if ( NULL != largeframe )
       memcpy(buffer, largeframe, WIDTH*HEIGHT*2);
 
-    
+
+    if (view > 1)
+      fill_poly((int*) buffer, points, color);
+  
     if ( NULL != smallframe ) {
       int* b1;
       int* b2;
@@ -520,22 +540,6 @@ int main(int argc, char**argv)
 	}
       }
     }
-
-    // overlay
-    int R = 200; //122;
-    int G = 255; //189;
-    int B = 200; //255;
-
-    int Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
-    int U = ((-38 * R + -74 * G + 112 * B + 128) >> 8) + 128;
-    int V = ((112 * R + -94 * G + -18 * B + 128) >> 8) + 128;
-
-    ColorYUV color;
-    color.Y = Y;
-    color.U = U;
-    color.V = V;
-
-    fill_poly((int*) buffer, points, color);
 
     write(devout, buffer, sizeimage);
 
