@@ -1,0 +1,7 @@
+s1_angle: -2.14
+s2_angle: -2.64
+s3_angle: 2.64
+s4_angle: 2.14
+sonar_min: 0.0
+sonar_max: 2.0
+sonar_arc: 0.7

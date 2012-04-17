@@ -35,7 +35,12 @@
 #ifndef ROS_ARDUINO_HARDWARE_H_
 #define ROS_ARDUINO_HARDWARE_H_
 
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
 #include "WProgram.h"
+#endif
+
 #include <HardwareSerial.h>
 
 class ArduinoHardware {
