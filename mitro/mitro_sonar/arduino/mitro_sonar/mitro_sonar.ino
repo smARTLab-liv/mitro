@@ -1,101 +1,94 @@
-/* Ping))) Sensor
-  
-   This sketch reads a PING))) ultrasonic rangefinder and returns the
-   distance to the closest object in range. To do this, it sends a pulse
-   to the sensor to initiate a reading, then listens for a pulse 
-   to return.  The length of the returning pulse is proportional to 
-   the distance of the object from the sensor.
-     
-   The circuit:
-	* +V connection of the PING))) attached to +5V
-	* GND connection of the PING))) attached to ground
-	* SIG connection of the PING))) attached to digital pin 7
+#include <ros.h>
+#include <mitro_sonar/SonarRaw.h>
 
-   http://www.arduino.cc/en/Tutorial/Ping
-   
-   created 3 Nov 2008
-   by David A. Mellis
-   modified 30 Aug 2011
-   by Tom Igoe
- 
-   This example code is in the public domain.
+#include <ArduinoHardware.h>
 
- */
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif
 
-// this constant won't change.  It's the pin number
-// of the sensor's output:
 const int pingPin1 = 4;
 const int pingPin2 = 5;
 const int pingPin3 = 6;
 const int pingPin4 = 7;
 
-const long interval = 100;
+const long interval = 200;
+
+mitro_sonar::SonarRaw sonar_msg;
+ros::Publisher sonar_pub("sonar_raw", &sonar_msg);
+ros::NodeHandle nh;
 
 void setup() {
-  // initialize serial communication:
-  Serial.begin(115200);
+  nh.getHardware()->setBaud(115200);
+  nh.initNode();
+  nh.advertise(sonar_pub);
 }
 
-long time = millis();
+long prev_time = millis();
 
 void loop()
 {
   // establish variables for duration of the ping, 
   // and the distance result in inches and centimeters:
-  long duration, cm, del;
+  long duration, del, cm;
   int pingPin;
 
   for (int i = 1; i <= 4; i++) {
-    if (i == 1) {pingPin = pingPin1;}
-    if (i == 2) {pingPin = pingPin2;}
-    if (i == 3) {pingPin = pingPin3;}
-    if (i == 4) {pingPin = pingPin4;}
-    
-  // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
-  // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
-  pinMode(pingPin, OUTPUT);
-  digitalWrite(pingPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(pingPin, HIGH);
-  delayMicroseconds(5);
-  digitalWrite(pingPin, LOW);
+    if (i == 1) {
+      pingPin = pingPin1;
+    }
+    else if (i == 2) {
+      pingPin = pingPin2;
+    }
+    else if (i == 3) {
+      pingPin = pingPin3;
+    }
+    else if (i == 4) {
+      pingPin = pingPin4;
+    }
 
-  // The same pin is used to read the signal from the PING))): a HIGH
-  // pulse whose duration is the time (in microseconds) from the sending
-  // of the ping to the reception of its echo off of an object.
-  pinMode(pingPin, INPUT);
-  duration = pulseIn(pingPin, HIGH);
+    // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
+    // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
+    pinMode(pingPin, OUTPUT);
+    digitalWrite(pingPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(pingPin, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(pingPin, LOW);
 
-  // convert the time into a distance
-  //inches = microsecondsToInches(duration);
-  cm = microsecondsToCentimeters(duration);
-  
-  //Serial.print(inches);
-  //Serial.print("in, ");
-  Serial.print("S");
-  Serial.print(i);
-  Serial.print(": ");
-  Serial.print(cm);
-  Serial.print("cm");
-  Serial.println();
+    // The same pin is used to read the signal from the PING))): a HIGH
+    // pulse whose duration is the time (in microseconds) from the sending
+    // of the ping to the reception of its echo off of an object.
+    pinMode(pingPin, INPUT);
+    duration = pulseIn(pingPin, HIGH);
+
+    // convert the time into a distance
+    //inches = microsecondsToInches(duration);
+    cm = microsecondsToCentimeters(duration);
+
+    if (i == 1) {
+      sonar_msg.s1_dist = cm;
+    }
+    else if (i == 2) {
+      sonar_msg.s2_dist = cm;
+    }
+    else if (i == 3) {
+      sonar_msg.s3_dist = cm;
+    }
+    else if (i == 4) {
+      sonar_msg.s4_dist = cm;
+    }
   }
-  
-  del = millis() - time;
-  time = millis();
-  
-  Serial.println(del);
-  
-  delay(max(0, interval - del));
-}
 
-long microsecondsToInches(long microseconds)
-{
-  // According to Parallax's datasheet for the PING))), there are
-  // 73.746 microseconds per inch (i.e. sound travels at 1130 feet per
-  // second).  This gives the distance travelled by the ping, outbound
-  // and return, so we divide by 2 to get the distance of the obstacle.
-  // See: http://www.parallax.com/dl/docs/prod/acc/28015-PING-v1.3.pdf
-  return microseconds / 74 / 2;
+  sonar_pub.publish(&sonar_msg);
+  
+  nh.spinOnce();
+
+  del = millis() - prev_time;
+  prev_time = millis();
+  delay(max(0, interval - del));
 }
 
 long microsecondsToCentimeters(long microseconds)
@@ -105,3 +98,6 @@ long microsecondsToCentimeters(long microseconds)
   // object we take half of the distance travelled.
   return microseconds / 29 / 2;
 }
+
+
+
