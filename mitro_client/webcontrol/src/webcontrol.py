@@ -17,6 +17,7 @@ import roslib;
 roslib.load_manifest('geometry_msgs')
 import rospy
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Int16
 
 from subprocess import Popen, PIPE
 
@@ -58,7 +59,7 @@ class ChatWebSocketHandler(WebSocket):
             data.linear.x = linear
             data.angular.z = angular
 
-            pub.publish(data)
+            pub_twist.publish(data)
 
             response = TextMessage('cmd twist: %f %f'%(linear, angular))
             cherrypy.engine.publish('websocket-broadcast', response)
@@ -71,8 +72,9 @@ class ChatWebSocketHandler(WebSocket):
             r = text.split(':')
             view = int(r[1])
             if view < 5 and view > 0:
-                fd.write(str(view) + '\n')
-                fd.flush()
+                #fd.write(str(view) + '\n')
+                #fd.flush()
+                pub_view.publish(view-1)
                 response = TextMessage('switched to view: %d'%view)
                 cherrypy.engine.publish('websocket-broadcast', response)
 
@@ -280,10 +282,10 @@ class Root(object):
 
 if __name__ == '__main__':
 
-    global fd
+    #global fd
 
-    filename = '/tmp/multicam-fifo'
-    fd = open(filename, 'w');
+    #filename = '/tmp/multicam-fifo'
+    #fd = open(filename, 'w');
 
     global skype
     # Create an instance of the Skype class.
@@ -294,9 +296,10 @@ if __name__ == '__main__':
 
 
     rospy.init_node('web_control', anonymous=False, disable_signals=True)
-    global pub
-    pub = rospy.Publisher("cmd_twist_tele", Twist)
-    
+    global pub_twist, pub_view
+    pub_twist = rospy.Publisher("cmd_twist_tele", Twist)
+    pub_view = rospy.Publisher("/multicam/view", Int16)
+
     parser = argparse.ArgumentParser(description='Echo CherryPy Server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('-p', '--port', default=9000, type=int)
