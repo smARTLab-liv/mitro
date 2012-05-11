@@ -72,13 +72,13 @@ class ChatWebSocketHandler(WebSocket):
             r = text.split(':')
             view = int(r[1])
             if view < 5 and view > 0:
-                #fd.write(str(view) + '\n')
-                #fd.flush()
-                pub_view.publish(view-1)
+                pub_view.publish(view-1) # apparently the view subscriper likes only view_number between 0-3
                 response = TextMessage('switched to view: %d'%view)
                 cherrypy.engine.publish('websocket-broadcast', response)
 
         if text.startswith('skype:'):
+            # skype command protocol:
+            # skype:[contact_name]
             r = text.split(':')
             user = str(r[1])
 
@@ -89,28 +89,28 @@ class ChatWebSocketHandler(WebSocket):
                 # Add a user (send request)
                 uprofile = skype.User(Username=user)
                 if uprofile.BuddyStatus != Skype4Py.budFriend:
-                    uprofile.SetBuddyStatusPendingAuthorization('hello %s'%user)
+                    uprofile.SetBuddyStatusPendingAuthorization('hello %s'%user) # TODO this could be a more descriptive message
 
                 # Call the user
                 a = skype.PlaceCall(user)
 
                 t = rospy.get_time()
-                while not a.Status == 'INPROGRESS':
+                while not a.Status == 'INPROGRESS': # wait until call is accepted by remote user
                     rospy.sleep(1)
-                    if rospy.get_time() - t > 60:
+                    if rospy.get_time() - t > 60: # wait a maximum of one minute 
                         break
 
                 rospy.sleep(5)
-                keypress(skype_sequence)
+                keypress(skype_sequence) # send fullscreen command to skype
 
 
-            except SkypeError as details:
+            except SkypeError as details: # skype fucked up
                 response = TextMessage('skype failed: %s'%details.args[1])
                 cherrypy.engine.publish('websocket-broadcast', response)
                 
             
 
-    def closed(self, code, reason="A client left the room without a proper explanation."):
+    def closed(self, code, reason="A client left the room without a proper explanation."): # well that's clearly from the example
         cherrypy.engine.publish('websocket-broadcast', TextMessage(reason))
 
 class Root(object):
@@ -120,6 +120,7 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
+        """ this is just the index webpage """
         return """<html>
     <head>
       <script type='application/javascript' src='/js/jquery-1.6.2.min.js'></script>
@@ -278,6 +279,7 @@ class Root(object):
 
     @cherrypy.expose
     def ws(self):
+        """ websocket handling """
         cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
 
 if __name__ == '__main__':
