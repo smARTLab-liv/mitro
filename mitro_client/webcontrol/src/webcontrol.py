@@ -23,7 +23,9 @@ from subprocess import Popen, PIPE
 skype_sequence = '''key F
 '''
 
+
 def keypress(sequence):
+    """ This uses commandline tool xte to execute a keysequence. Used to fullscreen Skype video call window. """
     p = Popen(['xte'], stdin=PIPE)
     p.communicate(input=sequence)
 
@@ -33,6 +35,7 @@ class ChatWebSocketHandler(WebSocket):
         super(ChatWebSocketHandler, self).__init__(*args, **kwargs)
 
     def received_message(self, m):
+        """ Handles Websocket messages. """
         if not m.is_text:
             return
 
@@ -40,9 +43,11 @@ class ChatWebSocketHandler(WebSocket):
 
         if text == 'connect':
             response = TextMessage('connected')
-            cherrypy.engine.publish('websocket-broadcast', response)
+            cherrypy.engine.publish('websocket-broadcast', response) # this proably shouldn't be a broadcast, just one connection to server
             
         if text.startswith('cmd:'):
+            # command velocity protocol looks like:
+            # cmd:[linear_speed],[angular_speed], where linear_ and angular_speed are floats
             r = text.split(':')
             cmdstr = str(r[1]);
             cmd = cmdstr.split(',')
@@ -60,6 +65,9 @@ class ChatWebSocketHandler(WebSocket):
 
 
         if text.startswith('view:'):
+            # command view switches view
+            # protocol looks like:
+            # view:[view_number] where view_number is 1-4
             r = text.split(':')
             view = int(r[1])
             if view < 5 and view > 0:
