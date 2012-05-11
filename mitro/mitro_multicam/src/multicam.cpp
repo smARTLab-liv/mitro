@@ -24,29 +24,29 @@
 
 #define NUM_BUFFERS 2
 
-#define FIFO_FILE "/tmp/multicam-fifo"
+#define FIFO_FILE "/tmp/multicam-fifo" // not needed anymore
 #define MAX_BUF_SIZE 255
 
 
 int view = 0;
 int new_view = -1;
 
+// buffers used for V4L2
 typedef struct {
   void *start;
   size_t length;
 } buffer;
 
+// used for augmentation
 typedef struct {
   int x;
   int y;
 } Point2D;
-
 typedef struct {
   int Y;
   int U;
   int V;
 } ColorYUV;
-
 std::vector<Point2D> points;
 
 int open_device(char* name) {
@@ -188,6 +188,7 @@ void q_buffer(int device, struct v4l2_buffer *buf) {
 
 
 Point2D proj(float x, float y, float z) {
+  """ 3D to 2D projection """
   // ROS to OpenCV
   float temp = x;
   x = -(y - 0.051);
@@ -227,6 +228,7 @@ Point2D proj(float x, float y, float z) {
 }
 
 void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
+  """ files horizontal line in a v4l2 buffer """
   if (x2 < x1) {
     int t = x1;
     x1 = x2;
@@ -253,6 +255,7 @@ void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
 }
 
 void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
+  """ fills a polygon by calling the horizontal line fill method """
   int n = points.size();
   if (n < 2) 
     return;
@@ -301,7 +304,7 @@ void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
 }
 
 std::vector<Point2D> twist2poly(float lin, float ang) {
-  // computing the polygon
+  // computing the polygon for a twist
   std::vector<Point2D> points;
   std::vector<Point2D> points_temp;
   Point2D p;
@@ -348,6 +351,7 @@ int main(int argc, char**argv)
   int G = 255; //189;
   int B = 200; //255;
 
+  // converting from RGB to YUV
   int Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
   int U = ((-38 * R + -74 * G + 112 * B + 128) >> 8) + 128;
   int V = ((112 * R + -94 * G + -18 * B + 128) >> 8) + 128;
@@ -377,7 +381,7 @@ int main(int argc, char**argv)
   ros::NodeHandle n;
   ros::Subscriber sub_odom = n.subscribe("odom", 1, odom_callback);
 
-  // start video streams
+  // device handles
   int devin1, devin2, devout;
 
   // input 1
@@ -422,7 +426,7 @@ int main(int argc, char**argv)
 
   while (ros::ok()) {
     int t = new_view;
-    if (t > -1 && t < 4 && t != view) {
+    if (t > -1 && t < 4 && t != view) { // check if view change triggers resolution change (0 to 1, and 2 to 3 are save)
       if ( t < 2 && view >= 2 ) {
 	stop_streamin(devin1);
 	stop_streamin(devin2);
@@ -433,7 +437,7 @@ int main(int argc, char**argv)
 	close(devin1);
 	close(devin2);
 
-	usleep(1000);
+	usleep(1000); // this is a heuristic, can't immediately open device again
 
 	devin1 = open_device(devin1_name);
 	devin2 = open_device(devin2_name);
@@ -523,7 +527,7 @@ int main(int argc, char**argv)
     if (view > 1)
       fill_poly((int*) buffer, points, color);
   
-    if ( NULL != smallframe ) {
+    if ( NULL != smallframe ) { // if we have a smallframe, downsampling buffer by factor 2 
       int* b1;
       int* b2;
       b1 = (int*) smallframe;
@@ -554,9 +558,9 @@ int main(int argc, char**argv)
       }
     }
 
-    write(devout, buffer, sizeimage);
+    write(devout, buffer, sizeimage); // write the ouput buffer to device
 
-    q_buffer(devin1, &buf1);
+    q_buffer(devin1, &buf1); // requeuing buffers
     q_buffer(devin2, &buf2);
 
     ros::spinOnce();
