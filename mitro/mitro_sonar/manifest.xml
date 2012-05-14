@@ -10,5 +10,6 @@
   <url>http://ros.org/wiki/mitro_sonar</url>
 
   <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
 
 </package>
