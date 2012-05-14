@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     n.getParam("mitro_sonar/sonar_max", max_range);
     n.getParam("mitro_sonar/sonar_arc", arc_range);
     
-    angles = std::vector<float>(4);
+    angles = std::vector<float>(5);
     angles[0] = s1_angle;
     angles[1] = s2_angle;
     angles[2] = s3_angle;

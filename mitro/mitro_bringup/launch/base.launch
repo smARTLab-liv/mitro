@@ -9,6 +9,9 @@
     
     <!-- start hokuyo -->
     <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
+
+    <!-- start sonar -->
+    <include file="$(find mitro_sonar)/launch/mitro_sonar.launch" />
     
     <!-- start assisted drive -->
     <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
