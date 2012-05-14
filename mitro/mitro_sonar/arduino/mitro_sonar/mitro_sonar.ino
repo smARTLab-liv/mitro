@@ -9,10 +9,11 @@
 #include "WProgram.h"
 #endif
 
-const int pingPin1 = 4;
-const int pingPin2 = 5;
-const int pingPin3 = 6;
-const int pingPin4 = 7;
+const int pingPin1 = 3; // far left
+const int pingPin2 = 4; // left center
+const int pingPin3 = 5; // center
+const int pingPin4 = 6; // right center
+const int pingPin5 = 7; // far right
 
 const long interval = 200;
 
@@ -35,7 +36,7 @@ void loop()
   long duration, del, cm;
   int pingPin;
 
-  for (int i = 1; i <= 4; i++) {
+  for (int i = 1; i <= 5; i++) {
     if (i == 1) {
       pingPin = pingPin1;
     }
@@ -47,6 +48,9 @@ void loop()
     }
     else if (i == 4) {
       pingPin = pingPin4;
+    }
+    else if (i == 5) {
+      pingPin = pingPin5;
     }
 
     // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
@@ -79,6 +83,9 @@ void loop()
     }
     else if (i == 4) {
       sonar_msg.s4_dist = cm;
+    }
+    else if (i == 5) {
+      sonar_msg.s5_dist = cm;
     }
   }
 
