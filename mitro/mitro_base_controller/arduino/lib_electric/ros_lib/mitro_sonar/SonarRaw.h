@@ -16,6 +16,7 @@ namespace mitro_sonar
       int16_t s2_dist;
       int16_t s3_dist;
       int16_t s4_dist;
+      int16_t s5_dist;
 
     virtual int serialize(unsigned char *outbuffer) const
     {
@@ -52,6 +53,14 @@ namespace mitro_sonar
       *(outbuffer + offset + 0) = (u_s4_dist.base >> (8 * 0)) & 0xFF;
       *(outbuffer + offset + 1) = (u_s4_dist.base >> (8 * 1)) & 0xFF;
       offset += sizeof(this->s4_dist);
+      union {
+        int16_t real;
+        uint16_t base;
+      } u_s5_dist;
+      u_s5_dist.real = this->s5_dist;
+      *(outbuffer + offset + 0) = (u_s5_dist.base >> (8 * 0)) & 0xFF;
+      *(outbuffer + offset + 1) = (u_s5_dist.base >> (8 * 1)) & 0xFF;
+      offset += sizeof(this->s5_dist);
       return offset;
     }
 
@@ -94,11 +103,20 @@ namespace mitro_sonar
       u_s4_dist.base |= ((uint16_t) (*(inbuffer + offset + 1))) << (8 * 1);
       this->s4_dist = u_s4_dist.real;
       offset += sizeof(this->s4_dist);
+      union {
+        int16_t real;
+        uint16_t base;
+      } u_s5_dist;
+      u_s5_dist.base = 0;
+      u_s5_dist.base |= ((uint16_t) (*(inbuffer + offset + 0))) << (8 * 0);
+      u_s5_dist.base |= ((uint16_t) (*(inbuffer + offset + 1))) << (8 * 1);
+      this->s5_dist = u_s5_dist.real;
+      offset += sizeof(this->s5_dist);
      return offset;
     }
 
     const char * getType(){ return "mitro_sonar/SonarRaw"; };
-    const char * getMD5(){ return "ef1304116228f22e51da1a232e0d6808"; };
+    const char * getMD5(){ return "deb7cee22b91aff48f551d443124d471"; };
 
   };
 
