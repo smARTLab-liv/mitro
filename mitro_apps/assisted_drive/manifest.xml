@@ -14,5 +14,6 @@
   <depend package="nav_msgs"/>
   <depend package="std_msgs"/>
   <depend package="tf"/>
+  <depend package="mitro_sonar"/>
 
 </package>
