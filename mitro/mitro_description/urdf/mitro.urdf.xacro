@@ -9,6 +9,7 @@
     <property name="top_plate_lift" value="0.12"/>
     <property name="top_plate_height" value="0.016"/> <!-- TODO: requires meassurement -->
     <property name="hokuyo_scan_height" value="0.056"/>
+    <property name="sonar_scan_height" value="0.035"/>
     <property name="pole_length" value="1.45"/>
     <property name="pole_x_offset" value="-0.0611"/>
     <property name="kinect_pitch_angle" value="1.16"/>
@@ -34,6 +35,15 @@
         <origin xyz="0 0 ${base_plate_lift}"/>
         <parent link="base_link"/>
         <child link="base_plate"/>
+      </joint>
+      
+      <link name="base_sonar">
+      </link>
+      
+      <joint name="base_sonar_joint" type="fixed">
+        <origin xyz="0 0 ${sonar_scan_height}"/>
+        <parent link="base_plate"/>
+        <child link="base_sonar"/>
       </joint>
 
       <link name="base_laser">

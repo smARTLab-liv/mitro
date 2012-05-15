@@ -18,11 +18,11 @@ sensor_msgs::LaserScan laser_msg;
 
 void sonar_raw_cb(const mitro_sonar::SonarRaw::ConstPtr& msg) {
     sonar_msg.header.stamp = ros::Time::now();
-    ranges[0] = (msg->s1_dist) / 100.0 + base_radius;
-    ranges[1] = (msg->s2_dist) / 100.0 + base_radius;
-    ranges[2] = (msg->s3_dist) / 100.0 + base_radius;
-    ranges[3] = (msg->s4_dist) / 100.0 + base_radius;
-    ranges[4] = (msg->s5_dist) / 100.0 + base_radius;
+    ranges[0] = (msg->s1_dist) / 100.0 + base_radius - 0.01;
+    ranges[1] = (msg->s2_dist) / 100.0 + base_radius - 0.01;
+    ranges[2] = (msg->s3_dist) / 100.0 + base_radius - 0.01;
+    ranges[3] = (msg->s4_dist) / 100.0 + base_radius - 0.01;
+    ranges[4] = (msg->s5_dist) / 100.0 + base_radius - 0.01;
     sonar_msg.ranges = ranges;
     sonar_pub.publish(sonar_msg);
     
@@ -67,14 +67,14 @@ int main(int argc, char** argv) {
     sonar_msg.max_range = max_range;
     sonar_msg.angles = angles;
     
-    laser_msg.header.frame_id = "base_link";
+    laser_msg.header.frame_id = "base_sonar";
     laser_msg.angle_min = s1_angle;
     laser_msg.angle_max = s1_angle + 2.0;
     laser_msg.angle_increment = 0.5;
     laser_msg.range_min = min_range;
     laser_msg.range_max = max_range;
-    laser_msg.scan_time = 0.12;
-    laser_msg.time_increment = 0.12 / 5.0;
+    laser_msg.scan_time = 0.12; // estimated guess
+    laser_msg.time_increment = 0.12 / 5.0; // estimated guess
     
   }
   catch (ros::InvalidNameException e) {
