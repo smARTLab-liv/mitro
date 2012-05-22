@@ -20,7 +20,7 @@ bool obst_stop = false;
 bool sonar_stop = false;
 ros::Time last_costmap, last_update, last_sonar;
 
-bool use_assisted_drive = false;
+bool use_assisted_drive = true;
 
 double modulus(double a, double b);
 
