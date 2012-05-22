@@ -12,3 +12,8 @@ psutil:
   ubuntu: 
     pip: 
       packages: [psutil]
+
+v4l-conf:
+  ubuntu:
+    apt:
+      packages: [v4l-conf]
