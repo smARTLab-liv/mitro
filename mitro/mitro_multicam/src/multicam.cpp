@@ -188,7 +188,7 @@ void q_buffer(int device, struct v4l2_buffer *buf) {
 
 
 Point2D proj(float x, float y, float z) {
-  """ 3D to 2D projection """
+  //""" 3D to 2D projection """
   // ROS to OpenCV
   float temp = x;
   x = -(y - 0.051);
@@ -228,7 +228,7 @@ Point2D proj(float x, float y, float z) {
 }
 
 void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
-  """ files horizontal line in a v4l2 buffer """
+  //""" files horizontal line in a v4l2 buffer """
   if (x2 < x1) {
     int t = x1;
     x1 = x2;
@@ -255,7 +255,7 @@ void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
 }
 
 void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
-  """ fills a polygon by calling the horizontal line fill method """
+  //""" fills a polygon by calling the horizontal line fill method """
   int n = points.size();
   if (n < 2) 
     return;
