@@ -1,0 +1,20 @@
+<package>
+  <description brief="mitro_webcontrol">
+
+     mitro_webcontrol
+
+  </description>
+  <author>Swarmlab</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/mitro_webcontrol</url>
+
+  <depend package="rospy"/>
+
+  <rosdep name="cherrypy"/>
+  <rosdep name="ws4py"/>
+  <rosdep name="skype4py"/>
+
+</package>
+
+

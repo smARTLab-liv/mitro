@@ -17,3 +17,19 @@ v4l-conf:
   ubuntu:
     apt:
       packages: [v4l-conf]
+
+
+cherrypy:
+  ubuntu:
+    pip:
+      packages: [cherrypy]
+
+ws4py:
+  ubuntu:
+    pip:
+      packages: [ws4py]
+
+skype4py:
+  ubuntu:
+    pip:
+       packages: [skype4py]
