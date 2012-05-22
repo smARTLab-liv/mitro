@@ -51,7 +51,7 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
                     twist_msg.angular.z = msg->angular.z;
                 }
                 else {
-                    twist_msg.linear.x = 0.2;
+                    twist_msg.linear.x = 0.66 * msg->linear.x;
                     twist_msg.angular.z = msg->angular.z;
                 }
             }

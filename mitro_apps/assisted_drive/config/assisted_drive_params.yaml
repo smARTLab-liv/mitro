@@ -5,4 +5,4 @@ sonar_topic: sonar_scan
 base_frame_id: base_link
 max_range: 1.5 # maximum range for which obstacles will be considered
 clearing_dist: 0.15 # minimum distance required between robot base and obstacles
-sonar_clearing_dist: 0.1
+sonar_clearing_dist: 0.3
