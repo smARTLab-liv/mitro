@@ -16,7 +16,7 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg, int32_t priority) {
     
     if ( (priority >= current_level) | ((time_now - time_last).toSec() > HOLD_OFF_TIME) ) {
         if (current_level != priority) {
-            std::cout << "New level: " << priority << std::endl;
+            ROS_DEBUG("New level: %d", priority);
         }
         current_level = priority;
         time_last = ros::Time::now();
