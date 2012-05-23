@@ -49,7 +49,7 @@ typedef struct {
   int V;
 } ColorYUV;
 std::vector<Point2D> points;
-std::vector<float> sonar_data;
+std::vector<float> sonar_data(5,0);
 
 int open_device(char* name) {
   int device;
@@ -402,12 +402,12 @@ int main(int argc, char**argv)
   ros::NodeHandle private_n("~");
 
   ros::Subscriber sub_view = private_n.subscribe("view", 1, view_callback);
-
   // ros::NodeHandle n;
   // ros::Subscriber sub_twist = n.subscribe("cmd_twist_mixed", 1, twist_callback);
 
   ros::NodeHandle n;
   ros::Subscriber sub_odom = n.subscribe("odom", 1, odom_callback);
+  ros::Subscriber sub_sonar = n.subscribe("sonar_scan", 10, sonar_callback);
 
   // device handles
   int devin1, devin2, devout;
@@ -557,14 +557,15 @@ int main(int argc, char**argv)
       
       int sonar_width = 20;
       double sonar_dist_offset = 0.225;
-      double sonar_dist_max = 0.25;
-      double sonar_scale = 1.0;
+      double sonar_dist_max = 1.0;
+      double sonar_scale = 100.0;
       int sonar_pos_x[5] = {250, 280, 310, 340, 370};
       int sonar_pos_y = 470;
       
       for (int i = 0; i < 5; i++) {
-        int height = std::floor(sonar_scale * std::min(sonar_dist_max, std::max(1.0, sonar_data[i] - sonar_dist_offset)));
-        fill_rect((int*) buffer, sonar_pos_x[i], sonar_pos_y - height, sonar_width, height, sonar_color);
+        int height = std::floor(sonar_scale * (sonar_dist_max - std::min(sonar_dist_max, std::max(0.01, sonar_data[i] - sonar_dist_offset))));
+        //std::cout << i << ", " << sonar_data[i] << ", " << height << std::endl; 
+	fill_rect((int*) buffer, sonar_pos_x[i], sonar_pos_y - height, sonar_width, height, sonar_color);
       }
     }
   

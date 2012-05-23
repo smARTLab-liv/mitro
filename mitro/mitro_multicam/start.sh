@@ -14,7 +14,8 @@ while [ $DONE -lt 1 ]; do
     then
 	sleep 1
 	/home/swarmlab/ros/mitro/mitro_multicam/bin/multicam /dev/video1 /dev/video2 /dev/video3 > $LOG_FILE &
-	PID=`ps aux | grep multicam | grep -v grep | grep -v ps3 | awk '{print $2}'`
+        sleep 1
+	PID=`ps aux | grep 'bin/multicam' | grep -v grep | grep -v ps3 | awk '{print $2}'`
 	echo $PID > $PID_FILE
 	echo "process started with PID: " $PID
 	DONE=1
