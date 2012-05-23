@@ -15,6 +15,7 @@
 #include "std_msgs/Int16.h"
 #include "geometry_msgs/Twist.h"
 #include "nav_msgs/Odometry.h"
+#include "mitro_sonar/SonarScan.h"
 
 #define WIDTH_SMALL 320
 #define HEIGHT_SMALL 240
@@ -48,6 +49,7 @@ typedef struct {
   int V;
 } ColorYUV;
 std::vector<Point2D> points;
+std::vector<float> sonar_data;
 
 int open_device(char* name) {
   int device;
@@ -254,6 +256,12 @@ void line(int* buffer, int x1, int x2, int y, ColorYUV color) {
   }
 }
 
+void fill_rect(int* buffer, int x, int y, int width, int height, ColorYUV color) {
+  for (int i = y; i <= y + height; i++) {
+    line(buffer, x, x + width, i, color);
+  }
+}
+
 void fill_poly(int* buffer, std::vector<Point2D> points, ColorYUV color) {
   //""" fills a polygon by calling the horizontal line fill method """
   int n = points.size();
@@ -343,14 +351,13 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr& msg) {
   points = twist2poly(msg->twist.twist.linear.x, msg->twist.twist.angular.z);
 }
 
+void sonar_callback(const mitro_sonar::SonarScan::ConstPtr& msg) {
+  sonar_data.clear();
+  sonar_data.reserve(msg->ranges.size());
+  std::copy(msg->ranges.begin(), msg->ranges.end(), sonar_data.begin());
+}
 
-int main(int argc, char**argv)
-{
-  // overlay
-  int R = 200; //122;
-  int G = 255; //189;
-  int B = 200; //255;
-
+ColorYUV rgb_to_yuv(int R, int G, int B) {
   // converting from RGB to YUV
   int Y = ((66 * R + 129 * G + 25 * B + 128) >> 8) + 16;
   int U = ((-38 * R + -74 * G + 112 * B + 128) >> 8) + 128;
@@ -360,6 +367,27 @@ int main(int argc, char**argv)
   color.Y = Y;
   color.U = U;
   color.V = V;
+  
+  return color;
+}
+
+
+int main(int argc, char**argv)
+{
+  // overlay
+  int R = 200; //122;
+  int G = 255; //189;
+  int B = 200; //255;
+
+  ColorYUV path_color = rgb_to_yuv(R, G, B);
+  
+  R = 255;
+  G = 50;
+  B = 0;
+  
+  ColorYUV sonar_color = rgb_to_yuv(R, G, B); 
+  
+  
 
   if ( argc < 4 ) {
     printf("usage: %s video_in_1 video_in_2 video_out\n", argv[0]);
@@ -524,8 +552,10 @@ int main(int argc, char**argv)
       memcpy(buffer, largeframe, WIDTH*HEIGHT*2);
 
 
-    if (view > 1)
-      fill_poly((int*) buffer, points, color);
+    if (view > 1) {
+      fill_poly((int*) buffer, points, path_color);
+      fill_rect((int*) buffer, 50, 50, 20, 10, sonar_color);
+    }
   
     if ( NULL != smallframe ) { // if we have a smallframe, downsampling buffer by factor 2 
       int* b1;
