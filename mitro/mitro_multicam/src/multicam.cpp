@@ -554,7 +554,18 @@ int main(int argc, char**argv)
 
     if (view > 1) {
       fill_poly((int*) buffer, points, path_color);
-      fill_rect((int*) buffer, 50, 50, 20, 10, sonar_color);
+      
+      int sonar_width = 20;
+      double sonar_dist_offset = 22.5;
+      double sonar_dist_max = 25.0;
+      double sonar_scale = 1.0;
+      int sonar_pos_x[5] = {250, 280, 310, 340, 370};
+      int sonar_pos_y = 470;
+      
+      for (int i = 0; i < 5; i++) {
+        int height = std::floor(sonar_scale * std::min(sonar_dist_max, std::max(0.0, sonar_data[i] - sonar_dist_offset)));
+        fill_rect((int*) buffer, sonar_pos_x[i], sonar_pos_y - height, sonar_width, height, sonar_color);
+      }
     }
   
     if ( NULL != smallframe ) { // if we have a smallframe, downsampling buffer by factor 2 
