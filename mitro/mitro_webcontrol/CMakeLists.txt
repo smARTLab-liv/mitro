@@ -27,6 +27,4 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 #rosbuild_add_executable(example examples/example.cpp)
-rosbuild_add_executable(map_saver src/map_saver.cpp)
 
-target_link_libraries(map_saver /usr/lib/libpngwriter.a)
