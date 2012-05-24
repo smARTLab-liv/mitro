@@ -10,11 +10,11 @@
   <url>http://ros.org/wiki/mitro_webcontrol</url>
 
   <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="nav_msgs"/>
 
   <rosdep name="cherrypy"/>
   <rosdep name="ws4py"/>
   <rosdep name="skype4py"/>
 
 </package>
-
-
