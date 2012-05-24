@@ -10,7 +10,6 @@
   <url>http://ros.org/wiki/mitro_webcontrol</url>
 
   <depend package="rospy"/>
-  <depend package="roscpp"/>
   <depend package="nav_msgs"/>
 
   <rosdep name="cherrypy"/>
