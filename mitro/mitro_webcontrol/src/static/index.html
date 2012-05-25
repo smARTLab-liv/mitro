@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <script src="/static/js/jquery-1.6.2.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css" type="text/css" />
+    <script>%(script)s</script>
+    <title>mitro</title>
+  </head>
+  <body>
+    <h1 class="logo">Mitro</h1>
+
+    <div class="content">
+
+      <h2>Status</h2>
+      <ul>
+	<li id="runstop">runstop pressed</li>
+	<li id="wifi">wifi</li>
+	<li id="battery_robot">battery robot</li>
+	<li id="battery_laptop">battery laptop</li>
+      </ul>
+
+      <div id="commands">
+	<h2>Commands</h2>
+	<div class="emergency_group">
+	  <input type="button" id="emergency_stop" value="stop" />
+	</div>
+	<div class="arrow_keys_group">
+	  <input type="button" id="up" value="up"/><br />
+	  <input type="button" id="left" value="left"/><input type="button" id="down" value="down"/><input type="button" id="right" value="right"/>
+	</div>
+	<div class="view_group">
+	  <input id="view_1" type="button" value="view 1" />
+	  <input id="view_2" type="button" value="view 2" />
+	  <input id="view_3" type="button" value="view 3" />
+	  <input id="view_4" type="button" value="view 4" />
+	</div>
+
+	<div class="skype_group">
+	  <input id="skype_user" type="text" placeholder="Enter your Skype-name!">
+	  <input id="skype_call" type="submit" value="call">
+	</div>
+      </div>
+
+
+      <div class="navigation">
+	<h2>Navigation</h2>
+	<div class="map_group">
+	  <input id="home" type="button" value="home" />
+	  <input id="navigation" type="button" value="navigation" />
+	  <input id="assisted_drive" type="button" value="assisted drive" />
+	  <input id="costmap" type="button" value="recover" />
+	</div>
+	<div class="map">
+	  <div class="map_marker" id="robot_marker"></div>
+	  <div class="map_marker" id="goal_marker"></div>
+	  <div class="map_marker" id="home_marker"></div>
+	  <img src="/static/images/map.png">
+	</div>
+      </div>
+
+
+      <div class="logger">
+	<h2 id="logger_link">Logger</h2>
+	<textarea id="logger" cols="35" rows="10"></textarea>
+      </div>
+
+    </div>
+    <div class="content" style="display: none;">
+      <p>Disconnected from server.</p>
+    </div>
+
+  </body>
+</html>

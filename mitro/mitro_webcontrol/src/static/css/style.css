@@ -1,19 +1,78 @@
- body {
-        background-image: url(/images/linedpaper.jpg);
-        margin: 0;
-        padding: 0;
-        text-align: left;
+.content {
+    display: block;
 }
 
-#content {
-        background: #fff;
-        margin: auto;
-        overflow: hidden;
-        margin-top: 20px;
-        width: 900px;
-        height: 620px;
-        box-shadow: 8px 8px 12px #020100;
+.disconnected {
+    display: none;
 }
 
-#canvas { 
+.emergency_group {
+    float: left;
+    width: 75px;
+}
+
+.emergency_group input[type="button"] {
+    margin: 2px;
+    height: 32px;
+}
+
+.arrow_keys_group {
+    margin-left: 75px;
+}
+.arrow_keys_group input[type="button"] {
+    margin: 2px;
+    width:  32px;
+    height: 32px;
+}
+
+#up {
+    margin-left: 38px;
+}
+
+.skype_group, .view_group {
+    margin-top: 15px;
+}
+
+.map_group {
+    float: left;
+    width: 75px;
+}
+
+.map {
+    position: relative;
+    display: block;
+    margin-left: 75px;
+}
+
+#robot_marker {
+    top: 20px;
+    left: 20px;
+    background: transparent url('/static/images/wifi-0.png') no-repeat;
+}
+
+#goal_marker {
+    top: 150px;
+    left: 30px;
+    background: transparent url('/static/images/nav.png') no-repeat;
+}
+
+#home_marker {
+    top: 120px;
+    left: 20px;
+    background: transparent url('/static/images/home.png') no-repeat;
+    opacity: 0.4;
+}
+
+.map_marker {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+}
+
+#logger_link {
+    cursor: pointer;
+}
+
+#logger {
+    display: none;
 }

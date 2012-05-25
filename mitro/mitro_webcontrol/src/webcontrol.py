@@ -14,15 +14,24 @@ import Skype4Py
 from Skype4Py import SkypeError
 
 import roslib;
-roslib.load_manifest('geometry_msgs')
+roslib.load_manifest('mitro_webcontrol')
 import rospy
-from geometry_msgs.msg import Twist
-from std_msgs.msg import Int16
+
+from geometry_msgs.msg import Twist, PoseWithCovarianceStamped, PoseStamped
+from std_msgs.msg import Int16, Bool
+from mitro_diagnostics.msg import SysInfo
+from nav_msgs.msg import MapMetaData
 
 from subprocess import Popen, PIPE
 
+import tf
+
+import json
+
 skype_sequence = '''key F
 '''
+
+
 
 
 def keypress(sequence):
@@ -61,8 +70,8 @@ class ChatWebSocketHandler(WebSocket):
 
             pub_twist.publish(data)
 
-            response = TextMessage('cmd twist: %f %f'%(linear, angular))
-            cherrypy.engine.publish('websocket-broadcast', response)
+            #response = TextMessage('cmd twist: %f %f'%(linear, angular))
+            #cherrypy.engine.publish('websocket-broadcast', response)
 
 
         if text.startswith('view:'):
@@ -120,167 +129,87 @@ class Root(object):
 
     @cherrypy.expose
     def index(self):
-        """ this is just the index webpage """
-        return """<html>
-    <head>
-      <script type='application/javascript' src='/js/jquery-1.6.2.min.js'></script>
-      <script type='application/javascript'>
-        function send_cmds() {
-          if (keys[0] | keys[1] | keys[2] | keys[3]) {
-            linear = 0;
-            angular = 0;
-            if (keys[0] & !keys[1]) {
-              linear = 0.7;
-            }
-            if (keys[1] & !keys[0]) {
-              linear = -0.15;
-            }
-            if (keys[2] & !keys[3]) {
-              angular = 1;
-            }
-            if (keys[3] & !keys[2]) {
-              angular = -1;
-            }
-            ws.send('cmd:' + linear + ',' + angular);
-          } 
-          setTimeout("send_cmds()", 100);
-        };          
+        """ this is definetely not just the index webpage """
+        htmldoc = file('static/index.html', 'r').read()
+        jsscript = file('static/script.js', 'r').read()
 
-        $(document).ready(function() {
-          websocket = 'ws://' + window.location.host + '/ws';
-          // websocket = 'ws://%(host)s:%(port)s/ws';
-          if (window.WebSocket) {
-            ws = new WebSocket(websocket);
-          }
-          else if (window.MozWebSocket) {
-            ws = MozWebSocket(websocket);
-          }
-          else {
-            console.log('WebSocket Not Supported');
-            return;
-          }
-
-          ws.onopen = function() {
-             ws.send("connect");
-          };
-          window.onbeforeunload = function(e) {
-            $('#chat').val('bye bye...\\n' + $('#chat').val());
-            ws.close(1000, 'disconnect');
-               
-            if(!e) e = window.event;
-            e.stopPropagation();
-            e.preventDefault();
-          };
-          ws.onmessage = function (evt) {
-             $('#chat').val('<< ' + evt.data + '\\n' + $('#chat').val());
-          };
-          ws.onclose = function(evt) {
-
-             $('#chat').val($('#chat').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\\n');  
-          };
-
-          $('#skype').click(function() {
-             ws.send('skype:' + $('#skypeuser').val());
-             return false;
-          });
-
-          $('#view1').click(function() {
-             ws.send('view:1');
-             return false;
-          });
-
-          $('#view2').click(function() {
-             ws.send('view:2');
-             return false;
-          });
-
-          $('#view3').click(function() {
-             ws.send('view:3');
-             return false;
-          });
-
-          $('#view4').click(function() {
-             ws.send('view:4');
-             return false;
-          });
-
-
-          keys = new Array(0, 0, 0, 0);
-
-          document.onkeydown = function(e){
-            keyCode = ('which' in event) ? event.which : event.keyCode;
-            switch(keyCode) {
-              case 38:
-                // up
-                keys[0] = 1;
-                break;
-              case 40:
-                // down
-                keys[1] = 1;
-                break;
-              case 37:
-                // left
-                keys[2] = 1;
-                break;
-              case 39:
-                // right
-                keys[3] = 1;
-                break;
-            };
-          };
-
-          document.onkeyup = function(e){
-            keyCode = ('which' in event) ? event.which : event.keyCode;
-            switch(keyCode) {
-              case 38:
-                // up
-                keys[0] = 0;
-                break;
-              case 40:
-                // down
-                keys[1] = 0;
-                break;
-              case 37:
-                // left
-                keys[2] = 0;
-                break;
-              case 39:
-                // right
-                keys[3] = 0;
-                break;
-            };
-          };
-
-          document.onblur = function(e) {
-            keys = Array(0, 0, 0, 0);
-          };
-
-          setTimeout("send_cmds()", 100);
-
-        });
-      </script>
-    </head>
-    <body>
-    <form action='#' id='chatform' method='get'>
-      <textarea id='chat' cols='35' rows='10'></textarea>
-      <br />
-      <input id='skypeuser' type='text'/>
-      <input id='skype' type='submit' value='Call' />
-      <br />
-      <input id='view1' type='submit' value='View 1' />
-      <input id='view2' type='submit' value='View 2' />
-      <input id='view3' type='submit' value='View 3' />
-      <input id='view4' type='submit' value='View 4' />
-      </form>
-    </body>
-    </html>
-    """ % { 'host': self.host,
-            'port': self.port}
+        return htmldoc%{'script': jsscript%{ 'host': self.host,
+                                             'port': self.port}}
 
     @cherrypy.expose
     def ws(self):
         """ websocket handling """
         cherrypy.log("Handler created: %s" % repr(cherrypy.request.ws_handler))
+
+
+status_msg = {}
+
+def callback_relais(msg):
+    global status_msg
+    status_msg['relais'] = msg.data
+
+def callback_runstop(msg):
+    global status_msg
+    status_msg['runstop'] = msg.data
+
+def callback_hasgoal(msg):
+    global status_msg
+    status_msg['hasgoal'] = msg.data
+
+def callback_assisted(msg):
+    global status_msg
+    status_msg['assisted'] = msg.data
+
+def callback_mapmeta(msg):
+    global mapmeta
+    mapmeta = msg
+
+from threading import Thread
+
+class StatusThread(Thread):
+    def __init__ (self):
+        Thread.__init__(self)
+        self.stopped = False
+        self.listener = tf.TransformListener()
+    
+    def stop(self):
+        self.stopped = True
+
+    def run(self):
+        global status_msg, mapmeta
+        while not self.stopped:
+            try:
+                (trans,rot) = self.listener.lookupTransform('/map', '/base_link', rospy.Time(0))
+            except (tf.LookupException, tf.ConnectivityException):
+                trans = None
+
+            if trans and mapmeta:
+                (x, y, th) = trans
+                status_msg['location'] = (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
+                                          int((y-mapmeta.origin.position.y)/mapmeta.resolution))
+                
+            cherrypy.engine.publish('websocket-broadcast', TextMessage(json.dumps(status_msg)))
+            rospy.sleep(1)
+
+
+from cherrypy.process import plugins
+
+class MyFeature(plugins.SimplePlugin):
+    """A feature that does something."""
+
+    def start(self):
+        self.bus.log("Starting my feature")
+        self.thread = StatusThread()
+        self.thread.start()
+
+    def stop(self):
+        self.bus.log("Stopping my feature.")
+        self.thread.stop()
+        self.thread.join()
+
+my_feature = MyFeature(cherrypy.engine)
+my_feature.subscribe()
+
 
 if __name__ == '__main__':
 
@@ -302,6 +231,17 @@ if __name__ == '__main__':
     pub_twist = rospy.Publisher("cmd_twist_tele", Twist)
     pub_view = rospy.Publisher("/multicam/view", Int16)
 
+    rospy.Subscriber("/relais", Bool, callback_relais)
+    rospy.Subscriber("/runstop", Bool, callback_runstop)
+    rospy.Subscriber("/assisted_drive/status", Bool, callback_assisted)
+    rospy.Subscriber("/goal_planner/has_goal", Bool, callback_hasgoal)
+    rospy.Subscriber("/map_metadata", MapMetaData, callback_mapmeta)
+
+
+#    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
+#    rospy.Subscriber("/move_base/current_goal", PoseStamped, callback_goal)
+#    rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, callback_amcl)
+
     parser = argparse.ArgumentParser(description='Echo CherryPy Server')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('-p', '--port', default=9000, type=int)
@@ -311,6 +251,8 @@ if __name__ == '__main__':
                             'server.socket_port': args.port,
                             'tools.staticdir.root': os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))})
 
+
+
     WebSocketPlugin(cherrypy.engine).subscribe()
     cherrypy.tools.websocket = WebSocketTool()
 
@@ -319,9 +261,14 @@ if __name__ == '__main__':
             'tools.websocket.on': True,
             'tools.websocket.handler_cls': ChatWebSocketHandler
             },
-        '/js': {
+        '/static': {
               'tools.staticdir.on': True,
-              'tools.staticdir.dir': 'js'
+              'tools.staticdir.dir': ''
             }
         }
     )
+
+
+        
+        
+        

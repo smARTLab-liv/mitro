@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="mitro_webcontrol" type="map_saver" name="map_saver" output="screen">
+        <param name="filename" value="/home/swarmlab/map.png"/>
+    </node>
+</launch>
