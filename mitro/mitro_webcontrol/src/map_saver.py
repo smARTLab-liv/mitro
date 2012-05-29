@@ -9,7 +9,7 @@ import Image, ImageDraw
 
 class MapSaver():
 
-    file_name = '../map.png'
+    file_name = 'static/images/map.png'
     image = None
     image_draw = None
 

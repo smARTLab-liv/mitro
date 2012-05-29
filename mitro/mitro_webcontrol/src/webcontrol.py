@@ -52,7 +52,7 @@ class ChatWebSocketHandler(WebSocket):
         text = m.data
 
         if text == 'connect':
-            response = TextMessage('connected')
+            response = TextMessage('log:connected')
             cherrypy.engine.publish('websocket-broadcast', response) # this proably shouldn't be a broadcast, just one connection to server
             
         if text.startswith('cmd:'):
@@ -82,8 +82,34 @@ class ChatWebSocketHandler(WebSocket):
             view = int(r[1])
             if view < 5 and view > 0:
                 pub_view.publish(view-1) # apparently the view subscriper likes only view_number between 0-3
-                response = TextMessage('switched to view: %d'%view)
+                response = TextMessage('log:switched to view: %d'%view)
                 cherrypy.engine.publish('websocket-broadcast', response)
+        
+        if text.startswith('relais:'):
+            # relais switching protocol:
+            # relais:[0 1]
+            r = text.split(':')
+            option = bool(int(r[1]))
+            
+            pub_relais.publish(option)
+            response = TextMessage('log:relais set to %s'%option);
+            cherrypy.engine.publish('websocket-broadcast', response)
+        
+        if text.startswith('goal:'):
+            if not mapmeta:
+                return # TODO ERROR HANDLING
+            r = text.split(':')
+            x = int(r[1])
+            y = int(r[2])
+            goal = PoseStamped()
+            goal.pose.position.x = x * mapmeta.resolution + mapmeta.origin.position.x
+            goal.pose.position.y = (mapmeta.height-y) * mapmeta.resolution + mapmeta.origin.position.y
+            goal.header.frame_id = 'map'
+            goal.header.stamp = rospy.Time.now()
+            pub_goal.publish(goal)
+
+        if text.startswith('cancel_goal'):
+            pub_cancelgoal.publish(True)
 
         if text.startswith('skype:'):
             # skype command protocol:
@@ -91,7 +117,7 @@ class ChatWebSocketHandler(WebSocket):
             r = text.split(':')
             user = str(r[1])
 
-            response = TextMessage('trying to call: %s'%user)
+            response = TextMessage('log:trying to call: %s'%user)
             cherrypy.engine.publish('websocket-broadcast', response)
 
             try:
@@ -114,7 +140,7 @@ class ChatWebSocketHandler(WebSocket):
 
 
             except SkypeError as details: # skype fucked up
-                response = TextMessage('skype failed: %s'%details.args[1])
+                response = TextMessage('log:skype failed: %s'%details.args[1])
                 cherrypy.engine.publish('websocket-broadcast', response)
                 
             
@@ -156,9 +182,25 @@ def callback_hasgoal(msg):
     global status_msg
     status_msg['hasgoal'] = msg.data
 
+def callback_goal(msg):
+    global status_msg
+    x = msg.pose.position.x
+    y = msg.pose.position.y
+    status_msg['goal'] =  (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
+                           mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
+            
+
 def callback_assisted(msg):
     global status_msg
     status_msg['assisted'] = msg.data
+    
+def callback_sysinfo(msg):
+    global status_msg
+    if msg.hostname == 'bob':
+        status_msg['wifi'] = msg.network.wifi_signallevel
+        status_msg['battery_base'] = int(msg.battery.percent)
+    elif msg.hostname == 'mitro-laptop':
+        status_msg['battery_laptop'] = int(msg.battery.percent)
 
 def callback_mapmeta(msg):
     global mapmeta
@@ -186,7 +228,7 @@ class StatusThread(Thread):
             if trans and mapmeta:
                 (x, y, th) = trans
                 status_msg['location'] = (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
-                                          int((y-mapmeta.origin.position.y)/mapmeta.resolution))
+                                          mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
                 
             cherrypy.engine.publish('websocket-broadcast', TextMessage(json.dumps(status_msg)))
             rospy.sleep(1)
@@ -227,17 +269,22 @@ if __name__ == '__main__':
 
 
     rospy.init_node('web_control', anonymous=False, disable_signals=True)
-    global pub_twist, pub_view
+    global pub_twist, pub_view, pub_relais
     pub_twist = rospy.Publisher("cmd_twist_tele", Twist)
     pub_view = rospy.Publisher("/multicam/view", Int16)
+    pub_relais = rospy.Publisher("cmd_relais", Bool)
+    pub_goal = rospy.Publisher("/goal_planner/goal", PoseStamped)
+    pub_cancelgoal = rospy.Publisher("/goal_planner/cancel", Bool)
+
 
     rospy.Subscriber("/relais", Bool, callback_relais)
     rospy.Subscriber("/runstop", Bool, callback_runstop)
     rospy.Subscriber("/assisted_drive/status", Bool, callback_assisted)
     rospy.Subscriber("/goal_planner/has_goal", Bool, callback_hasgoal)
+    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
     rospy.Subscriber("/map_metadata", MapMetaData, callback_mapmeta)
-
-
+    rospy.Subscriber("/goal_planner/goal", PoseStamped, callback_goal)
+    
 #    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
 #    rospy.Subscriber("/move_base/current_goal", PoseStamped, callback_goal)
 #    rospy.Subscriber("/amcl_pose", PoseWithCovarianceStamped, callback_amcl)
