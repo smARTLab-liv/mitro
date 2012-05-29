@@ -78,6 +78,19 @@ def cb_bat_volt(msg):
     global battery_voltage
     battery_voltage = msg.data
     
+def voltage_to_perc(self, v):
+    a = -7.87073944428413e-5
+    b = -0.001363457642237
+    c = 12.529846888629164
+
+    if v > c: 
+        return 100.0
+
+    if v < 11.77:
+        return 0.0
+
+    return 100 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
+    
 def sysinfo():
     global battery_name
     
@@ -122,7 +135,7 @@ def sysinfo():
         if use_battery_voltage:
             info_msg.battery.voltage = battery_voltage
             info_msg.battery.plugged_in = False
-            info_msg.battery.percent = -1
+            info_msg.battery.percent = voltage_to_perc(battery_voltage)
             info_msg.battery.time = -1
         else:
             battery_status()
