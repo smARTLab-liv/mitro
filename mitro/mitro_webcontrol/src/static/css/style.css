@@ -151,6 +151,14 @@ input[type="text"]:focus {
     background-image: url('../images/wifi.png');
 }
 
+#battery_robot {
+    background-image: url('../images/battery_3.png');
+}
+
+#battery_laptop {
+    background-image: url('../images/battery_3.png');
+}
+
 
 /* CONTROLS */
 
@@ -194,7 +202,7 @@ input[type="text"]:focus {
 #robot_marker {
     top: 20px;
     left: 20px;
-    background: transparent url('/static/images/1.png') no-repeat;
+    background: transparent url('/static/images/robot_marker.png') no-repeat;
 }
 
 #goal_marker {

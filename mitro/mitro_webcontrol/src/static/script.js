@@ -48,6 +48,8 @@ $(document).ready(function() {
     };
 
     ws.onmessage = function(evt) {
+        // TODO: error handling
+    
 	    // logging
 	    //$('#log').val('<< ' + evt.data + '\n' + $('#log').val());
 	    if (evt.data.indexOf("log:") == 0) {
@@ -73,41 +75,50 @@ $(document).ready(function() {
 	        
 	        //handle wifi
 	        var level = -obj.wifi;
-		if (level < 30) { level = 30; }
-		if (level > 95) { level = 95; }
-		var perc = 100 - (level-30) * 100.0/65.0;
-		if (perc >= 75) { $('#wifi').removeClass().addClass("green"); }
-		else if (perc >= 50) { $('#wifi').removeClass().addClass("yellow"); }
-		else { $('#wifi').removeClass().addClass("red"); }
-            
-		// handle battery
-		if (obj.battery_base >= 60) { $('#battery_robot').removeClass().addClass("green"); }
-		else if (obj.battery_base >= 30) { $('#battery_robot').removeClass().addClass("yellow"); }
-		else { $('#battery_robot').removeClass().addClass("red"); }
-		
-		if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
-		else if (obj.battery_laptop >= 30) { $('#battery_laptop').removeClass().addClass("yellow"); }
-		else { $('#battery_laptop').removeClass().addClass("red"); }
-		
-		// handle goal status
-		if (obj.hasgoal) {
-		    $('#nav').removeAttr('disabled').addClass('down');
-		    $('#goal_marker').show()
-		} else {
-		    $('#nav').attr('disabled', 'disabled').removeClass('down');
-		    $('#goal_marker').hide()
-		}		    
-		
-		// set robot location
-	        $('#robot_marker').css({'left': ""+(obj.location[0]-13)+"px", 'top': ""+(obj.location[1]-13)+"px"});
+            if (level < 30) { level = 30; }
+            if (level > 95) { level = 95; }
+            var perc = 100 - (level-30) * 100.0/65.0;
+            if (perc >= 75) { $('#wifi').removeClass().addClass("green"); }
+            else if (perc >= 50) { $('#wifi').removeClass().addClass("yellow"); }
+            else { $('#wifi').removeClass().addClass("red"); }
+                
+            // handle battery
+            if (obj.battery_base >= 60) { $('#battery_robot').removeClass().addClass("green"); }
+            else if (obj.battery_base >= 30) { $('#battery_robot').removeClass().addClass("yellow"); }
+            else { $('#battery_robot').removeClass().addClass("red"); }
 
-		if (obj.hasOwnProperty('goal')) {
-		    // set goal location
-	            $('#goal_marker').css({'left': ""+(obj.goal[0]-13)+"px", 'top': ""+(obj.goal[1]-26)+"px"});
-		} else {
-		    $('#goal_marker').hide();
-		}
+            if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
+            else if (obj.battery_laptop >= 30) { $('#battery_laptop').removeClass().addClass("yellow"); }
+            else { $('#battery_laptop').removeClass().addClass("red"); }
 
+            // handle goal status
+            if (obj.hasgoal) {
+                $('#nav').removeAttr('disabled').addClass('down');
+                $('#goal_marker').show()
+            } else {
+                $('#nav').attr('disabled', 'disabled').removeClass('down');
+                $('#goal_marker').hide()
+            }
+
+            // handle assisted drive status
+            if (obj.assisted) {
+                $('#assisted').addClass("down");
+            }
+            else {
+                $('#assisted').removeClass("down");
+            }
+
+            // set robot location
+            $('#robot_marker').css({'left': ""+(obj.location[0]-13)+"px", 'top': ""+(obj.location[1]-13)+"px"});
+            // set robot rotation
+            $('#robot_marker').css("-webkit-transform", "rotate("+obj.orientation+"rad)");
+
+            if (obj.hasOwnProperty('goal')) {
+                // set goal location
+                    $('#goal_marker').css({'left': ""+(obj.goal[0]-13)+"px", 'top': ""+(obj.goal[1]-26)+"px"});
+            } else {
+                $('#goal_marker').hide();
+            }
 	    }
     };
    
@@ -151,19 +162,32 @@ $(document).ready(function() {
     $('#view_3').click(toggle_view);
     $('#view_4').click(toggle_view);
 
-    $('.toggle_button').click(function() {
+    $('.view_button.toggle_button').click(function() {
         $(this).toggleClass("down");
     });
     
     $('#relais_button').click(function() {
         if($(this).hasClass("down")) {
-            ws.send('relais:0');
-            $(this).removeClass("down");
+            ws.send('relais:1');
         }
         else {
-            ws.send('relais:1');
-            $(this).addClass("down");
+            ws.send('relais:0');
         }
+        return false;
+    });
+    
+    $('#assisted').click(function() {
+        if($(this).hasClass("down")) {
+            ws.send('assisted:0');
+        }
+        else {
+            ws.send('assisted:1');
+        }
+        return false;
+    });
+    
+    $('#costmap').click(function() {
+        ws.send('recovery');
         return false;
     });
 

@@ -21,6 +21,9 @@ from geometry_msgs.msg import Twist, PoseWithCovarianceStamped, PoseStamped
 from std_msgs.msg import Int16, Bool
 from mitro_diagnostics.msg import SysInfo
 from nav_msgs.msg import MapMetaData
+from std_srvs.srv import Empty
+
+from tf.transformations import euler_from_quaternion
 
 from subprocess import Popen, PIPE
 
@@ -90,9 +93,8 @@ class ChatWebSocketHandler(WebSocket):
             # relais:[0 1]
             r = text.split(':')
             option = bool(int(r[1]))
-            
             pub_relais.publish(option)
-            response = TextMessage('log:relais set to %s'%option);
+            response = TextMessage('log:relais switched %s'%('on' if option else 'off'));
             cherrypy.engine.publish('websocket-broadcast', response)
         
         if text.startswith('goal:'):
@@ -104,19 +106,35 @@ class ChatWebSocketHandler(WebSocket):
             goal = PoseStamped()
             goal.pose.position.x = x * mapmeta.resolution + mapmeta.origin.position.x
             goal.pose.position.y = (mapmeta.height-y) * mapmeta.resolution + mapmeta.origin.position.y
-            goal.header.frame_id = 'map'
+            goal.pose.orientation.w = 1.0;
+            goal.header.frame_id = '/map'
             goal.header.stamp = rospy.Time.now()
             pub_goal.publish(goal)
 
         if text.startswith('cancel_goal'):
             pub_cancelgoal.publish(True)
+            response = TextMessage('log:goal cancelled')
+            cherrypy.engine.publish('websocket-broadcast', response)
+        
+        if text.startswith('recovery'):
+            srv_costmap()
+            response = TextMessage('log:attempting recovery...')
+            cherrypy.engine.publish('websocket-broadcast', response)
+        
+        if text.startswith('assisted:'):
+            # assisted drive switching protocol:
+            # assisted:[0 1]
+            r = text.split(':')
+            option = bool(int(r[1]))
+            pub_assisted.publish(option)
+            response = TextMessage('log:assisted drive %s'%('enabled' if option else 'disabled'));
+            cherrypy.engine.publish('websocket-broadcast', response)
 
         if text.startswith('skype:'):
             # skype command protocol:
             # skype:[contact_name]
             r = text.split(':')
             user = str(r[1])
-
             response = TextMessage('log:trying to call: %s'%user)
             cherrypy.engine.publish('websocket-broadcast', response)
 
@@ -222,6 +240,7 @@ class StatusThread(Thread):
         while not self.stopped:
             try:
                 (trans,rot) = self.listener.lookupTransform('/map', '/base_link', rospy.Time(0))
+                rpy = list(euler_from_quaternion(rot))
             except (tf.LookupException, tf.ConnectivityException):
                 trans = None
 
@@ -229,6 +248,7 @@ class StatusThread(Thread):
                 (x, y, th) = trans
                 status_msg['location'] = (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
                                           mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
+                status_msg['orientation'] = -rpy[2];
                 
             cherrypy.engine.publish('websocket-broadcast', TextMessage(json.dumps(status_msg)))
             rospy.sleep(1)
@@ -267,23 +287,28 @@ if __name__ == '__main__':
     skype.Attach()
 
 
-
     rospy.init_node('web_control', anonymous=False, disable_signals=True)
     global pub_twist, pub_view, pub_relais
     pub_twist = rospy.Publisher("cmd_twist_tele", Twist)
-    pub_view = rospy.Publisher("/multicam/view", Int16)
+    pub_view = rospy.Publisher("multicam/view", Int16)
     pub_relais = rospy.Publisher("cmd_relais", Bool)
-    pub_goal = rospy.Publisher("/goal_planner/goal", PoseStamped)
-    pub_cancelgoal = rospy.Publisher("/goal_planner/cancel", Bool)
+    pub_goal = rospy.Publisher("goal_planner/goal", PoseStamped)
+    pub_cancelgoal = rospy.Publisher("goal_planner/cancel", Bool)
+    pub_assisted = rospy.Publisher("assisted_drive/set", Bool)
+    
+    rospy.wait_for_service('/move_base/clear_costmaps')
+    try:
+        srv_costmap = rospy.ServiceProxy('/move_base/clear_costmaps', Empty)
+    except rospy.ServiceException, e:
+        print "Service call failed: %s"%e
 
-
-    rospy.Subscriber("/relais", Bool, callback_relais)
-    rospy.Subscriber("/runstop", Bool, callback_runstop)
-    rospy.Subscriber("/assisted_drive/status", Bool, callback_assisted)
-    rospy.Subscriber("/goal_planner/has_goal", Bool, callback_hasgoal)
-    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
-    rospy.Subscriber("/map_metadata", MapMetaData, callback_mapmeta)
-    rospy.Subscriber("/goal_planner/goal", PoseStamped, callback_goal)
+    rospy.Subscriber("relais", Bool, callback_relais)
+    rospy.Subscriber("runstop", Bool, callback_runstop)
+    rospy.Subscriber("assisted_drive/status", Bool, callback_assisted)
+    rospy.Subscriber("goal_planner/has_goal", Bool, callback_hasgoal)
+    rospy.Subscriber("sysinfo", SysInfo, callback_sysinfo)
+    rospy.Subscriber("map_metadata", MapMetaData, callback_mapmeta)
+    rospy.Subscriber("goal_planner/goal", PoseStamped, callback_goal)
     
 #    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
 #    rospy.Subscriber("/move_base/current_goal", PoseStamped, callback_goal)
