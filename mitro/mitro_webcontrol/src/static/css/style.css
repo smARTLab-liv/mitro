@@ -92,12 +92,32 @@ input[type="text"]:focus {
     display: block;
 }
 
+h2 {
+	font-family: Verdana, sans-serif;
+	font-size: 14pt;
+}
+.no_top_margin {
+	margin-top: 0px;
+}
+
+.clearing {
+	clear: both;
+}
+
 .disconnected {
     display: none;
 }
 
+#left_column {
+    float: left;
+    width: 200px;
+}
+#right_column {
+    
+}
+
 #navigation, #status, #controls, #logger {
-    clear: both;
+    /*clear: both;*/
 }
 
 
