@@ -38,7 +38,7 @@ Laser\ Scan..IntensityMin\ ColorB=0
 Laser\ Scan..IntensityMin\ Intensity=0
 Laser\ Scan..IntensityUse\ full\ RGB\ spectrum=0
 Map.Alpha=0.7
-Map.Draw\ Behind=0
+Map.Draw\ Behind=1
 Map.Enabled=1
 Map.Topic=/map
 Obstacles.Alpha=1
@@ -123,8 +123,8 @@ Robot\:\ Robot\ Model\ Link\ top_pole_linkShow\ Trail=0
 Tool\ 2D\ Nav\ GoalTopic=/goal_planner/goal
 Tool\ 2D\ Pose\ EstimateTopic=/initialpose
 Camera\ Type=rviz::XYOrbitViewController
-Camera\ Config=0.391 5.71625 9.42618 -5.11403 4.06982e-06 -13.1801
-Property\ Grid\ State=selection=;expanded=Pose.Enabled.Pose.Shape Properties;scrollpos=0,0;splitterpos=239,495;ispageselected=1
+Camera\ Config=0.001 1.54806 21.4473 1.49841 8.83819e-06 0.144218
+Property\ Grid\ State=selection=Pose Array.Enabled;expanded=;scrollpos=0,0;splitterpos=133,266;ispageselected=1
 [Display0]
 Name=Map
 Package=rviz
