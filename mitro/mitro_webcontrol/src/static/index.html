@@ -2,31 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <script src="static/js/jquery-1.6.2.min.js"></script>
-    <link rel="stylesheet" href="static/css/style.css" type="text/css" />
+    <script src="/static/js/jquery-1.6.2.min.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css" type="text/css" />
     <script>%(script)s</script>
     <title>Mitro Webcontrol</title>
   </head>
   <body>
-    <!--<h1 class="logo">Mitro</h1>-->
+<!--    <h1 class="logo">Mitro</h1> -->
 
     <div class="content">
     
-    <div id="left_column">
-    
       <div id="status">
-        <h2 class="no_top_margin">Status</h2>
+        <h2>Status</h2>
         <ul id="status_list">
 	        <li id="runstop" />
 	        <li id="wifi" />
 	        <li id="battery_robot" />
 	        <li id="battery_laptop" />
         </ul>
-		<div class="clearing"></div>
+	<br/><br/>
       </div>
+      
 
       <div id="controls">
-	      <h2>Controls</h2>
+	      <h2>Controls:</h2>
 	      <div id="relais">
 	        <button id="relais_button" class="toggle_button down"><img src="static/images/relais.png"></img></button>
 	      </div>
@@ -44,28 +43,22 @@
 	        <input type="text" id="skype_user" placeholder="Enter Skype name!">
 	        <button id="skype_call"><img src="static/images/skype.png"></img></button>
 	      </div>
-		  <div class="clearing"></div>
       </div>
 
       <div id="navigation">
-	      <h2>Navigation</h2>
-	      <!--<div id="nav_controls"> -->
+	      <h2>Navigation:</h2>
+	      <div id="nav_controls">
 <!--	        <button id="home" disabled><img src="static/images/home.png"></img></button>       -->
           <button id="nav" disabled class="toggle_button"><img src="static/images/nav.png"></img></button>
           <button id="assisted" class="toggle_button"><img src="static/images/assisted_drive.png"></img></button>
           <button id="costmap"><img src="static/images/settings.png"></img></button>
-	      <!--</div>-->
-		  <div class="clearing"></div>
-      </div>
-      
-      </div>
-      <div id="right_column">
-        <div id="map">
+	      </div>
+	      <div id="map">
 	        <div class="map_marker" id="goal_marker"></div>
 	        <div class="map_marker" id="robot_marker"></div>
 <!--	        <div class="map_marker" id="home_marker"></div> -->
-	        <img id="map_image" src="static/images/map.png">
-	      </div>      
+	        <img id="map_image" src="/static/images/map.png">
+	      </div>
       </div>
 
       <h2 id="logger_link">Logger</h2>

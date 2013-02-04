@@ -35,7 +35,7 @@ std::string static TF_TARGET_FRAME = "/base_link";
 
 // dynamic reconfigure parameters
 float voxel_size = 0.025f;
-float plane_tresh = 0.02f;
+float plane_tresh = 0.03f;
 int outlier_neighbors = 10;
 float outlier_radius = 0.1f;
 

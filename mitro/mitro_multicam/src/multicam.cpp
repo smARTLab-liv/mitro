@@ -557,8 +557,8 @@ int main(int argc, char**argv)
       
       int sonar_width = 20;
       double sonar_dist_offset = 0.225;
-      double sonar_dist_max = 1.0;
-      double sonar_scale = 100.0;
+      double sonar_dist_max = 0.25;
+      double sonar_scale = 200.0;
       int sonar_pos_x[5] = {250, 280, 310, 340, 370};
       int sonar_pos_y = 470;
       
