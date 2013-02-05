@@ -1,10 +1,12 @@
-#include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <move_base_msgs/MoveBaseActionGoal.h>
-#include <actionlib_msgs/GoalID.h>
-#include <std_msgs/Bool.h>
+#include "ros/ros.h"
+#include "geometry_msgs/PoseStamped.h"
+#include "move_base_msgs/MoveBaseActionGoal.h"
+#include "actionlib_msgs/GoalID.h"
+#include "std_msgs/Bool.h"
 
-ros::Publisher status_pub, goal_pub, cancel_pub;
+ros::Publisher status_pub;
+ros::Publisher goal_pub;
+ros::Publisher cancel_pub;
 std::vector<actionlib_msgs::GoalID> current_goals;
 int ID = 0;
 
