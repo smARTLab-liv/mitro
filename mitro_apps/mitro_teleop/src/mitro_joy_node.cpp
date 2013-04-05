@@ -123,7 +123,7 @@ class TeleopMITRO
         else
             req_vy = 0.0;
         if((axis_vw >= 0) && (((unsigned int)axis_vw) < joy_msg->axes.size()))
-          req_vw = joy_msg->axes[axis_vw] * vw;
+            req_vw = joy_msg->axes[axis_vw] * vw;
         else
             req_vw = 0.0;
 
@@ -132,6 +132,9 @@ class TeleopMITRO
         req_vx = max(min(req_vx, vx), -vx);
         req_vy = max(min(req_vy, vy), -vy);
         req_vw = max(min(req_vw, vw), -vw);
+        
+        fprintf(stdout,"required:: %f, %f, %f.\n",
+                req_vx, req_vy, req_vw);
     }
 
     void send_cmd_vel()

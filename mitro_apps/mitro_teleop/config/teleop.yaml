@@ -2,9 +2,9 @@
 # adapted for mitro
 
 # Axes
-axis_vx: 3
+axis_vx: 1
 axis_vy: 0
-axis_vw: 2
+axis_vw: 0
 axis_pan: 0
 axis_tilt: 3
 
