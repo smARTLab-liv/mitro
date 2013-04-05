@@ -9,7 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_teleop</url>
   
-  <depend package="pr2_teleop" />
+  <!--<depend package="pr2_teleop" />-->
+  <depend package="roscpp" />
   <depend package="ps3joy" />
 
 </package>
