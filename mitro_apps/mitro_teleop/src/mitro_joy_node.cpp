@@ -139,16 +139,14 @@ class TeleopMITRO
         if(deadman_  &&
            last_recieved_joy_message_time_ + joy_msg_timeout_ > ros::Time::now())
         {
+            // Base
+            cmd.linear.x = req_vx;
+            cmd.linear.y = req_vy;
+            cmd.angular.z = req_vw;
+            vel_pub_.publish(cmd);
 
-        // Base
-        cmd.linear.x = req_vx;
-        cmd.linear.y = req_vy;
-        cmd.angular.z = req_vw;
-        vel_pub_.publish(cmd);
-
-        fprintf(stdout,"teleop_base:: %f, %f, %f.",
+            fprintf(stdout,"teleop_base:: %f, %f, %f.\n",
                 cmd.linear.x, cmd.linear.y, cmd.angular.z);
-
         }
         else
         {
