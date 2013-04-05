@@ -17,8 +17,8 @@
   <depend package="mitro_diagnostics"/>
   <depend package="tf"/>
 
-  <rosdep name="cherrypy"/>
+  <!--<rosdep name="cherrypy"/>
   <rosdep name="ws4py"/>
-  <rosdep name="skype4py"/>
+  <rosdep name="skype4py"/>-->
 
 </package>

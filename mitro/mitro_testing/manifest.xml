@@ -9,8 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/mitro_testing</url>
 
-  <rosdep name="netifaces" />
-  <rosdep name="v4l-conf" />
+  <!--<rosdep name="netifaces" />-->
+  <!--<rosdep name="v4l-conf" />-->
 
 </package>
 
