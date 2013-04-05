@@ -78,7 +78,7 @@ def cb_bat_volt(msg):
     global battery_voltage
     battery_voltage = msg.data
     
-def voltage_to_perc(self, v):
+def voltage_to_perc(v):
     a = -7.87073944428413e-5
     b = -0.001363457642237
     c = 12.529846888629164
