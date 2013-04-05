@@ -5,9 +5,9 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <unistd.h>
-#include <math.h>
-#include <fcntl.h>
+#include <unistd.h> //don't know if needed
+#include <math.h> //don't know if needed
+#include <fcntl.h> //don't know if needed
 #include "ros/ros.h"
 #include "sensor_msgs/Joy.h"
 #include "geometry_msgs/Twist.h"
@@ -57,6 +57,9 @@ class TeleopMITRO
         n_private_.param("max_vx_run", max_vx_run, max_vx_run);
         n_private_.param("max_vy_run", max_vy_run, max_vy_run);
         n_private_.param("max_vw_run", max_vw_run, max_vw_run);
+        
+        n_private_.param("deadman_button", deadman_button, 0);
+        n_private_.param("run_button", run_button, 0);
 
         double joy_msg_timeout;
         n_private_.param("joy_msg_timeout", joy_msg_timeout, 0.5); //default to 0.5 seconds timeout
