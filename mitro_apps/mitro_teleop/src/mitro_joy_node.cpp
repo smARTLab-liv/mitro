@@ -57,7 +57,11 @@ class TeleopMITRO
         n_private_.param("max_vx_run", max_vx_run, max_vx_run);
         n_private_.param("max_vy_run", max_vy_run, max_vy_run);
         n_private_.param("max_vw_run", max_vw_run, max_vw_run);
-        
+
+        n_private_.param("axis_vx", axis_vx, 1);
+        n_private_.param("axis_vw", axis_vw, 0);
+        n_private_.param("axis_vy", axis_vy, 3);
+
         n_private_.param("deadman_button", deadman_button, 0);
         n_private_.param("run_button", run_button, 0);
 
@@ -132,9 +136,6 @@ class TeleopMITRO
         req_vx = max(min(req_vx, vx), -vx);
         req_vy = max(min(req_vy, vy), -vy);
         req_vw = max(min(req_vw, vw), -vw);
-        
-        fprintf(stdout,"required:: %f, %f, %f.\n",
-                req_vx, req_vy, req_vw);
     }
 
     void send_cmd_vel()
