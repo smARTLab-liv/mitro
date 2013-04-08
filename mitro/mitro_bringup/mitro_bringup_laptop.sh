@@ -1,5 +1,5 @@
 #!/bin/bash
-source /opt/ros/electric/setup.bash
+source /opt/ros/fuerte/setup.bash
 export ROS_MASTER_URI=http://bob:11311
 export ROS_PACKAGE_PATH=/home/swarmlab/ros:$ROS_PACKAGE_PATH
 

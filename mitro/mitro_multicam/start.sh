@@ -5,7 +5,7 @@ rm -f $PID_FILE
 rm -f $LOG_FILE
 touch $LOG_FILE
 
-source /opt/ros/electric/setup.bash
+source /opt/ros/fuerte/setup.bash
 export ROS_MASTER_URI=http://bob:11311
 
 DONE=0
