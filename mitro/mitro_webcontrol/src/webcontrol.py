@@ -131,6 +131,9 @@ class ChatWebSocketHandler(WebSocket):
             cherrypy.engine.publish('websocket-broadcast', response)
 
         if text.startswith('skype:'):
+            response = TextMessage('log:we do not use skype anymore')
+            cherrypy.engine.publish('websocket-broadcast', response)
+	    return
             # skype command protocol:
             # skype:[contact_name]
             r = text.split(':')
@@ -280,11 +283,11 @@ if __name__ == '__main__':
     #filename = '/tmp/multicam-fifo'
     #fd = open(filename, 'w');
 
-    global skype
+    #global skype
     # Create an instance of the Skype class.
-    skype = Skype4Py.Skype(Transport='x11')
+    #skype = Skype4Py.Skype(Transport='x11')
     # Connect the Skype object to the Skype client.
-    skype.Attach()
+    #skype.Attach()
 
 
     rospy.init_node('web_control', anonymous=False, disable_signals=True)

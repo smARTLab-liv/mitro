@@ -450,8 +450,6 @@ int main(int argc, char**argv)
   memset(buffer, 0, sizeimage);
 
 
-
-
   while (ros::ok()) {
     int t = new_view;
     if (t > -1 && t < 4 && t != view) { // check if view change triggers resolution change (0 to 1, and 2 to 3 are save)
