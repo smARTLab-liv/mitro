@@ -18,16 +18,12 @@ battery_plugged_in = False
 def battery_max():
     global battery_name, battery_max
     try:
-        f = open( "/proc/acpi/battery/" + battery_name + "/info" )
-        contents = f.read().split('\n')
+        f = open( "/sys/class/power_supply/" + battery_name + "/energy_full" )
+        battery_max = float(f.readline())
         f.close()
     except:
-        print "Cannot open battery state file: /proc/acpi/battery/" + battery_name + "/state"
-    
-    for line in contents:
-        if 'last full capacity' in line:
-            el = line.split()
-            battery_max = float(el[3])
+        rospy.logerr("Cannot open battery state file: /sys/class/power_supply/$s/energy_full."%battery_name)
+
 
 def network_up(name):
     fn = "/sys/class/net/%s/operstate"%name
@@ -40,39 +36,41 @@ def network_up(name):
         return False
 
 
-
 def battery_status():
     global battery_name, battery_max, battery_percent, battery_time, battery_plugged_in, battery_voltage
-    try:
-        f = open( "/proc/acpi/battery/" + battery_name + "/state" )
-        contents = f.read().split('\n')
-        f.close()
-    except:
-        rospy.logerr("Cannot open battery state file: /proc/acpi/battery/$s/state."%battery_name)
-
+    
     battery_percent = -1
     battery_time = -1
     battery_plugged_in = False
     battery_voltage = -1
+    
+    try:
+        f = open( "/sys/class/power_supply/" + battery_name + "/power_now" )
+        rate = float(f.readline())
+        f.close()
 
-    rate = 0
-    for line in contents:
-        if 'present rate' in line:
-            rate = float(line.split()[2])
-        if 'remaining capacity' in line:
-            cap = float(line.split()[2])
-            battery_percent = (cap / battery_max) * 100.0
-            battery_percent = max(0.0, battery_percent)
-            battery_percent = min(100.0, battery_percent)
-            battery_time = -1
-            if rate > 0:
-                battery_time = cap / rate
-        if 'charging state' in line:
-            state = line.split()[2]
-            if not state == 'discharging':
-                battery_plugged_in = True
-        if 'present voltage' in line:
-            battery_voltage = float(line.split()[2]) / 1000.0
+        f = open( "/sys/class/power_supply/" + battery_name + "/energy_now" )
+        cap = float(f.readline())
+        battery_percent = (cap / battery_max) * 100.0
+        battery_percent = max(0.0, battery_percent)
+        battery_percent = min(100.0, battery_percent)
+        battery_time = -1
+        if rate > 0:
+            battery_time = cap / rate        
+        f.close()
+
+        f = open( "/sys/class/power_supply/" + battery_name + "/status" )
+        state = float(f.readline())
+        if state == 'Charging':
+            battery_plugged_in = True
+        f.close()
+
+        f = open( "/sys/class/power_supply/" + battery_name + "/voltage_now" )
+        battery_voltage = float(f.readline())
+        f.close()
+    except:
+        rospy.logerr("Cannot open battery state file: /proc/acpi/battery/$s/state."%battery_name)
+
             
 def cb_bat_volt(msg):
     global battery_voltage
