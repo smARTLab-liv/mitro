@@ -22,7 +22,7 @@ def battery_max():
         battery_max = float(f.readline())
         f.close()
     except:
-        rospy.logerr("Cannot open battery state file: /sys/class/power_supply/$s/energy_full."%battery_name)
+        rospy.logerr("Cannot open battery state file: /sys/class/power_supply/" + battery_name + "/energy_full.")
 
 
 def network_up(name):
@@ -60,8 +60,8 @@ def battery_status():
         f.close()
 
         f = open( "/sys/class/power_supply/" + battery_name + "/status" )
-        state = float(f.readline())
-        if state == 'Charging':
+        state = f.readline()
+        if 'Charging' in state:
             battery_plugged_in = True
         f.close()
 
@@ -69,7 +69,7 @@ def battery_status():
         battery_voltage = float(f.readline())
         f.close()
     except:
-        rospy.logerr("Cannot open battery state file: /proc/acpi/battery/$s/state."%battery_name)
+        rospy.logerr("Cannot open battery state file: /proc/acpi/battery/" + battery_name + "/state.")
 
             
 def cb_bat_volt(msg):
