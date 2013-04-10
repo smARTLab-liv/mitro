@@ -1,0 +1,1 @@
+rosrun mitro_testing test_mitro_base.py
