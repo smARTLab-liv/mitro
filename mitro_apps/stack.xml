@@ -1,9 +1,0 @@
-<stack>
-  <description brief="mitro_apps">mitro_apps</description>
-  <author>Maintained by danielhennes</author>
-  <license>BSD</license>  
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/mitro_apps</url>
-  <depend stack="ros" />
-
-</stack>

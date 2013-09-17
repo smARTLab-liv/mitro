@@ -38,9 +38,6 @@ MIRTRO dashboard:
 GUI for the Maastricht Intelligent Teleperesence RObot
 """
 
-import roslib
-roslib.load_manifest('mitro_dashboard')
-
 WXVER = '2.8'
 import wxversion
 if wxversion.checkInstalled(WXVER):

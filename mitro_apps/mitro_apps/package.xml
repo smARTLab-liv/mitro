@@ -1,0 +1,20 @@
+<package>
+    <name>mitro_apps</name>
+    <version>1.0.0</version>
+    <description>
+        MITRO application packages
+    </description>
+    <maintainer email="daan.bloembergen@gmail.com">Daan Bloembergen</maintainer>
+    <license>BSD</license>
+    
+    <buildtool_depend>catkin</buildtool_depend>
+  
+    <run_depend>assisted_drive</run_depend>
+    <run_depend>mitro_dashboard</run_depend>
+    <run_depend>mitro_navigation</run_depend>
+    <run_depend>mitro_teleop</run_depend>
+    
+    <export>
+        <metapackage/>
+    </export>
+</package>
