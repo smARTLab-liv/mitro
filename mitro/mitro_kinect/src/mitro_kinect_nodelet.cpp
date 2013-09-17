@@ -19,8 +19,10 @@
 #include <pcl/filters/radius_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
 
+#include <pcl_conversions/pcl_conversions.h>
+
 #include <dynamic_reconfigure/server.h>
-#include <mitro_kinect/MitroKinectConfig.h>
+#include <mitro_kinect/MitroKinectNodeletConfig.h>
 
 #include <tf/transform_broadcaster.h>
 
@@ -51,7 +53,7 @@ namespace mitro_kinect
     float plane_tresh;
     int outlier_neighbors;
     float outlier_radius;
-    dynamic_reconfigure::Server<MitroKinectConfig> dynreconf_server;
+    dynamic_reconfigure::Server<MitroKinectNodeletConfig> dynreconf_server;
 
     // other params
     double max_update_rate;
@@ -89,7 +91,7 @@ namespace mitro_kinect
       tf_broadcaster = new tf::TransformBroadcaster();
 
       // dynamic reconfigure server
-      dynamic_reconfigure::Server<MitroKinectConfig>::CallbackType f;
+      dynamic_reconfigure::Server<MitroKinectNodeletConfig>::CallbackType f;
       f = boost::bind(&MitroKinectNodelet::cb_dynreconf, this, _1, _2);
       dynreconf_server.setCallback(f);
 
@@ -99,7 +101,7 @@ namespace mitro_kinect
     }
 
     // dynamic reconfigure
-    void cb_dynreconf(mitro_kinect::MitroKinectConfig &config, uint32_t level) {
+    void cb_dynreconf(mitro_kinect::MitroKinectNodeletConfig &config, uint32_t level) {
       ROS_DEBUG("dyn reconf call (voxel_size, plane_tresh, outlier_radius, outlier_neighbors): %f %f %f %d", 
 		config.voxel_size,
 		config.plane_tresh,
@@ -111,30 +113,35 @@ namespace mitro_kinect
       outlier_neighbors = config.outlier_neighbors;
     }
 
-    void cb_pointcloud2(const sensor_msgs::PointCloud2::Ptr cloud_in)
+    void cb_pointcloud2(const sensor_msgs::PointCloud2 &cloud_in)
     {
       //      last_cloud = cloud_in;
       filter(cloud_in);
     }
 
-    void filter(sensor_msgs::PointCloud2::Ptr cloud_in)
+    void filter(const sensor_msgs::PointCloud2 &cloud_in)
     {
-      if ( 0 == cloud_in->width * cloud_in->height )
+      if ( 0 == cloud_in.width * cloud_in.height )
       {
 	ROS_ERROR("Input cloud is empty!");
 	return;
       }
-      ROS_DEBUG("Input cloud size: %d", cloud_in->width * cloud_in->height );
+      ROS_DEBUG("Input cloud size: %d", cloud_in.width * cloud_in.height );
       
-      sensor_msgs::PointCloud2::Ptr cloud_voxel (new sensor_msgs::PointCloud2);
+      pcl::PCLPointCloud2::Ptr cloud_voxel (new pcl::PCLPointCloud2);
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor (new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_without_floor_filtered(new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud (new pcl::PointCloud<pcl::PointXYZ>);
       pcl::PointCloud<pcl::PointXYZ>::Ptr temp_cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
   
-      pcl::VoxelGrid<sensor_msgs::PointCloud2> voxel_filter;
-      voxel_filter.setInputCloud (cloud_in);
+      //pcl::VoxelGrid<sensor_msgs::PointCloud2> voxel_filter;
+      pcl::VoxelGrid<pcl::PCLPointCloud2> voxel_filter;
+  
+      pcl::PCLPointCloud2::Ptr pcl_pc (new pcl::PCLPointCloud2 ());      
+      pcl_conversions::toPCL(cloud_in, *pcl_pc);
+        
+      voxel_filter.setInputCloud (pcl_pc);
       voxel_filter.setLeafSize (voxel_size, voxel_size, voxel_size);
       voxel_filter.filter (*cloud_voxel);
 
@@ -146,8 +153,8 @@ namespace mitro_kinect
 
       ROS_DEBUG("Voxel cloud size: %d", cloud_voxel->width * cloud_voxel->height );
 
-      pcl::fromROSMsg(*cloud_voxel, *pcl_cloud);
-      pcl::fromROSMsg(*cloud_voxel, *temp_cloud);
+      pcl::fromPCLPointCloud2(*cloud_voxel, *pcl_cloud);
+      pcl::fromPCLPointCloud2(*cloud_voxel, *temp_cloud);
 
       if ( 0 == pcl_cloud->points.size() )
       {
@@ -243,7 +250,7 @@ namespace mitro_kinect
       }
 
       // publishing transform
-      tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in->header.stamp, tf_frame, tf_target_frame));
+      tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in.header.stamp, tf_frame, tf_target_frame));
 
       if (!found)
       {

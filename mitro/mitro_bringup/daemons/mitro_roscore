@@ -1,5 +1,5 @@
 #!/bin/bash
-DAEMON_PATH=/home/swarmlab/ros/mitro/mitro_bringup
+DAEMON_PATH=/home/swarmlab/ros_catkin_ws/src/mitro/mitro_bringup
 DAEMON=$DAEMON_PATH/mitro_bringup_core.sh
 DAEMON_OPTS=""
 NAME=mitro_roscore

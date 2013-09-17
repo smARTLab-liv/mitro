@@ -1,5 +1,5 @@
 #!/bin/bash
-DAEMON_PATH=/home/swarmlab/ros/mitro/mitro_multicam
+DAEMON_PATH=/home/swarmlab/ros_catkin_ws/src/mitro/mitro_multicam
 DAEMON=$DAEMON_PATH/start.sh
 DAEMON_OPTS=""
 NAME=multicam

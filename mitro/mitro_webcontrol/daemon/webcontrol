@@ -1,5 +1,5 @@
 #!/bin/bash
-DAEMON_PATH=/home/swarmlab/ros/mitro/mitro_webcontrol
+DAEMON_PATH=/home/swarmlab/ros_catkin_ws/src/mitro/mitro_webcontrol
 DAEMON=$DAEMON_PATH/start.sh
 DAEMON_OPTS=""
 NAME=webcontrol

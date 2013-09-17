@@ -1,0 +1,27 @@
+<package>
+    <name>mitro</name>
+    <version>1.0.0</version>
+    <description>
+        MITRO basic packages
+    </description>
+    <maintainer email="daan.bloembergen@gmail.com">Daan Bloembergen</maintainer>
+    <license>BSD</license>
+    
+    <buildtool_depend>catkin</buildtool_depend>
+  
+    <run_depend>mitro_base_controller</run_depend>
+    <run_depend>mitro_bringup</run_depend>
+    <run_depend>mitro_description</run_depend>
+    <run_depend>mitro_diagnostics</run_depend>
+    <run_depend>mitro_kinect</run_depend>
+    <run_depend>mitro_multicam</run_depend>
+    <run_depend>mitro_odom</run_depend>
+    <run_depend>mitro_sonar</run_depend>
+    <run_depend>mitro_testing</run_depend>
+    <run_depend>mitro_webcontrol</run_depend>
+    <run_depend>twist_mixer</run_depend>
+    
+    <export>
+        <metapackage/>
+    </export>
+</package>

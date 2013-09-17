@@ -1,5 +1,5 @@
 #!/bin/bash
-DAEMON_PATH=/opt/ros/fuerte/stacks/joystick_drivers/ps3joy
+DAEMON_PATH=/opt/ros/hydro/lib/ps3joy
 DAEMON=$DAEMON_PATH/ps3joy.py
 DAEMON_OPTS=""
 NAME=ps3joy
