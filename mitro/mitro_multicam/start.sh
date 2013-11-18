@@ -13,7 +13,7 @@ while [ $DONE -lt 1 ]; do
     if rostopic list > /dev/null
     then
 	sleep 1
-	/home/swarmlab/ros_catkin_ws/src/mitro/mitro_multicam/bin/multicam /dev/video1 /dev/video2 /dev/video3 > $LOG_FILE &
+	/home/swarmlab/ros_catkin_ws/devel/lib/mitro_multicam/multicam /dev/video0 /dev/video1 /dev/video2 > $LOG_FILE &
         sleep 1
 	PID=`ps aux | grep 'bin/multicam' | grep -v grep | grep -v ps3 | awk '{print $2}'`
 	echo $PID > $PID_FILE
