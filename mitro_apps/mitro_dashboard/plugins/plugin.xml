@@ -1,0 +1,22 @@
+<library path="src">
+    <class name="MitroDashboard" type="mitro_dashboard.dashboard.MitroDashboard" base_class_type="rqt_gui_py::Plugin">
+        <description>
+            Dashboard for MITRO
+        </description>
+        <qtgui>
+            <group>
+                <label>Robot</label>
+                <icon type="theme">folder</icon>
+                <statustip>Plugins related to specific robots.</statustip>
+            </group>
+            <group>
+                <label>MITRO</label>
+                <icon type="file">images/kobuki_icon.png</icon>
+                <statustip>Plugins related to MITRO.</statustip>
+            </group>
+            <label>MITRO Dashboard</label>
+            <icon type="file">images/kobuki_icon.png</icon>
+            <statustip>Check what's going on with MITRO</statustip>
+        </qtgui>
+    </class>
+</library>
