@@ -149,7 +149,8 @@ class SystemInfo():
         elif msg.voltage < SystemInfo.BAT_VOLT_WARN:
             self.stat_bat.level = DiagnosticStatus.WARN
             self.stat_bat.message = "Battery almost empty"
-
+        
+        return msg
 
     def cb_bat_volt(self, msg):
         self._base_bat_voltage = msg.data
