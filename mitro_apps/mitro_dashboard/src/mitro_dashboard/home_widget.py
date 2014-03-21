@@ -43,9 +43,10 @@ class HomeWidget(MenuDashWidget):
         self._pub_set_goal.unregister()
 
     def update_current_location(self, msg):
+        rospy.loginfo("Pose updated")
         self._last_pose = msg.pose.pose
         if self._home_goal is None:
-            update_status(2)
+            self.update_state(2)
 
     def set_stale(self):
 	    self.update_state(0)
@@ -55,7 +56,7 @@ class HomeWidget(MenuDashWidget):
     def set_home(self):
         if self._last_pose is not None:
             self._home_goal = self._last_pose
-            self.update_status(1)
+            self.update_state(1)
             rospy.loginfo("New home location set")
         else:
             rospy.logwarn("Current position unknown, cannot set home location")

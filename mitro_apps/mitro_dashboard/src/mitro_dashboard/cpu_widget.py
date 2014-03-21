@@ -3,10 +3,10 @@ import roslib
 
 from os import path
 from rqt_robot_dashboard.widgets import IconToolButton
-from rqt_robot_dashboard import util
+#from rqt_robot_dashboard import util
 from python_qt_binding.QtCore import QSize
 from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import QApplication, QLabel
+#from PyQt4.QtGui import QApplication, QLabel
 
 from std_srvs.srv import Empty
 
@@ -29,8 +29,7 @@ class CpuWidget(IconToolButton, QtGui.QWidget):
         super(CpuWidget, self).update_state(state)
         self._state = state
         if state is 0:
-            self._cpu_usage_hist = {} #[10,20,15,30,50,50,50,80,100,10]
-            self._cpu_usage = -1
+            self._cpu_usage_hist = []
             self.setToolTip("CPU: stale")
 
     def close(self):
@@ -40,7 +39,7 @@ class CpuWidget(IconToolButton, QtGui.QWidget):
         self.update_state(0)
 
     def update(self, cpu_usage, cpu_temp):
-        self._cpu_usage_hist.insert(0, self._cpu_usage)
+        self._cpu_usage_hist.insert(0, cpu_usage)
         if len(self._cpu_usage_hist) > 10:
             self._cpu_usage_hist.pop()
         tooltip = "CPU: %.0f%%, %.0fC"%(cpu_usage, cpu_temp)
@@ -55,9 +54,9 @@ class CpuWidget(IconToolButton, QtGui.QWidget):
         if self._state is 0:
             qp.drawPixmap(target, self._icons[0].pixmap(QSize(35,35)), source)
         else:
-            qp.drawPixmap(target, self._icons[1].pixmap(QSize(40,40)), source)
+            qp.drawPixmap(target, self._icons[1].pixmap(QSize(35,35)), source)
         for x in range(len(self._cpu_usage_hist)):
-            pct = int(self._cpu_usage_hist[x] / 10.0)
+            pct = int(round(self._cpu_usage_hist[x] / 10.0))
             for y in range (pct):
                 if y < 7:
                     color = QtGui.QColor(0, 255, 0)

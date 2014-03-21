@@ -37,7 +37,7 @@ class RunstopWidget(IconToolButton):
         pass
 
     def update(self, msg):
-        if msg.data:
+        if not msg.data:
             self.update_state(1)
         else:
             self.update_state(2)

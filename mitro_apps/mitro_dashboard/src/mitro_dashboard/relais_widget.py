@@ -47,7 +47,8 @@ class RelaisWidget(IconToolButton):
             self.update_state(2)
 
     def close(self):
-        self._pub_relais.unregister()
+        pass
+        #self._pub_relais.unregister()
 
     def switch_relais(self):
         self._pub_relais.publish(not self._relais_state)

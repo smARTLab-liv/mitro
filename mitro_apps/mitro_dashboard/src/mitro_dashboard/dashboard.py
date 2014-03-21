@@ -2,10 +2,10 @@ import roslib;roslib.load_manifest('mitro_dashboard')
 import rospy
 
 from rqt_robot_dashboard.dashboard import Dashboard
-from rqt_robot_dashboard.widgets import MonitorDashWidget, ConsoleDashWidget, MenuDashWidget, IconToolButton
-from QtGui import QMessageBox, QAction
-from PyQt4 import QtGui, QtCore
-from python_qt_binding.QtCore import QSize
+from rqt_robot_dashboard.widgets import MonitorDashWidget, ConsoleDashWidget
+#from QtGui import QMessageBox, QAction
+from PyQt4 import QtCore#, QtGui
+#from python_qt_binding.QtCore import QSize
 
 import std_msgs.msg
 import mitro_diagnostics.msg
@@ -104,8 +104,8 @@ class MitroDashboard(Dashboard):
         if (rospy.get_time() - self._last_runstop_message > 5.0):
             self._runstop_widget.set_stale()
 
-        if (rospy.get_time() - self._last_pose_message > 5.0):
-            self._home_widget.set_stale()
+        #if (rospy.get_time() - self._last_pose_message > 5.0):
+        #    self._home_widget.set_stale()
 
         if (rospy.get_time() - self._last_nav_message > 5.0):
             self._nav_widget.set_stale()

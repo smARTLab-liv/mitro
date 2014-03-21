@@ -43,7 +43,7 @@ class AssistedDriveWidget(IconToolButton):
             self.update_state(2)
 
     def toggle(self):
-        self._pub_assisted_drive.publish(not self._assisted_drive_status)
+        self._pub_assisted_drive.publish(not self._assisted_drive_state)
         rospy.loginfo("Assisted drive toggled")
 
     def close(self):

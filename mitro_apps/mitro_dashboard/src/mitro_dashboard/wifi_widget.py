@@ -36,10 +36,10 @@ class WifiWidget(IconToolButton):
     def update(self, signallevel):
         self.setToolTip("Wifi signal level: %.1f dBm"%signallevel)
 
-        if self._signallevel == -1:
+        if signallevel == -1:
             self.update_state(5)
         else:
-            level = - self._signallevel
+            level = -signallevel
             if level < 30:
                 level = 30
             if level > 95:

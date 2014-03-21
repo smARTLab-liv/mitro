@@ -43,9 +43,9 @@ class BatteryWidget(IconToolButton):
         self._voltage = volt
         
         if not self._charging:       
-            self.update_state(round(perc / 20.0))
+            self.update_state(int(perc / 20.0))
         else:
-            self.update_state(round(perc / 20.0) + 6)
+            self.update_state(int(perc / 20.0) + 6)
 
 
     def update_state(self, state):
@@ -53,7 +53,7 @@ class BatteryWidget(IconToolButton):
         if state is 12:
             self.setToolTip("Battery: Stale")
         else:
-            self.setToolTip("Battery: %.0f %% (%.2f V)"%(pct, voltage))
+            self.setToolTip("Battery: %.0f %% (%.2f V)"%(self._perc, self._voltage))
 
 
     def set_stale(self):
