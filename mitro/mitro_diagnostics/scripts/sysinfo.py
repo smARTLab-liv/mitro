@@ -69,7 +69,7 @@ class SystemInfo():
         msg = NetworkStatus()
         msg.wifi_signallevel = -1.0
         try:
-            msg.wifi_signallevel = self.wifi.getStatistics()[1].getSignallevel()
+            msg.wifi_signallevel = self._wifi.getStatistics()[1].getSignallevel()
         except:
             pass
         
