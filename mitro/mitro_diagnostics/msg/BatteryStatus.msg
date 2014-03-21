@@ -1,7 +1,5 @@
 # Battery status: voltage, watt, percent, temp, and plugged in indication
 
-Header      header
-
 float32     voltage
 float32     watt
 float32     percent
