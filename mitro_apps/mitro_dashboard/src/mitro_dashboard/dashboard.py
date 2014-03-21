@@ -126,14 +126,9 @@ class MitroDashboard(Dashboard):
 
     def cb_sysinfo(self, msg):
         self._last_sysinfo_message = rospy.get_time()
-
-        msg.battery.percent = self.voltage_to_perc(msg.battery.voltage)
-        if msg.battery.voltage > 13.0:
-            msg.battery.plugged_in = True
-
         self._battery_widget.update(msg.battery.percent, msg.battery.voltage, msg.battery.plugged_in)
         self._wifi_widget.update(msg.network.wifi_signallevel)
-        self._cpu_widget.update(msg.system.cpu_usage_average, -1)
+        self._cpu_widget.update(msg.system.cpu_usage_average, msg.system.cpu_temp_average)
         
     def cb_assisted_drive(self, msg):
         self._last_assisted_drive_message = rospy.get_time()
