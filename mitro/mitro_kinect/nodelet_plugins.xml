@@ -1,4 +1,4 @@
-<library path="lib/libMitroKinectNodelet">
+<library path="lib/libmitro_kinect_nodelet">
   <class name="mitro_kinect/MitroKinectNodelet" type="mitro_kinect::MitroKinectNodelet" base_class_type="nodelet::Nodelet">
     <description> 
       Kinect processing node for MITRO.

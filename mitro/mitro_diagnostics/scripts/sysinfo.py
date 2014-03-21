@@ -73,15 +73,16 @@ class SystemInfo():
         except:
             pass
         
-        fn = "/sys/class/net/%s/operstate"%(self._eth_name)
-        try:
-            f = open( fn )
-            state = f.read().strip()
-            msg.ethernet_connected = True
-        except:
-            rospy.logerr("Can't open file %s"%fn)
-            msg.ethernet_connected = False
-        
+        #fn = "/sys/class/net/%s/operstate"%(self._eth_name)
+        #try:
+        #    f = open( fn )
+        #    state = f.read().strip()
+        #    msg.ethernet_connected = True
+        #except:
+        #    rospy.logerr("Can't open file %s"%fn)
+        #    msg.ethernet_connected = False
+        msg.ethernet_connected = False        
+
         self.stat_network = DiagnosticStatus(name="computer: Network",level=DiagnosticStatus.OK,message="OK")
         self.stat_network.values = [KeyValue("WiFi signal strength (db)",str(msg.wifi_signallevel)),
                                     KeyValue("Ethernet connected",str(msg.ethernet_connected))]
@@ -123,7 +124,7 @@ class SystemInfo():
         return msg   
 
 
-    def battery_status():
+    def battery_status(self):
         msg = BatteryStatus()
         
         msg.percent = self.voltage_to_perc(self._base_bat_voltage)
@@ -150,11 +151,11 @@ class SystemInfo():
             self.stat_bat.message = "Battery almost empty"
 
 
-    def cb_bat_volt(msg):
+    def cb_bat_volt(self, msg):
         self._base_bat_voltage = msg.data
 
 
-    def voltage_to_perc(v):
+    def voltage_to_perc(self, v):
         a = -7.87073944428413e-5
         b = -0.001363457642237
         c = 12.529846888629164
@@ -165,7 +166,7 @@ class SystemInfo():
         if v < 11.77:
             return 0.0
         
-        return 100 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
+        return 100 + ( b + numpy.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
 
 
 if __name__ == '__main__':
