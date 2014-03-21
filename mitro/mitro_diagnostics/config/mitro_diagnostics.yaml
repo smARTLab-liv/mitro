@@ -20,5 +20,5 @@ analyzers:
     joystick:
         type: diagnostic_aggregator/GenericAnalyzer
         path: Joystick
-        find_and_remove_prefix: joy
+        find_and_remove_prefix: ps3_joy
         num_items: 1
