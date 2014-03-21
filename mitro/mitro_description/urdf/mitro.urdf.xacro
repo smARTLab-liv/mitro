@@ -12,7 +12,7 @@
     <property name="sonar_scan_height" value="0.035"/>
     <property name="pole_length" value="1.45"/>
     <property name="pole_x_offset" value="-0.0611"/>
-    <property name="kinect_pitch_angle" value="1.16"/>
+    <property name="kinect_pitch_angle" value="1.27"/>
 
     <macro name="mitro">
 
