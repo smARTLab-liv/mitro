@@ -1,7 +1,8 @@
 <launch>
     <!-- launch file for sysinfo publisher -->
     <node name="sysinfo" pkg="mitro_diagnostics" type="sysinfo.py" output="screen" />
-    <!-- optional -->
-    <!-- <param name="battery_name" value="BAT0" /> -->
-    
+
+    <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" output="screen" >
+        <rosparam command="load" file="$(find mitro_diagnostics)/config/mitro_diagnostics.yaml" />
+    </node>
 </launch>

@@ -1,0 +1,24 @@
+pub_rate: 1.0
+base_path: ''
+analyzers:
+    sensors:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Hokuyo
+        timeout: 5.0
+        find_and_remove_prefix: base_laser
+        num_items: 2
+    power:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Battery
+        find_and_remove_prefix: battery
+        num_items: 1
+    computer:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Computer
+        find_and_remove_prefix: computer
+        num_items: 2
+    joystick:
+        type: diagnostic_aggregator/GenericAnalyzer
+        path: Joystick
+        find_and_remove_prefix: joy
+        num_items: 1
