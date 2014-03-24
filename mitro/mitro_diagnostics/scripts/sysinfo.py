@@ -7,8 +7,9 @@ from pythonwifi.iwlibs import Wireless
 import psutil
 import socket
 import numpy
-import os
-import re
+#import os
+#import re
+import sensors
 
 class SystemInfo():
     
@@ -44,6 +45,8 @@ class SystemInfo():
 
         info_msg = SysInfo()
         info_msg.hostname = socket.gethostname()
+        
+        sensors.init()
         
         diag_msg = DiagnosticArray()
         
@@ -97,9 +100,16 @@ class SystemInfo():
         msg.mem_usage = psutil.phymem_usage()[3]
         
         temps = []
-        res = os.popen("sensors | grep Core")
-        for line in res.readlines():
-            temps.append(float(re.search('\+(.*?)\W\WC', line).group(1)))
+        #res = os.popen("sensors | grep Core")
+        #for line in res.readlines():
+        #    temps.append(float(re.search('\+(.*?)\W\WC', line).group(1)))
+        try:
+            for chip in sensors.iter_detected_chips():
+                for feature in chip:
+                    if "Core" in feature.label:
+                        temps.append(feature.get_value())
+        except:
+            pass
         msg.cpu_temp_detail = temps
         msg.cpu_temp_average = numpy.mean(temps)
         
