@@ -1,6 +1,6 @@
 #!/bin/bash
-PID_FILE="/home/swarmlab/multicam.pid"
-LOG_FILE="/home/swarmlab/multicam.log"
+PID_FILE="/home/swarmlab/.ros/multicam.pid"
+LOG_FILE="/home/swarmlab/.ros/multicam.log"
 rm -f $PID_FILE
 rm -f $LOG_FILE
 touch $LOG_FILE

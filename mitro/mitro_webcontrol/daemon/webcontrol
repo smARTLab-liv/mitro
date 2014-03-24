@@ -5,7 +5,7 @@ DAEMON_OPTS=""
 NAME=webcontrol
 DESC="webcontrol"
 RUN_AS=swarmlab
-PID_FILE=/home/swarmlab/webcontrol.pid
+PID_FILE=/home/swarmlab/.ros/webcontrol.pid
  ############### END EDIT ME ##################
 test -x $DAEMON || exit 0
 set -e

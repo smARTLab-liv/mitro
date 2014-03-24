@@ -322,7 +322,7 @@ if __name__ == '__main__':
 
     cherrypy.config.update({'server.socket_host': args.host,
                             'server.socket_port': args.port,
-                            'tools.staticdir.root': os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))})
+                            'tools.staticdir.root': os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/static'))})
 
 
 
