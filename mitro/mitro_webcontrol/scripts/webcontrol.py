@@ -129,9 +129,9 @@ class ChatWebSocketHandler(WebSocket):
             cherrypy.engine.publish('websocket-broadcast', response)
 
         if text.startswith('skype:'):
-            response = TextMessage('log:we do not use skype anymore')
-            cherrypy.engine.publish('websocket-broadcast', response)
-	    return
+        #    response = TextMessage('log:we do not use skype anymore')
+        #    cherrypy.engine.publish('websocket-broadcast', response)
+	    #return
             # skype command protocol:
             # skype:[contact_name]
             r = text.split(':')
@@ -215,11 +215,11 @@ def callback_assisted(msg):
     
 def callback_sysinfo(msg):
     global status_msg
-    if msg.hostname == 'bob':
-        status_msg['wifi'] = msg.network.wifi_signallevel
-        status_msg['battery_base'] = int(msg.battery.percent)
-    elif msg.hostname == 'mitro-laptop':
-        status_msg['battery_laptop'] = int(msg.battery.percent)
+    #if msg.hostname == 'bob':
+    status_msg['wifi'] = msg.network.wifi_signallevel
+    status_msg['battery'] = int(msg.battery.percent)
+    #elif msg.hostname == 'mitro-laptop':
+    #    status_msg['battery_laptop'] = int(msg.battery.percent)
 
 def callback_mapmeta(msg):
     global mapmeta
@@ -281,11 +281,17 @@ if __name__ == '__main__':
     #filename = '/tmp/multicam-fifo'
     #fd = open(filename, 'w');
 
-    #global skype
+    global skype
     # Create an instance of the Skype class.
-    #skype = Skype4Py.Skype(Transport='x11')
-    # Connect the Skype object to the Skype client.
-    #skype.Attach()
+    skype = Skype4Py.Skype(Transport='x11')
+    # Starting Skype if it's not running already..
+    if not skype.Client.IsRunning:
+        print 'Starting Skype..'
+        skype.Client.Start()
+
+    # Attaching to Skype..
+    print 'Connecting to Skype..'
+    skype.Attach()
 
 
     rospy.init_node('web_control', anonymous=False, disable_signals=True)

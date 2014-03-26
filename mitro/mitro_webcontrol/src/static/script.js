@@ -75,6 +75,7 @@ $(document).ready(function() {
 	        
 	        //handle wifi
 	        var level = -obj.wifi;
+	        $('#log').val('<< wifi ' + level + '\n' + $('#log').val());
             if (level < 30) { level = 30; }
             if (level > 95) { level = 95; }
             var perc = 100 - (level-30) * 100.0/65.0;
@@ -83,13 +84,13 @@ $(document).ready(function() {
             else { $('#wifi').removeClass().addClass("red"); }
                 
             // handle battery
-            if (obj.battery_base >= 60) { $('#battery_robot').removeClass().addClass("green"); }
-            else if (obj.battery_base >= 30) { $('#battery_robot').removeClass().addClass("yellow"); }
+            if (obj.battery >= 60) { $('#battery').removeClass().addClass("green"); }
+            else if (obj.battery >= 30) { $('#battery').removeClass().addClass("yellow"); }
             else { $('#battery_robot').removeClass().addClass("red"); }
 
-            if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
-            else if (obj.battery_laptop >= 30) { $('#battery_laptop').removeClass().addClass("yellow"); }
-            else { $('#battery_laptop').removeClass().addClass("red"); }
+            //if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
+            //else if (obj.battery_laptop >= 30) { $('#battery_laptop').removeClass().addClass("yellow"); }
+            //else { $('#battery_laptop').removeClass().addClass("red"); }
 
             // handle goal status
             if (obj.hasgoal) {
