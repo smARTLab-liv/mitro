@@ -12,3 +12,6 @@ TrajectoryPlannerROS:
     yaw_goal_tolerance: 0.25
     xy_goal_tolerance: 0.2
     latch_xy_goal_tolerance: true
+
+NavfnROS:
+    default_tolerance: 0.3
