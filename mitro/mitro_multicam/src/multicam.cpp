@@ -607,9 +607,9 @@ int main(int argc, char**argv)
             } */
             for (y=0; y<HEIGHT_SMALL; y++) {
                 for (x=0; x<WIDTH_SMALL; x++) {
-                    b2[y*WIDTH + x] = b1[y*WIDTH_SMALL + x];
+                    b2[y*WIDTH/2 + x/2] = b1[y*WIDTH_SMALL/2 + x/2];
                 }
-            }                
+            }
         }
 
         write(devout, buffer, sizeimage); // write the ouput buffer to device
