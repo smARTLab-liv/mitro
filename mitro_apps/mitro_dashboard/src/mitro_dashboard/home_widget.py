@@ -43,7 +43,7 @@ class HomeWidget(MenuDashWidget):
         self._pub_set_goal.unregister()
 
     def update_current_location(self, msg):
-        rospy.loginfo("Pose updated")
+        #rospy.loginfo("Pose updated")
         self._last_pose = msg.pose.pose
         if self._home_goal is None:
             self.update_state(2)
