@@ -171,13 +171,13 @@ h2 {
     background-image: url('../images/wifi.png');
 }
 
-#battery_robot {
+#battery {
     background-image: url('../images/battery_3.png');
 }
 
-#battery_laptop {
+/* #battery_laptop {
     background-image: url('../images/battery_3.png');
-}
+} */
 
 
 /* CONTROLS */
