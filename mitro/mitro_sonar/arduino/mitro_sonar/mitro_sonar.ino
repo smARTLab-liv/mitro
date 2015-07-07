@@ -1,5 +1,7 @@
 #include <ros.h>
 #include <mitro_sonar/SonarRaw.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
 
 #include <ArduinoHardware.h>
 
@@ -14,20 +16,62 @@ const int pingPin2 = 4; // left center
 const int pingPin3 = 5; // center
 const int pingPin4 = 6; // right center
 const int pingPin5 = 7; // far right
+const int relaisCtl = 8; // relais control
+const int runstopIn = 9; // runstop input
 
 const long interval = 200;
+const long msg_interval = 1000;
+
+boolean relais = false;
+
+void cmd_rel_cb( const std_msgs::Bool& cmd_rel_msg) {
+  if (cmd_rel_msg.data == true) {
+    set_relais(true);
+  }
+  else {
+    set_relais(false);
+  }
+}
 
 mitro_sonar::SonarRaw sonar_msg;
+std_msgs::Bool runstop_msg;
+std_msgs::Bool relais_msg;
 ros::Publisher sonar_pub("sonar_raw", &sonar_msg);
+ros::Publisher pub_runstop("runstop", &runstop_msg);
+ros::Publisher pub_relais("relais", &relais_msg);
+ros::Subscriber<std_msgs::Bool> sub_relais("cmd_relais", cmd_rel_cb);
 ros::NodeHandle nh;
 
+void set_relais(boolean set) {
+  if (set) {
+    digitalWrite(relaisCtl, HIGH);
+    relais_msg.data = true;
+    relais = true;
+  }
+  else {
+    digitalWrite(relaisCtl, LOW);
+    relais_msg.data = false;
+    relais = false;
+  }
+}
+
 void setup() {
+  pinMode(relaisCtl, OUTPUT);
+  digitalWrite(relaisCtl, LOW);
+
+  pinMode(runstopIn, INPUT);
+  
   nh.getHardware()->setBaud(115200);
   nh.initNode();
   nh.advertise(sonar_pub);
+  nh.advertise(pub_relais);
+  nh.advertise(pub_runstop);
+  nh.subscribe(sub_relais);
+  relais_msg.data = false;
 }
 
 long prev_time = millis();
+long prev_msg = millis();
 
 void loop()
 {
@@ -90,6 +134,15 @@ void loop()
   }
 
   sonar_pub.publish(&sonar_msg);
+  
+  boolean runstop = !digitalRead(runstopIn);
+  set_relais(runstop);
+  
+  if (millis() - prev_msg > msg_interval - interval) {
+    runstop_msg.data = runstop;
+    pub_relais.publish(&relais_msg);
+    pub_runstop.publish(&runstop_msg);
+  }
   
   nh.spinOnce();
 
