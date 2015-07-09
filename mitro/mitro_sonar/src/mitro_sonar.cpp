@@ -7,6 +7,8 @@
 
 #define PI 3.1415926536
 
+//just checking
+
 ros::Publisher sonar_pub;
 ros::Publisher laser_pub;
 
