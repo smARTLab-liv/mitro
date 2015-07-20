@@ -24,8 +24,8 @@ class SystemInfo():
     
     def __init__(self):
         rospy.init_node('sysinfo')
-        pub = rospy.Publisher('sysinfo', SysInfo)
-        pub_diagnostics = rospy.Publisher('/diagnostics', DiagnosticArray)
+        pub = rospy.Publisher('sysinfo', SysInfo, queue_size=1)
+        pub_diagnostics = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
         rospy.Subscriber('battery_voltage', Float32, self.cb_bat_volt)
         
         wifi_name = 'wlan0'

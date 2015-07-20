@@ -1,1 +1,1 @@
-SUBSYSTEMS=="usb", ATTRS{idProduct}=="7523" ATTRS{idVendor}=="1a86", SYMLINK+="mitro/arduino_nano"
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="7523" ATTRS{idVendor}=="1a86", MODE:="0666", SYMLINK+="mitro/arduino_nano"

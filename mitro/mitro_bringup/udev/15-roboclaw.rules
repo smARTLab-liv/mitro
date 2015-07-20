@@ -1,1 +1,1 @@
-SUBSYSTEMS=="usb", ATTRS{idProduct}=="2404" ATTRS{idVendor}=="03eb", SYMLINK+="mitro/roboclaw"
+SUBSYSTEMS=="usb", ATTRS{idProduct}=="2404" ATTRS{idVendor}=="03eb", MODE:="0666", SYMLINK+="mitro/roboclaw"

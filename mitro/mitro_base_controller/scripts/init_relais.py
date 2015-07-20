@@ -11,7 +11,7 @@ class RelaisInit:
 	def __init__(self): 
 		self.trying = False
 		self.quit = False
-		self.cmd_rel_pub = rospy.Publisher('cmd_relais', Bool)
+		self.cmd_rel_pub = rospy.Publisher('cmd_relais', Bool, queue_size=1)
 		rospy.Subscriber('relais', Bool, self.relais_cb)
 		self.main()
 
