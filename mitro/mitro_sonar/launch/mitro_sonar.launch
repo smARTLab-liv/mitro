@@ -3,12 +3,12 @@
     
     <!-- launch rosserial -->
     <node pkg="rosserial_python" type="serial_node.py" name="serial_node_sonar" output="screen" respawn="true">
-        <param name="port" value="/dev/mitro/arduino_nano"/>
+        <param name="port" value="/dev/mitro/sonar"/>
         <param name="baud" value="115200" />
     </node> 
     
-    <!--<node pkg="mitro_sonar" type="mitro_sonar" name="mitro_sonar" output="screen">
+    <node pkg="mitro_sonar" type="mitro_sonar" name="mitro_sonar" output="screen">
         <rosparam file="$(find mitro_sonar)/config/sonar_params.yaml" command="load" />
-    </node>-->
+    </node>
 
 </launch>
