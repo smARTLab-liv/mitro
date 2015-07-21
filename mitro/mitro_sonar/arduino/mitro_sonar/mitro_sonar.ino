@@ -1,6 +1,6 @@
 #include <ros.h>
 #include <mitro_sonar/SonarRaw.h>
-#include <std_msgs/Float32.h>
+//#include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
 
 #include <ArduinoHardware.h>
@@ -11,26 +11,23 @@
 #include "WProgram.h"
 #endif
 
-const int pingPin1 = 3; // far left
-const int pingPin2 = 4; // left center
-const int pingPin3 = 5; // center
-const int pingPin4 = 6; // right center
-const int pingPin5 = 7; // far right
+const int pingPin1 = 2; // far left
+const int pingPin2 = 5; // left center
+const int pingPin3 = 3; // center
+const int pingPin4 = 4; // right center
+const int pingPin5 = 6; // far right
 const int relaisCtl = 8; // relais control
 const int runstopIn = 9; // runstop input
 
-const long interval = 200;
+const long ping_interval = 100;
 const long msg_interval = 1000;
 
-boolean relais = false;
+boolean relais_on = true;
+boolean runstop_pressed = false;
 
 void cmd_rel_cb( const std_msgs::Bool& cmd_rel_msg) {
-  if (cmd_rel_msg.data == true) {
-    set_relais(true);
-  }
-  else {
-    set_relais(false);
-  }
+  relais_on = cmd_rel_msg.data;
+  set_relais();
 }
 
 mitro_sonar::SonarRaw sonar_msg;
@@ -41,23 +38,20 @@ ros::Publisher pub_runstop("runstop", &runstop_msg);
 ros::Publisher pub_relais("relais", &relais_msg);
 ros::Subscriber<std_msgs::Bool> sub_relais("cmd_relais", cmd_rel_cb);
 ros::NodeHandle nh;
+//ros::NodeHandle_<ArduinoHardware, 2, 2, 80, 105> nh;
 
-void set_relais(boolean set) {
-  if (set) {
+void set_relais() {
+  if (relais_on && !runstop_pressed) {
     digitalWrite(relaisCtl, HIGH);
-    relais_msg.data = true;
-    relais = true;
   }
   else {
     digitalWrite(relaisCtl, LOW);
-    relais_msg.data = false;
-    relais = false;
   }
 }
 
 void setup() {
   pinMode(relaisCtl, OUTPUT);
-  digitalWrite(relaisCtl, LOW);
+  digitalWrite(relaisCtl, HIGH);
 
   pinMode(runstopIn, INPUT);
   
@@ -67,10 +61,10 @@ void setup() {
   nh.advertise(pub_relais);
   nh.advertise(pub_runstop);
   nh.subscribe(sub_relais);
-  relais_msg.data = false;
+  set_relais();
 }
 
-long prev_time = millis();
+long prev_ping = millis();
 long prev_msg = millis();
 
 void loop()
@@ -135,20 +129,22 @@ void loop()
 
   sonar_pub.publish(&sonar_msg);
   
-  boolean runstop = !digitalRead(runstopIn);
-  set_relais(runstop);
+  runstop_pressed = !digitalRead(runstopIn);
+  set_relais();
   
-  if (millis() - prev_msg > msg_interval - interval) {
-    runstop_msg.data = runstop;
+  if (millis() - prev_msg > msg_interval) {
+    runstop_msg.data = runstop_pressed;
+    relais_msg.data = relais_on && !runstop_pressed;
     pub_relais.publish(&relais_msg);
     pub_runstop.publish(&runstop_msg);
+    prev_msg = millis();
   }
   
   nh.spinOnce();
 
-  del = millis() - prev_time;
-  prev_time = millis();
-  delay(max(0, interval - del));
+  del = millis() - prev_ping;
+  prev_ping = millis();
+  delay(max(0, ping_interval - del));
 }
 
 long microsecondsToCentimeters(long microseconds)

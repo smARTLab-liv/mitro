@@ -3,7 +3,7 @@
     
     <!-- launch rosserial -->
     <node pkg="rosserial_python" type="serial_node.py" name="serial_node_sonar" output="screen" respawn="true">
-        <param name="port" value="/dev/mitro/arduino_nano"/>
+        <param name="port" value="/dev/ttyACM0"/>
         <param name="baud" value="115200" />
     </node> 
     
