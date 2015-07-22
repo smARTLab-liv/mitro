@@ -3,16 +3,15 @@
 
     <!-- start minimal -->
     <include file="$(find mitro_bringup)/launch/minimal.launch" />
-    
-    <!-- start odom -->
-    <include file="$(find mitro_odom)/launch/mitro_odom_kinect.launch" />
+
+    <!-- launch base controller -->
+    <include file="$(find mitro_base_controller)/launch/mitro_base_controller.launch">
+        <arg name="frame_id" value="odom_kinect" />
+    </include>
     
     <!-- start hokuyo -->
     <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
 
-    <!-- start sonar -->
-    <!--<include file="$(find mitro_sonar)/launch/mitro_sonar.launch" />-->
-    
     <!-- start assisted drive -->
     <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
     

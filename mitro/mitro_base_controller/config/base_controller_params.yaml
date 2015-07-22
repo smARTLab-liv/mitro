@@ -1,0 +1,4 @@
+# linear acceleration limit
+acc_lim_lin: 0.5
+# angular acceleration limit
+acc_lim_ang: 1.5

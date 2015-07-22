@@ -1,19 +1,23 @@
 <launch>
     <!-- launch file for mitro base controller -->
 
-    <!-- launch rosserial -->
-    <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" respawn="true">
-        <param name="port" value="/dev/mitro/base_controller"/>
-	<param name="baud" value="115200" />
-    </node>  
+    <!-- set the base_frame_id for odom, either base_link (without kinect) or odom_kinect -->
+    <arg name="frame_id" value="base_link" />
 
-    
-    <!-- launch base controller -->
-    <node pkg="mitro_base_controller" type="mitro_base_controller" name="mitro_base_controller" output="screen" >
-        <remap from="cmd_twist" to="cmd_twist_mixed" />
+    <node name="mitro_base_controller" pkg="roboclaw_driver" type="roboclaw_driver" output="screen" >
+    	  <param name="port" value="/dev/mitro/roboclaw" />
+	  <param name="baud_rate" value="1000000" />
+	  <param name="rate" value="30" />
+	  <param name="base_frame_id" value="$(arg frame_id)" />
+	  <param name="QPPS" value="9000" />
+	  <param name="left_motor_direction" value="1" />
+	  <param name="right_motor_direction" value="-1" />
+	  <remap from="~base_width" to="/wheel_base" />
+	  <remap from="~ticks_per_metre" to="/ticks_per_metre" />
+	  <remap from="/cmd_vel" to="/cmd_twist_mixed" />
     </node>
 
     <!-- initialize relais -->
-    <node pkg="mitro_base_controller" type="init_relais.py" name="init_relais" output="screen" />
+    <!-- <node pkg="mitro_base_controller" type="init_relais.py" name="init_relais" output="screen" /> -->
     
 </launch>   

@@ -4,7 +4,7 @@ project(mitro_base_controller)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy geometry_msgs std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS rospy std_msgs)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -20,10 +20,10 @@ catkin_python_setup()
 #######################################
 
 ## Generate messages in the 'msg' folder
-add_message_files(FILES
-  JointStates.msg
-  VelocityCommand.msg
-)
+#add_message_files(FILES
+#  JointStates.msg
+#  VelocityCommand.msg
+#)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -33,7 +33,7 @@ add_message_files(FILES
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(DEPENDENCIES std_msgs)
+#generate_messages(DEPENDENCIES std_msgs)
 
 ###################################
 ## catkin specific configuration ##
@@ -47,7 +47,7 @@ generate_messages(DEPENDENCIES std_msgs)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ${PROJECT_NAME}
-  CATKIN_DEPENDS roscpp rospy geometry_msgs std_msgs message_runtime
+  CATKIN_DEPENDS rospy std_msgs
 #  DEPENDS system_lib
 )
 
@@ -58,9 +58,9 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+#include_directories(
+#  ${catkin_INCLUDE_DIRS}
+#)
 
 ## Declare a cpp library
 # add_library(test
@@ -68,16 +68,16 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(mitro_base_controller src/mitro_base_controller.cpp)
+#add_executable(mitro_base_controller src/mitro_base_controller.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(mitro_base_controller mitro_base_controller_gencpp)
+#add_dependencies(mitro_base_controller mitro_base_controller_gencpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(mitro_base_controller
-  ${catkin_LIBRARIES}
-)
+#target_link_libraries(mitro_base_controller
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##

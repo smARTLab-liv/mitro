@@ -149,8 +149,7 @@ class TeleopMITRO
             cmd.angular.z = req_vw;
             vel_pub_.publish(cmd);
 
-            fprintf(stdout,"teleop_base:: %f, %f, %f.\n",
-                cmd.linear.x, cmd.linear.y, cmd.angular.z);
+            ROS_DEBUG("teleop_base:: %f, %f, %f.\n", cmd.linear.x, cmd.linear.y, cmd.angular.z);
         }
         else
         {
