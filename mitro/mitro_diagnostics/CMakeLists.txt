@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     message_generation
     diagnostic_msgs
+    roboclaw_driver
 )
 
 add_message_files(
@@ -23,5 +24,5 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS rospy std_msgs diagnostic_msgs message_runtime
+  CATKIN_DEPENDS rospy std_msgs diagnostic_msgs message_runtime roboclaw_driver
 )

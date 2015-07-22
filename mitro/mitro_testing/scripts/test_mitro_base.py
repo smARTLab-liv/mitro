@@ -6,11 +6,11 @@ def test_network():
     print '-'*80
     network_tests = []
     #add_test(network_tests, network.ip, 'eth0', '10.10.14.1')
-    add_test(network_tests, network.ip, 'wlan0', '10.10.16.1')
+    add_test(network_tests, network.ip, 'wlan0', '10.30.129.131')
     add_test(network_tests, network.ping, 'localhost')
     add_test(network_tests, network.ping, 'mitro')
     #add_test(network_tests, network.ping, 'mitro-laptop')
-    add_test(network_tests, network.ping, '10.10.16.254')
+    #add_test(network_tests, network.ping, '10.10.16.254')
     add_test(network_tests, network.ping, 'www.google.com')
     group_test(network_tests)
 
@@ -29,7 +29,7 @@ def test_process():
     print '-'*80
     process_tests = []
     add_test(process_tests, process.running, 'multicam')
-    #add_test(process_tests, process.running, 'skype')
+    add_test(process_tests, process.running, 'skype')
     add_test(process_tests, process.running, 'webcontrol.py')
     group_test(process_tests)
 

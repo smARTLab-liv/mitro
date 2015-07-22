@@ -9,12 +9,15 @@
 	  <param name="baud_rate" value="1000000" />
 	  <param name="rate" value="30" />
 	  <param name="base_frame_id" value="$(arg frame_id)" />
-	  <param name="QPPS" value="9000" />
 	  <param name="left_motor_direction" value="1" />
 	  <param name="right_motor_direction" value="-1" />
-	  <remap from="~base_width" to="/wheel_base" />
+	  <param name="robot_direction" value="0" />
+	  <param name="max_acceleration" value="0.5" />
+	  <param name="QPPS" value="9000" />
+          <remap from="~base_width" to="/wheel_base" />
 	  <remap from="~ticks_per_metre" to="/ticks_per_metre" />
 	  <remap from="/cmd_vel" to="/cmd_twist_mixed" />
+	
     </node>
 
     <!-- initialize relais -->

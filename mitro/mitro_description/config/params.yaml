@@ -1,7 +1,8 @@
 wheel_base: 0.393 # in meters
 wheel_radius: 0.07725 # in meters
 ticks_per_revolution: 3200
-ticks_per_metre: 6593 # ticks_per_revolution / (2 * pi * wheel_radius)
+#ticks_per_metre: 6593 # ticks_per_revolution / (2 * pi * wheel_radius)
+ticks_per_metre: 6696
 base_diameter: 0.4572
 
 #hardware related stuff

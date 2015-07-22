@@ -4,6 +4,7 @@ Header          header
 
 string          hostname
 
-BatteryStatus   battery
+BatteryStatus   battery_base
+BatteryStatus   battery_pc
 NetworkStatus   network
 SystemStatus    system

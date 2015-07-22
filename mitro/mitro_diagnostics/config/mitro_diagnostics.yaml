@@ -11,7 +11,7 @@ analyzers:
         type: diagnostic_aggregator/GenericAnalyzer
         path: Battery
         find_and_remove_prefix: battery
-        num_items: 1
+        num_items: 2
     computer:
         type: diagnostic_aggregator/GenericAnalyzer
         path: Computer
