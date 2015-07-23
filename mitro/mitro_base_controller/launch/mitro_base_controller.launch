@@ -2,7 +2,7 @@
     <!-- launch file for mitro base controller -->
 
     <!-- set the base_frame_id for odom, either base_link (without kinect) or odom_kinect -->
-    <arg name="frame_id" value="base_link" />
+    <arg name="frame_id" default="base_link" />
 
     <node name="mitro_base_controller" pkg="roboclaw_driver" type="roboclaw_driver" output="screen" >
     	  <param name="port" value="/dev/mitro/roboclaw" />
