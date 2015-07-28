@@ -72,7 +72,11 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1="${debian_chroot:+($debian_chroot)}${BYELLOW}\u${NORMAL}@${GREEN}\h${NORMAL}:${BBLUE}\w${NORMAL}\$ "
+    if [ -n "$SSH_TTY" ] || [ -n "$SSH_CLIENT" ]; then
+	PS1="${debian_chroot:+($debian_chroot)}${BYELLOW}\u${NORMAL}@${GREEN}\h${NORMAL}:${BBLUE}\w${NORMAL}\$ "
+    else
+	PS1="${debian_chroot:+($debian_chroot)}${BYELLOW}\u${NORMAL}:${BBLUE}\w${NORMAL}\$ "
+    fi
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
