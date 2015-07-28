@@ -2,11 +2,8 @@
     <!-- launch file for SLAM gmapping -->
     
     <!-- start basic nodes -->
-    <include file="$(find mitro_bringup)/launch/minimal.launch" />
-
-    <!-- launch base controller -->
-    <include file="$(find mitro_base_controller)/launch/mitro_base_controller.launch">
-        <arg name="frame_id" value="base_link" />
+    <include file="$(find mitro_bringup)/launch/minimal.launch">
+        <arg name="odom_frame" value="base_link" />
     </include>
 
     <!-- start hokuyo -->

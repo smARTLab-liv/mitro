@@ -1,5 +1,6 @@
 <launch>
     <!-- launch basic nodes for mitro -->
+    <arg name="odom_frame" default="base_link" />
     
     <!-- load parameters -->
     <rosparam file="$(find mitro_description)/config/params.yaml" command="load" />
@@ -16,8 +17,10 @@
     <!-- launch sonar/arduino node -->
     <include file="$(find mitro_sonar)/launch/mitro_sonar.launch" />
 
-    <!-- initialize relais -->
-    <!--<node pkg="mitro_base_controller" type="init_relais.py" name="init_relais" output="screen" />-->
+    <!-- launch base controller -->
+    <include file="$(find mitro_base_controller/launch/mitro_base_controller.launch">
+        <arg name="frame_id" value="$(arg odom_frame)" />
+    </include>
 
     <!-- launch system info publisher -->
     <include file="$(find mitro_diagnostics)/launch/sysinfo.launch" />

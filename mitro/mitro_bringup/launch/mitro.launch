@@ -2,13 +2,10 @@
     <!-- full launch file for MITRO -->
 
     <!-- start minimal -->
-    <include file="$(find mitro_bringup)/launch/minimal.launch" />
-
-    <!-- launch base controller -->
-    <include file="$(find mitro_base_controller)/launch/mitro_base_controller.launch">
-        <arg name="frame_id" value="odom_kinect" />
+    <include file="$(find mitro_bringup)/launch/minimal.launch">
+        <arg name="odom_frame" value="odom_kinect" />
     </include>
-    
+
     <!-- start hokuyo -->
     <include file="$(find mitro_bringup)/launch/sensors/hokuyo.launch" />
 
