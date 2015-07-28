@@ -154,6 +154,7 @@ export ROS_WORKSPACE=$HOME/ros_ws/src
 
 alias 'rviz'='rosrun rviz rviz'
 alias 'emacs'='emacs -nw'
+alias 'meow_make'='catkin_make -C $HOME/ros_ws/'
 
 function ros {
     export ROS_MASTER_URI=http://$1:11311

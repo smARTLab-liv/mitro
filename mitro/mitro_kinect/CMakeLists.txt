@@ -80,7 +80,7 @@ add_library(mitro_kinect_nodelet src/mitro_kinect_nodelet.cpp)
 add_dependencies(mitro_kinect_nodelet ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(mitro_kinect_nodelet ${PCL_LIBRARIES})
+target_link_libraries(mitro_kinect_nodelet ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 #############
 ## Install ##

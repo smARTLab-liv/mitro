@@ -3,8 +3,10 @@ import rospy
 from mitro_diagnostics.msg import SysInfo, SystemStatus, NetworkStatus, BatteryStatus
 from std_msgs.msg import Float32
 from diagnostic_msgs.msg import DiagnosticStatus, DiagnosticArray, KeyValue
+from roboclaw_driver.msg import RoboClawState
 from pythonwifi.iwlibs import Wireless
 import psutil
+from nut2 import PyNUTClient
 import socket
 import numpy
 #import os
@@ -26,7 +28,7 @@ class SystemInfo():
         rospy.init_node('sysinfo')
         pub = rospy.Publisher('sysinfo', SysInfo, queue_size=1)
         pub_diagnostics = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
-        rospy.Subscriber('battery_voltage', Float32, self.cb_bat_volt)
+        rospy.Subscriber('roboclaw_state', RoboClawState, self.cb_bat_volt)
         
         wifi_name = 'wlan0'
         if rospy.has_param('~wifi_name'):
@@ -38,8 +40,10 @@ class SystemInfo():
             wifi_name = rospy.get_param('~eth_name')
 
         self._base_bat_voltage = -1
+        self._last_bat_base = rospy.Time.now()
 
-        self._stat_bat = []
+        self._stat_bat_base = []
+        self._stat_bat_pc = []
         self._stat_network = []
         self._stat_system = []
 
@@ -56,11 +60,13 @@ class SystemInfo():
             info_msg.header.stamp = rospy.Time.now()
             info_msg.system = self.system_status()
             info_msg.network = self.network_status()
-            info_msg.battery = self.battery_status()
+            info_msg.battery_base = self.battery_base_status()
+            info_msg.battery_pc = self.battery_pc_status()
             pub.publish(info_msg)
             
             diag_msg.header.stamp = rospy.Time.now()
-            diag_msg.status.append(self.stat_bat)
+            diag_msg.status.append(self.stat_bat_base)
+            diag_msg.status.append(self.stat_bat_pc)
             diag_msg.status.append(self.stat_network)
             diag_msg.status.append(self.stat_system)
             pub_diagnostics.publish(diag_msg)
@@ -134,36 +140,87 @@ class SystemInfo():
         return msg   
 
 
-    def battery_status(self):
+    def battery_base_status(self):
         msg = BatteryStatus()
+
+        # check if any cirrent messages were received
+        if (rospy.Time.now() - self._last_bat_base) > rospy.Duration(5):
+            self._base_bat_voltage = -1
         
-        msg.percent = self.voltage_to_perc(self._base_bat_voltage)
+        # this should be recalibrated 
+        # msg.percent = self.voltage_to_perc(self._base_bat_voltage)
+        msg.percent = -1;
         if self._base_bat_voltage > 13.0:
             msg.plugged_in = True
         else:
             msg.plugged_in = False
         msg.voltage = self._base_bat_voltage
-        msg.watt = -1
+        msg.current = -1
         msg.temp = -1
         
-        self.stat_bat = DiagnosticStatus(name="battery: Base",level=DiagnosticStatus.OK,message="OK")
-        self.stat_bat.values = [KeyValue("Voltage (V)",str(msg.voltage)),
+        self.stat_bat_base = DiagnosticStatus(name="battery: Base",level=DiagnosticStatus.OK,message="OK")
+        self.stat_bat_base.values = [KeyValue("Voltage (V)",str(msg.voltage)),
                                 KeyValue("Percentage",str(msg.percent)),
-                                KeyValue("Power (W)",str(msg.watt)),
+                                KeyValue("Current (A)",str(msg.current)),
                                 KeyValue("Temperature (C)",str(msg.temp)),
                                 KeyValue("Charging",str(msg.plugged_in))]
-        
-        if msg.voltage < SystemInfo.BAT_VOLT_ERROR:
-            self.stat_bat.level = DiagnosticStatus.ERROR
-            self.stat_bat.message = "Battery almost empty"
+
+        if msg.voltage == -1:
+            self.stat_bat_base.level = DiagnosticStatus.ERROR
+            self.stat_bat_base.message = "No data received in the past 5 seconds"
+        elif msg.voltage < SystemInfo.BAT_VOLT_ERROR:
+            self.stat_bat_base.level = DiagnosticStatus.ERROR
+            self.stat_bat_base.message = "Battery almost empty"
         elif msg.voltage < SystemInfo.BAT_VOLT_WARN:
-            self.stat_bat.level = DiagnosticStatus.WARN
-            self.stat_bat.message = "Battery almost empty"
+            self.stat_bat_base.level = DiagnosticStatus.WARN
+            self.stat_bat_base.message = "Battery almost empty"
         
         return msg
 
+
+    def battery_pc_status(self):
+        msg = BatteryStatus()
+        
+        msg.percent = -1
+        msg.plugged_in = False
+        msg.voltage = -1
+        msg.current = -1
+        msg.temp = -1
+        
+        try:
+            ups = PyNUTClient()
+            bat = ups.list_vars("OpenUPS")
+            msg.percent = float(bat['battery.charge'])
+            msg.plugged_in = (str(bat['ups.status']) != "OB DISCHRG")
+            msg.voltage = float(bat['battery.voltage'])
+            if msg.plugged_in:
+                msg.current = float(bat['input.current'])
+            else:
+                msg.current = -1 * float(bat['output.current']) * (float(bat['output.voltage']) / float(bat['battery.voltage']))
+            msg.temp = float(bat['battery.temperature'])        
+        except:
+            rospy.logerr("Cannot connect to power board.")
+
+        self.stat_bat_pc = DiagnosticStatus(name="battery: PC",level=DiagnosticStatus.OK,message="OK")
+        self.stat_bat_pc.values = [KeyValue("Voltage (V)",str(msg.voltage)),
+                                KeyValue("Percentage",str(msg.percent)),
+                                KeyValue("Current (A)",str(msg.current)),
+                                KeyValue("Temperature (C)",str(msg.temp)),
+                                KeyValue("Charging",str(msg.plugged_in))]
+        
+        if msg.percent < SystemInfo.BAT_PERC_ERROR:
+            self.stat_bat_pc.level = DiagnosticStatus.ERROR
+            self.stat_bat_pc.message = "Battery almost empty"
+        elif msg.percent < SystemInfo.BAT_PERC_WARN:
+            self.stat_bat_pc.level = DiagnosticStatus.WARN
+            self.stat_bat_pc.message = "Battery almost empty"
+        
+        return msg
+
+
     def cb_bat_volt(self, msg):
-        self._base_bat_voltage = msg.data
+        self._base_bat_voltage = msg.battery_voltage
+        self._last_bat_base = rospy.Time.now()
 
 
     def voltage_to_perc(self, v):

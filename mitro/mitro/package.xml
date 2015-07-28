@@ -16,7 +16,6 @@
     <run_depend>mitro_kinect</run_depend>
     <run_depend>mitro_multicam</run_depend>
     <run_depend>mitro_sonar</run_depend>
-    <run_depend>mitro_testing</run_depend>
     <run_depend>mitro_webcontrol</run_depend>
     <run_depend>twist_mixer</run_depend>
     

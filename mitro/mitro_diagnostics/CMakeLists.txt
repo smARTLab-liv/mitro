@@ -6,7 +6,10 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     message_generation
     diagnostic_msgs
+    roboclaw_driver
 )
+
+catkin_python_setup()
 
 add_message_files(
   FILES
@@ -23,5 +26,10 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS rospy std_msgs diagnostic_msgs message_runtime
+  CATKIN_DEPENDS rospy std_msgs diagnostic_msgs message_runtime roboclaw_driver
+)
+
+install(PROGRAMS
+  scripts/test_mitro_base
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
