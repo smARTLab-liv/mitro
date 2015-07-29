@@ -13,8 +13,8 @@
     <property name="pole_length" value="1.45"/>
     <property name="pole_x_offset" value="-0.0611"/>
     <property name="kinect_pitch_angle" value="1.18"/>
-    <property name="kinect_roll_angle" value="0.04"/>
-    <property name="kinect_yaw_angle" value="0.0"/>
+    <property name="kinect_roll_angle" value="0.06"/>
+    <property name="kinect_yaw_angle" value="0.02"/>
 
     <macro name="mitro">
 
@@ -112,7 +112,7 @@
 
 <!-- kinect -->
 
-      <link name="kinect_link">
+      <link name="kinect_model_link">
 	<visual>
 	  <origin xyz="0 0 0" rpy="0 0 0" />
 	  <geometry>
@@ -124,8 +124,16 @@
 	</visual>
       </link>
 
+      <joint name="kinect_model_joint" type="fixed">
+        <origin xyz="0.10 0 0" rpy="0 ${kinect_pitch_angle} 0"/>
+        <parent link="top_pole_link"/>
+        <child link="kinect_model_link"/>
+      </joint>
+
+
+      <link name="kinect_link"/>
       <joint name="kinect_joint" type="fixed">
-        <origin xyz="0.10 -0.04 0" rpy="${kinect_roll_angle} ${kinect_pitch_angle} ${kinect_yaw_angle}"/> <!-- TODO: requires meassurement -->
+        <origin xyz="0.10 -0.06 0" rpy="${kinect_roll_angle} ${kinect_pitch_angle} ${kinect_yaw_angle}"/> <!-- TODO: requires meassurement -->
         <parent link="top_pole_link"/>
         <child link="kinect_link"/>
       </joint>

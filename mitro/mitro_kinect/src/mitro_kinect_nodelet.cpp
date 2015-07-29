@@ -3,22 +3,16 @@
 #include "ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
-
 #include <pcl/point_types.h>
-
 #include <pcl/io/pcd_io.h>
-
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/sample_consensus/model_types.h>
-
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/ModelCoefficients.h>
-
 #include <pcl/filters/extract_indices.h>
 #include <pcl/filters/project_inliers.h>
 #include <pcl/filters/radius_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
-
 #include <pcl_conversions/pcl_conversions.h>
 
 #include <dynamic_reconfigure/server.h>
@@ -33,10 +27,10 @@
 
 namespace mitro_kinect
 {
-
+  
   class MitroKinectNodelet : public nodelet::Nodelet
   {
-
+    
     // plane constraints
     static const float MAX_ROLL_ANGLE = 15/180.0f * PI;
     static const float MAX_PITCH_ANGLE = 15/180.0f * PI;
@@ -47,7 +41,7 @@ namespace mitro_kinect
     ros::Publisher pub_obstacles, pub_voxel;
     sensor_msgs::PointCloud2::Ptr last_cloud;
     tf::TransformBroadcaster *tf_broadcaster;
-
+    
     // dynamic reconfigure
     float voxel_size;
     float plane_tresh;
@@ -63,8 +57,12 @@ namespace mitro_kinect
     std::string topic_cloud_voxel;
     std::string tf_frame;
     std::string tf_target_frame;
-
-  
+    
+    // (exponential) moving average
+    static const float ALPHA = 0.1f;
+    float avg_pitch;
+    float avg_roll;
+    
   public:
     MitroKinectNodelet()
       : voxel_size(0.025f),
@@ -73,21 +71,21 @@ namespace mitro_kinect
 	outlier_radius(0.1f),
 	dynreconf_server(),
 	max_update_rate(10.0),
-	kinect_pitch_angle(0.41),
+	kinect_pitch_angle(0.39), // opposite of the angle defined in urdf.. should make this a param
 	topic_cloud_in("points"),
 	topic_cloud_obstacles("/cloud_obstacles"),
 	topic_cloud_voxel("/cloud_voxel"),
 	tf_frame("odom_kinect"),
 	tf_target_frame("base_link")
     {}
-
-
+    
+    
   public:
     virtual void onInit()
     {
       //      ros::NodeHandle& private_nh = getPrivateNodeHandle();
       ros::NodeHandle& nh = getNodeHandle();
-
+      
       tf_broadcaster = new tf::TransformBroadcaster();
 
       // dynamic reconfigure server
@@ -98,10 +96,14 @@ namespace mitro_kinect
       sub = nh.subscribe(topic_cloud_in, 1, &MitroKinectNodelet::cb_pointcloud2, this);
       pub_obstacles = nh.advertise<sensor_msgs::PointCloud2>(topic_cloud_obstacles, 1);
       pub_voxel = nh.advertise<sensor_msgs::PointCloud2>(topic_cloud_voxel, 1);
+      
+      avg_pitch = 0.0;
+      avg_roll = 0.0;
     }
 
     // dynamic reconfigure
-    void cb_dynreconf(mitro_kinect::MitroKinectNodeletConfig &config, uint32_t level) {
+    void cb_dynreconf(mitro_kinect::MitroKinectNodeletConfig &config, uint32_t level)
+    {
       ROS_DEBUG("dyn reconf call (voxel_size, plane_tresh, outlier_radius, outlier_neighbors): %f %f %f %d", 
 		config.voxel_size,
 		config.plane_tresh,
@@ -219,11 +221,12 @@ namespace mitro_kinect
 	float pitch = atan2(z,y) - PI/2.0f + kinect_pitch_angle;
 	roll = wrap_angle(roll);
 	pitch = wrap_angle(pitch);
-
-
-	if ( fabs(roll) > MAX_ROLL_ANGLE || fabs(pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
+	avg_pitch = (1 - ALPHA) * avg_pitch + ALPHA * pitch;
+	avg_roll = (1 - ALPHA) * avg_roll + ALPHA * roll;
+	
+	if ( fabs(avg_roll) > MAX_ROLL_ANGLE || fabs(avg_pitch) > MAX_PITCH_ANGLE || fabs(d) > MAX_DIST || fabs(d) < MIN_DIST)
 	{
-	  ROS_DEBUG("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", pitch, roll, d);
+	  ROS_DEBUG("SACMODEL_PLANE coefficients dont seem right (pitch: %f, roll: %f, height: %f).\n Publishing entire cloud as obstacles.", avg_pitch, avg_roll, d);
 	  // prepare for second iteration
 	  pcl::ExtractIndices<pcl::PointXYZ> extract;
 	  extract.setInputCloud (pcl_cloud);
@@ -239,10 +242,10 @@ namespace mitro_kinect
 	  continue;
 	} else {
 	  // found floor, set transform
-	  ROS_DEBUG("found floor in %d iteration! (pitch: %f, roll: %f, height: %f)", (it+1), pitch, roll, d);
+	  ROS_DEBUG("found floor in %d iteration! (pitch: %f, roll: %f, height: %f)", (it+1), avg_pitch, avg_roll, d);
 	  transform.setOrigin( tf::Vector3(0.0, 0.0, 0.0) );
 	  tf::Quaternion quaternion;
-	  quaternion.setEuler(pitch, roll, 0.0d);
+	  quaternion.setEuler(avg_pitch, avg_roll, 0.0d);
 	  transform.setRotation( quaternion );
 	  found = true;
 	  break;
