@@ -1,35 +1,32 @@
 ### BEGIN INIT INFO
-# Provides:          ps3joy
+# Provides:          mitro_bringup
 # Required-Start:    
 # Required-Stop:     
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts instance of ps3joy.py
-# Description:       starts instance of pd3joy.py
+# Short-Description: starts the mitro nodes
+# Description:       starts the mitro nodes
 ### END INIT INFO
 
 ############### EDIT ME ##################
 
 #APP_PATH=""
 
-. /opt/ros/indigo/setup.sh
-export ROS_HOME=/root
-
 # path to daemon
-DAEMON=/opt/ros/indigo/lib/ps3joy/ps3joy.py
+DAEMON=/home/smartlab/ros_ws/src/mitro/mitro/mitro_bringup/mitro_bringup_base.sh
 
 # startup args
-DAEMON_OPTS="--inactivity-timeout=900 --redirect-output=/var/log/ps3joy.log"
+DAEMON_OPTS=""
 
 # script name
-NAME=ps3joy
+NAME=mitro_bringup
 
 # app name
-DESC=ps3joy
+DESC=mitro_bringup
 
-RUN_AS=root
+RUN_AS=smartlab
 
-PID_FILE=/var/run/ps3joy.pid
+PID_FILE=/home/smartlab/.ros/mitro_bringup.pid
 
 ############### END EDIT ME ##################
 
@@ -41,7 +38,7 @@ case "$1" in
   start)
         echo -n "Starting $DESC: "
 
-        start-stop-daemon -c $RUN_AS --start --background --pidfile $PID_FILE  --make-pidfile -a $DAEMON -- $DAEMON_OPTS
+        start-stop-daemon -c $RUN_AS --start --background --pidfile $PID_FILE  -a $DAEMON -- $DAEMON_OPTS
 
         if [ $? ]; then
             echo "[OK]"
