@@ -16,8 +16,8 @@
   <!-- By default, calibrations are stored to file://${ROS_HOME}/camera_info/${NAME}.yaml,
        where ${NAME} is of the form "[rgb|depth]_[serial#]", e.g. "depth_B00367707227042B".
        See camera_info_manager docs for calibration URL details. -->
-  <arg name="rgb_camera_info_url"   default="" />
-  <arg name="depth_camera_info_url" default="" />
+  <arg name="rgb_camera_info_url"   default="file://$(find mitro_kinect)/calibration/rgb_1402240322.yaml" />
+  <arg name="depth_camera_info_url" default="file://$(find mitro_kinect)/calibration/depth_1402240322.yaml" />
 
   <!-- Arguments for remapping "rgb", "depth", "depth_registered" namespaces -->
   <arg name="rgb"              default="rgb" />
