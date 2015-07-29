@@ -17,12 +17,12 @@ def test_network():
 def test_video():
     print '-'*80
     video_tests = []
-    add_test(video_tests, video.device, '/dev/video0')
-    add_test(video_tests, video.device, '/dev/video1')
-    add_test(video_tests, video.device, '/dev/video2')
-    add_test(video_tests, video.v4l_info, '/dev/video0', '046d:0821')
-    add_test(video_tests, video.v4l_info, '/dev/video1', '046d:08ce')
-    add_test(video_tests, video.v4l_info, '/dev/video2', 'Dummy')
+    add_test(video_tests, video.device, '/dev/mitro/video_front')
+    add_test(video_tests, video.device, '/dev/mitro/video_bottom')
+    add_test(video_tests, video.device, '/dev/video10')
+    add_test(video_tests, video.v4l_info, '/dev/mitro/video_front', '046d:0821')
+    add_test(video_tests, video.v4l_info, '/dev/mitro/video_bottom', '046d:08ce')
+    add_test(video_tests, video.v4l_info, '/dev/video10', 'Dummy')
     group_test(video_tests)
 
 def test_process():

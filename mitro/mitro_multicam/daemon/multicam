@@ -1,36 +1,79 @@
-#!/bin/bash
-DAEMON_PATH=/home/swarmlab/ros_catkin_ws/src/mitro/mitro_multicam
-DAEMON=$DAEMON_PATH/start.sh
+### BEGIN INIT INFO
+# Provides:          multicam
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the webcam mixer
+# Description:       starts the webcam mixer
+### END INIT INFO
+
+############### EDIT ME ##################
+
+#APP_PATH=""
+
+# path to daemon
+DAEMON=/home/smartlab/ros_ws/src/mitro/mitro/mitro_multicam/start.sh
+
+# startup args
 DAEMON_OPTS=""
-NAME=multicam
-DESC="multicam"
-RUN_AS=swarmlab
-PID_FILE=/home/swarmlab/.ros/multicam.pid
- ############### END EDIT ME ##################
+
+# script name
+NAME=mitro_bringup
+
+# app name
+DESC=mitro_bringup
+
+RUN_AS=smartlab
+
+PID_FILE=/home/smartlab/.ros/multicam.pid
+
+############### END EDIT ME ##################
+
 test -x $DAEMON || exit 0
+
 set -e
+
 case "$1" in
-    start)
+  start)
         echo -n "Starting $DESC: "
-        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --make-pidfile --pidfile $PID_FILE --exec $DAEMON -- $DAEMON_OPTS
-        echo "$NAME."
+
+        start-stop-daemon -c $RUN_AS --start --background --make-pidfile --pidfile $PID_FILE  -a $DAEMON -- $DAEMON_OPTS
+
+        if [ $? ]; then
+            echo "[OK]"
+        else
+            echo "[FAILED]"
+        fi
+
         ;;
-    stop)
+  stop)
         echo -n "Stopping $DESC: "
         start-stop-daemon --stop --pidfile $PID_FILE
-        echo "$NAME."
+        if [ $? ]; then
+            echo "[OK]"
+        else
+            echo "[FAILED]"
+        fi
         ;;
-    restart|force-reload)
+
+  restart|force-reload)
         echo -n "Restarting $DESC: "
-        start-stop-daemon --stop --pidfile $PID_FILE
-        sleep 2
-        start-stop-daemon -d $DAEMON_PATH -c $RUN_AS --start --background --make-pidfile --pidfile $PID_FILE  --exec $DAEMON -- $DAEMON_OPTS
-        echo "$NAME."
+        start-stop-daemon --stop --oknodo --pidfile $PID_FILE
+        sleep 1
+        start-stop-daemon -c $RUN_AS --start --background --pidfile $PID_FILE  --make-pidfile -a $DAEMON -- $DAEMON_OPTS
+        if [ $? ]; then
+            echo "[OK]"
+        else
+            echo "[FAILED]"
+        fi
+
         ;;
-    *)
+  *)
         N=/etc/init.d/$NAME
         echo "Usage: $N {start|stop|restart|force-reload}" >&2
         exit 1
         ;;
 esac
+
 exit 0
