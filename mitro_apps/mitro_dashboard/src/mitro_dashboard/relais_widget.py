@@ -26,7 +26,7 @@ class RelaisWidget(IconToolButton):
         self.update_state(0)
         self._relais_state = None
 
-        self._pub_relais = rospy.Publisher('cmd_relais', Bool)
+        self._pub_relais = rospy.Publisher('cmd_relais', Bool, queue_size=10)
 
     def update_state(self, state):
         super(RelaisWidget, self).update_state(state)

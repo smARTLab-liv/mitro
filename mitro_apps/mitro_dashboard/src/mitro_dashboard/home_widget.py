@@ -24,7 +24,7 @@ class HomeWidget(MenuDashWidget):
         self.add_action('Set home location', partial(self.set_home))
         self.add_action('Take me home!', partial(self.go_home))
 
-        self._pub_set_goal = rospy.Publisher("/goal_planner/goal", PoseStamped) 
+        self._pub_set_goal = rospy.Publisher("/goal_planner/goal", PoseStamped, queue_size=10) 
 
         self.update_state(0)
         self._last_pose = None

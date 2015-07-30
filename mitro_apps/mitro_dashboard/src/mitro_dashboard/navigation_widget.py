@@ -23,7 +23,7 @@ class NavigationWidget(IconToolButton):
 
         self.clicked.connect(self.cancel_goals)
 
-        self._pub_goal = rospy.Publisher("/goal_planner/cancel", Bool)
+        self._pub_goal = rospy.Publisher("/goal_planner/cancel", Bool, queue_size=10)
 
     def update_state(self, state):
         super(NavigationWidget, self).update_state(state)

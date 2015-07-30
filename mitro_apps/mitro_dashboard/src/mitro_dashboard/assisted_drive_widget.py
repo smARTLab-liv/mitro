@@ -23,7 +23,7 @@ class AssistedDriveWidget(IconToolButton):
 
         self.clicked.connect(self.toggle)
         self._assisted_drive_state = False
-        self._pub_assisted_drive = rospy.Publisher("/assisted_drive/set", Bool)
+        self._pub_assisted_drive = rospy.Publisher("/assisted_drive/set", Bool, queue_size=10)
 
 
     def update_state(self, state):

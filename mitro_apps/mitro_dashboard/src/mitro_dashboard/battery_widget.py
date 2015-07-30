@@ -44,9 +44,9 @@ class BatteryWidget(IconToolButton):
         self._voltage = volt
         
         if not self._charging:       
-            self.update_state(ceil(perc / 20.0) - 1)
+            self.update_state(int(ceil(perc / 20.0) - 1))
         else:
-            self.update_state(ceil(perc / 20.0) + 4)
+            self.update_state(int(ceil(perc / 20.0) + 4))
 
 
     def update_state(self, state):
