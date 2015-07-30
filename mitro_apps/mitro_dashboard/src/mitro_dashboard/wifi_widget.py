@@ -1,6 +1,7 @@
 import rospy
 import roslib
 from os import path
+from math import ceil
 from rqt_robot_dashboard.widgets import IconToolButton
 from rqt_robot_dashboard import util
 from python_qt_binding.QtCore import QSize
@@ -39,11 +40,10 @@ class WifiWidget(IconToolButton):
         if signallevel == -1:
             self.update_state(5)
         else:
-            level = -signallevel
-            if level < 30:
-                level = 30
-            if level > 95:
-                level = 95
-            perc = 100 - (level-30) * 100.0/65.0
-            idx = int( (perc + 12.5) / 25.0 )
+            if signallevel < -100:
+                level = -100
+            if level > -50:
+                level = -50
+            perc = 2 * (level + 100)
+            idx = ceil(perc / 20) - 1 #int( (perc + 12.5) / 25.0 )
 	    self.update_state(idx)

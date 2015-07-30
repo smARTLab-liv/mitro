@@ -126,7 +126,7 @@ class MitroDashboard(Dashboard):
 
     def cb_sysinfo(self, msg):
         self._last_sysinfo_message = rospy.get_time()
-        self._battery_widget.update(msg.battery.percent, msg.battery.voltage, msg.battery.plugged_in)
+        self._battery_widget.update(msg.battery_pc.percent, msg.battery_pc.voltage, msg.battery_pc.plugged_in)
         self._wifi_widget.update(msg.network.wifi_signallevel)
         self._cpu_widget.update(msg.system.cpu_usage_average, msg.system.cpu_temp_average)
         

@@ -2,6 +2,7 @@ import rospy
 import roslib
 
 from os import path
+from math import ceil
 from rqt_robot_dashboard.widgets import IconToolButton
 from rqt_robot_dashboard import util
 from python_qt_binding.QtCore import QSize
@@ -12,13 +13,13 @@ class BatteryWidget(IconToolButton):
         icons_path = path.join(roslib.packages.get_pkg_dir('mitro_dashboard'), "icons/")
         icons = []
         charge_icons = []
-        icons.append([icons_path + 'battery-0.png'])
+        #icons.append([icons_path + 'battery-0.png'])
         icons.append([icons_path + 'battery-1.png'])
         icons.append([icons_path + 'battery-2.png'])
         icons.append([icons_path + 'battery-3.png'])
         icons.append([icons_path + 'battery-4.png'])
         icons.append([icons_path + 'battery-5.png'])
-        icons.append([icons_path + 'battery-0-chrg.png'])
+        #icons.append([icons_path + 'battery-0-chrg.png'])
         icons.append([icons_path + 'battery-1-chrg.png'])
         icons.append([icons_path + 'battery-2-chrg.png'])
         icons.append([icons_path + 'battery-3-chrg.png'])
@@ -30,7 +31,7 @@ class BatteryWidget(IconToolButton):
         
         self.setFixedSize(QSize(40,40))
         
-        self.update_state(12)
+        self.update_state(10)
         
         self._voltage = -1
         self._perc = -1
@@ -43,14 +44,14 @@ class BatteryWidget(IconToolButton):
         self._voltage = volt
         
         if not self._charging:       
-            self.update_state(int(perc / 20.0))
+            self.update_state(ceil(perc / 20.0) - 1)
         else:
-            self.update_state(int(perc / 20.0) + 6)
+            self.update_state(ceil(perc / 20.0) + 4)
 
 
     def update_state(self, state):
         super(BatteryWidget, self).update_state(state)
-        if state is 12:
+        if state is 10:
             self.setToolTip("Battery: Stale")
         else:
             self.setToolTip("Battery: %.0f %% (%.2f V)"%(self._perc, self._voltage))
