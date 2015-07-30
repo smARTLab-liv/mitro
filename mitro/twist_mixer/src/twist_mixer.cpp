@@ -2,6 +2,9 @@
 #include <geometry_msgs/Twist.h>
 
 double HOLD_OFF_TIME = 0.5;
+double STOP_DELAY = 0.1;
+int NR_ZEROS = 5;
+bool SEND_ZEROS = false;
 
 std::vector<std::string> topics;
 std::vector<ros::Subscriber> subscribers;
@@ -9,6 +12,7 @@ ros::Publisher twist_pub;
 geometry_msgs::Twist twist_mixed;
 
 ros::Time time_last;
+ros::Time last_cmd_in;
 int current_level = 0;
 
 void twist_cb(const geometry_msgs::Twist::ConstPtr& msg, int32_t priority) {
@@ -26,6 +30,8 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg, int32_t priority) {
         
         time_last = time_now;
     }
+    last_cmd_in = time_now;
+    SEND_ZEROS = true;
 }
 
 int main(int argc, char** argv){
@@ -38,7 +44,8 @@ int main(int argc, char** argv){
     XmlRpc::XmlRpcValue list;
 
     try {
-        priv_nh.getParam("hold_off_time", HOLD_OFF_TIME);   
+        priv_nh.getParam("hold_off_time", HOLD_OFF_TIME);
+	priv_nh.getParam("stop_delay", STOP_DELAY);
         priv_nh.getParam("twist_mixer_topics", list);
         ROS_ASSERT(list.getType() == XmlRpc::XmlRpcValue::TypeArray);
           
@@ -59,6 +66,22 @@ int main(int argc, char** argv){
 
     twist_pub = nh.advertise<geometry_msgs::Twist>("cmd_twist_mixed", 10);
 
-    ros::spin();
+    ros::Rate loop_rate(50);
+    int count = 0;
+    while (ros::ok()) {
+      // if nothing is published, send 5 zero cmds to ensure the robot halts
+      ros::Time time_now = ros::Time::now();
+      if (SEND_ZEROS && (time_now - last_cmd_in).toSec() > STOP_DELAY) {
+	twist_mixed.linear.x = 0.0;
+        twist_mixed.angular.z = 0.0;
+        twist_pub.publish(twist_mixed);
+	count++;
+	if (count >= NR_ZEROS) {
+	  SEND_ZEROS = false;
+	  count = 0;
+	}
+      }
+      ros::spinOnce();
+    }
     return 0;
 }

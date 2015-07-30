@@ -3,3 +3,4 @@ twist_mixer_topics: [cmd_twist_move_base, cmd_twist_tele, cmd_twist_tele_assiste
 
 # time for which lower priority topics are ignored if something of higher priority is published
 hold_off_time: 1.0
+stop_delay: 0.25

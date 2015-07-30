@@ -6,7 +6,7 @@
   </node>
 
   <!-- MITRO joy node -->
-  <node pkg="mitro_teleop" type="mitro_joy_node" name="mitro_joy_node" output="screen" >
+  <node pkg="mitro_teleop" type="mitro_joy_node" name="mitro_joy_node" output="screen" args="--deadman_no_publish" >
     <rosparam file="$(find mitro_teleop)/config/teleop.yaml" command="load" />
     <remap from="cmd_vel" to="cmd_twist_ps3"/>
   </node>
