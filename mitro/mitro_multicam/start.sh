@@ -15,7 +15,7 @@ while [ $DONE -eq 0 ]; do
 	sleep 1
 	/home/smartlab/ros_ws/devel/lib/mitro_multicam/multicam /dev/mitro/video_front /dev/mitro/video_bottom /dev/video10 > $LOG_FILE &
         sleep 1
-	PID=`ps aux | grep 'bin/multicam' | grep -v grep | grep -v ps3 | awk '{print $2}'`
+	PID=`ps aux | grep 'mitro_multicam/multicam' | grep -v grep | grep -v ps3 | awk '{print $2}'`
 	echo $PID > $PID_FILE
 	echo "process started with PID: " $PID
 	DONE=1

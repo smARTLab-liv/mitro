@@ -1,5 +1,5 @@
 ### BEGIN INIT INFO
-# Provides:          multicam
+# Provides:          mitro_multicam
 # Required-Start:    
 # Required-Stop:     
 # Default-Start:     2 3 4 5
@@ -19,10 +19,10 @@ DAEMON=/home/smartlab/ros_ws/src/mitro/mitro/mitro_multicam/start.sh
 DAEMON_OPTS=""
 
 # script name
-NAME=mitro_bringup
+NAME=mitro_multicam
 
 # app name
-DESC=mitro_bringup
+DESC=mitro_multicam
 
 RUN_AS=smartlab
 
