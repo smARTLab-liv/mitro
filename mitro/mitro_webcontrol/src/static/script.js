@@ -39,53 +39,53 @@ $(document).ready(function() {
     };
 
     window.onbeforeunload = function(e) {
-	    $('#log').val('bye bye...\n' + $('#log').val());
-	    ws.close(1000, 'disconnect');
+	$('#log').val('bye bye...\n' + $('#log').val());
+	ws.close(1000, 'disconnect');
 	
-	    if(!e) e = window.event;
-	    e.stopPropagation();
-	    e.preventDefault();
+	if(!e) e = window.event;
+	e.stopPropagation();
+	e.preventDefault();
     };
 
     ws.onmessage = function(evt) {
         // TODO: error handling
-    
-	    // logging
-	    //$('#log').val('<< ' + evt.data + '\n' + $('#log').val());
-	    if (evt.data.indexOf("log:") == 0) {
-	        $('#log').val('<< ' + evt.data.substring(4) + '\n' + $('#log').val());
-	    }
-	    else {
-	        // parse JSON object
-	        obj = jQuery.parseJSON( evt.data );
+	
+	// logging
+	//$('#log').val('<< ' + evt.data + '\n' + $('#log').val());
+	if (evt.data.indexOf("log:") == 0) {
+	    $('#log').val('<< ' + evt.data.substring(4) + '\n' + $('#log').val());
+	}
+	else {
+	    // parse JSON object
+	    obj = jQuery.parseJSON( evt.data );
 
-	        // handle runstop
-	        if (obj.runstop) {
-	            $('#runstop').removeClass().addClass("red");
-	        } else {
-	            $('#runstop').removeClass().addClass("green");
-	        }
-	        
-	        // handle relais
-	        if (obj.relais) {
-	            $('#relais_button').removeClass("down");
-	        } else {
-	            $('#relais_button').addClass("down");
-	        }
-	        
-	        //handle wifi
-	        var level = -obj.wifi;
-	        //$('#log').val('<< wifi ' + level + '\n' + $('#log').val());
-            if (level < 30) { level = 30; }
-            if (level > 95) { level = 95; }
-            var perc = 100 - (level-30) * 100.0/65.0;
-            if (perc >= 75) { $('#wifi').removeClass().addClass("green"); }
-            else if (perc >= 50) { $('#wifi').removeClass().addClass("yellow"); }
-            else { $('#wifi').removeClass().addClass("red"); }
-                
+	    // handle runstop
+	    if (obj.runstop) {
+	        $('#runstop').removeClass().addClass("red");
+	    } else {
+	        $('#runstop').removeClass().addClass("green");
+	    }
+	    
+	    // handle relais
+	    if (obj.relais) {
+	        $('#relais_button').removeClass("down");
+	    } else {
+	        $('#relais_button').addClass("down");
+	    }
+	    
+	    //handle wifi
+	    var level = obj.wifi;
+	    //$('#log').val('<< wifi ' + level + '\n' + $('#log').val());
+	    if (level > -50) { level = -50; }
+	    if (level < -100) { level = -100; }
+            var perc = 2 * (level + 100);
+	    if (perc >= 75) { $('#wifi').removeClass().addClass("green"); }
+	    else if (perc >= 50) { $('#wifi').removeClass().addClass("yellow"); }
+	    else { $('#wifi').removeClass().addClass("red"); }
+            
             // handle battery
-            if (obj.battery >= 60) { $('#battery').removeClass().addClass("green"); }
-            else if (obj.battery >= 30) { $('#battery').removeClass().addClass("yellow"); }
+            if (obj.battery_pc >= 60) { $('#battery').removeClass().addClass("green"); }
+            else if (obj.battery_pc >= 30) { $('#battery').removeClass().addClass("yellow"); }
             else { $('#battery').removeClass().addClass("red"); }
 
             //if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
@@ -116,13 +116,13 @@ $(document).ready(function() {
 
             if (obj.hasOwnProperty('goal')) {
                 // set goal location
-                    $('#goal_marker').css({'left': ""+(obj.goal[0]-13)+"px", 'top': ""+(obj.goal[1]-26)+"px"});
+                $('#goal_marker').css({'left': ""+(obj.goal[0]-13)+"px", 'top': ""+(obj.goal[1]-26)+"px"});
             } else {
                 $('#goal_marker').hide();
             }
-	    }
+	}
     };
-   
+    
 
     ws.onclose = function(evt) {
 	$('#log').val($('#log').val() + 'Connection closed by server: ' + evt.code + ' \"' + evt.reason + '\"\n');
@@ -312,5 +312,3 @@ $(document).ready(function() {
 
 
 });
-
-

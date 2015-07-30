@@ -215,11 +215,9 @@ def callback_assisted(msg):
     
 def callback_sysinfo(msg):
     global status_msg
-    #if msg.hostname == 'bob':
     status_msg['wifi'] = msg.network.wifi_signallevel
-    status_msg['battery'] = int(msg.battery_pc.percent)
-    #elif msg.hostname == 'mitro-laptop':
-    #    status_msg['battery_laptop'] = int(msg.battery.percent)
+    status_msg['battery_base'] = msg.battery_base.voltage
+    status_msg['battery_pc'] = int(msg.battery_pc.percent)
 
 def callback_mapmeta(msg):
     global mapmeta
