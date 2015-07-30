@@ -4,12 +4,11 @@ from mitro_diagnostics.msg import SysInfo, SystemStatus, NetworkStatus, BatteryS
 from std_msgs.msg import Float32
 from diagnostic_msgs.msg import DiagnosticStatus, DiagnosticArray, KeyValue
 from roboclaw_driver.msg import RoboClawState
-from pythonwifi.iwlibs import Wireless
 import psutil
 from nut2 import PyNUTClient
 import socket
 import numpy
-#import os
+import os
 #import re
 import sensors
 
@@ -30,14 +29,13 @@ class SystemInfo():
         pub_diagnostics = rospy.Publisher('/diagnostics', DiagnosticArray, queue_size=1)
         rospy.Subscriber('roboclaw_state', RoboClawState, self.cb_bat_volt)
         
-        wifi_name = 'wlan0'
+        self._wifi_name = 'wlan0'
         if rospy.has_param('~wifi_name'):
-            wifi_name = rospy.get_param('~wifi_name')
-        self._wifi = Wireless(wifi_name)
+            self._wifi_name = rospy.get_param('~wifi_name')
 
         self._eth_name = 'eth0'
         if rospy.has_param('~eth_name'):
-            wifi_name = rospy.get_param('~eth_name')
+            self._eth_name = rospy.get_param('~eth_name')
 
         self._base_bat_voltage = -1
         self._last_bat_base = rospy.Time.now()
@@ -77,8 +75,12 @@ class SystemInfo():
     def network_status(self):
         msg = NetworkStatus()
         msg.wifi_signallevel = -1.0
+        msg.wifi_link_quality = "-1"
         try:
-            msg.wifi_signallevel = self._wifi.getStatistics()[1].getSignallevel()
+            f = os.popen('iwconfig %s | grep "Link Quality"' %(self._wifi_name))
+            fs = f.read().split()
+            msg.wifi_link_quality = fs[1].split('=')[1]
+            msg.wifi_signallevel = int(fs[3].split('=')[1])
         except:
             pass
         
@@ -90,10 +92,13 @@ class SystemInfo():
         #except:
         #    rospy.logerr("Can't open file %s"%fn)
         #    msg.ethernet_connected = False
-        msg.ethernet_connected = False        
+        
+        # since we're never connected annyway. I mean, no way you're squeezing a cable in there..
+        msg.ethernet_connected = False 
 
         self.stat_network = DiagnosticStatus(name="computer: Network",level=DiagnosticStatus.OK,message="OK")
         self.stat_network.values = [KeyValue("WiFi signal strength (db)",str(msg.wifi_signallevel)),
+                                    KeyValue("WiFi link quality",msg.wifi_link_quality),
                                     KeyValue("Ethernet connected",str(msg.ethernet_connected))]
         
         return msg
