@@ -22,6 +22,8 @@ class SystemInfo():
     CPU_TEMP_ERROR = 80
     CPU_USAGE_WARN = 90
     CPU_USAGE_ERROR = 95
+    WIFI_LEVEL_WARN = -62.5
+    WIFI_LEVEL_ERROR = -75
     
     def __init__(self):
         rospy.init_node('sysinfo')
@@ -100,6 +102,17 @@ class SystemInfo():
         self.stat_network.values = [KeyValue("WiFi signal strength (db)",str(msg.wifi_signallevel)),
                                     KeyValue("WiFi link quality",msg.wifi_link_quality),
                                     KeyValue("Ethernet connected",str(msg.ethernet_connected))]
+
+        if msg.wifi_signallevel == -1:
+            self.stat_network.level = DiagnosticStatus.ERROR
+            self.stat_network.message = "Cannot read WiFi statistics"
+        elif msg.wifi_signallevel < SystemInfo.WIFI_LEVEL_ERROR:
+            self.stat_network.level = DiagnosticStatus.ERROR
+            self.stat_network.message = "WiFi strength less than 75%"
+        elif msg.wifi_signallevel < SystemInfo.WIFI_LEVEL_WARN:
+            self.stat_network.level = DiagnosticStatus.WARN
+            self.stat_network.message = "WiFi strength less then 50%"
+
         
         return msg
 
