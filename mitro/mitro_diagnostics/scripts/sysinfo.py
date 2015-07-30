@@ -186,6 +186,8 @@ class SystemInfo():
         msg.voltage = -1
         msg.current = -1
         msg.temp = -1
+
+        success = False
         
         try:
             ups = PyNUTClient()
@@ -197,7 +199,8 @@ class SystemInfo():
                 msg.current = float(bat['input.current'])
             else:
                 msg.current = -1 * float(bat['output.current']) * (float(bat['output.voltage']) / float(bat['battery.voltage']))
-            msg.temp = float(bat['battery.temperature'])        
+            msg.temp = float(bat['battery.temperature'])
+            success = True
         except:
             rospy.logerr("Cannot connect to power board.")
 
@@ -208,7 +211,10 @@ class SystemInfo():
                                 KeyValue("Temperature (C)",str(msg.temp)),
                                 KeyValue("Charging",str(msg.plugged_in))]
         
-        if msg.percent < SystemInfo.BAT_PERC_ERROR:
+        if not success:
+            self.stat_bat_base.level = DiagnosticStatus.ERROR
+            self.stat_bat_base.message = "Cannot connect to the power board"
+        elif msg.percent < SystemInfo.BAT_PERC_ERROR:
             self.stat_bat_pc.level = DiagnosticStatus.ERROR
             self.stat_bat_pc.message = "Battery almost empty"
         elif msg.percent < SystemInfo.BAT_PERC_WARN:

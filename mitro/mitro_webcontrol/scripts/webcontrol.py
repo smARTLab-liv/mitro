@@ -217,7 +217,7 @@ def callback_sysinfo(msg):
     global status_msg
     #if msg.hostname == 'bob':
     status_msg['wifi'] = msg.network.wifi_signallevel
-    status_msg['battery'] = int(msg.battery.percent)
+    status_msg['battery'] = int(msg.battery_pc.percent)
     #elif msg.hostname == 'mitro-laptop':
     #    status_msg['battery_laptop'] = int(msg.battery.percent)
 
@@ -242,7 +242,7 @@ class StatusThread(Thread):
             try:
                 (trans,rot) = self.listener.lookupTransform('/map', '/base_link', rospy.Time(0))
                 rpy = list(euler_from_quaternion(rot))
-            except (tf.LookupException, tf.ConnectivityException):
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 trans = None
 
             if trans and mapmeta:
