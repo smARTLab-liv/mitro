@@ -168,7 +168,7 @@ class SystemInfo():
         # this should be recalibrated 
         # msg.percent = self.voltage_to_perc(self._base_bat_voltage)
         msg.percent = -1;
-        if self._base_bat_voltage > 13.0:
+        if self._base_bat_voltage > 12.75:
             msg.plugged_in = True
         else:
             msg.plugged_in = False
