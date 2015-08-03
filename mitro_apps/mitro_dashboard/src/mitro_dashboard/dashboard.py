@@ -52,7 +52,8 @@ class MitroDashboard(Dashboard):
         self._relais_widget = RelaisWidget()
                                         
         # Battery
-        self._battery_widget = BatteryWidget()
+        self._battery_base_widget = BatteryWidget("Base battery")
+        self._battery_pc_widget = BatteryWidget("PC battery")
 
         # WiFi
         self._wifi_widget = WifiWidget()
@@ -83,8 +84,8 @@ class MitroDashboard(Dashboard):
     def get_widgets(self):
 	return [[MonitorDashWidget(self.context), ConsoleDashWidget(self.context)], 
 		[self._runstop_widget, self._relais_widget], 
-		[self._battery_widget, self._wifi_widget, self._cpu_widget],		
-		[self._nav_widget, self._costmap_widget, self._assisted_drive_widget, self._home_widget] 
+		[self._battery_base_widget, self._battery_pc_widget, self._wifi_widget, self._cpu_widget],
+                [self._nav_widget, self._costmap_widget, self._assisted_drive_widget, self._home_widget] 
 		]
 		
 
@@ -112,7 +113,8 @@ class MitroDashboard(Dashboard):
 
         if (rospy.get_time() - self._last_sysinfo_message > 5.0):
             self._cpu_widget.set_stale()
-            self._battery_widget.set_stale()
+            self._battery_base_widget.set_stale()
+            self._battery_pc_widget.set_stale()
             self._wifi_widget.set_stale()
 
 
@@ -126,7 +128,14 @@ class MitroDashboard(Dashboard):
 
     def cb_sysinfo(self, msg):
         self._last_sysinfo_message = rospy.get_time()
-        self._battery_widget.update(msg.battery_pc.percent, msg.battery_pc.voltage, msg.battery_pc.plugged_in)
+        if msg.battery_base.voltage == -1:
+            self._battery_base_widget.set_stale()
+        else:
+            self._battery_base_widget.update(self.voltage_to_percent(msg.battery_base.voltage), msg.battery_base.voltage, msg.battery_base.plugged_in)
+        if msg.battery_pc.voltage == -1:
+            self._battery_pc_widget.set_stale()
+        else:
+            self._battery_pc_widget.update(msg.battery_pc.percent, msg.battery_pc.voltage, msg.battery_pc.plugged_in)
         self._wifi_widget.update(msg.network.wifi_signallevel)
         self._cpu_widget.update(msg.system.cpu_usage_average, msg.system.cpu_temp_average)
         
@@ -143,16 +152,19 @@ class MitroDashboard(Dashboard):
         self._nav_widget.update(msg)
 
         
-    def voltage_to_perc(self, v):
-        a = -7.87073944428413e-5
-        b = -0.001363457642237
-        c = 12.529846888629164
-
-        if v > c: 
-            return 100.0
-    
-        if v < 11.77:
-            return 0.0
-
-        return 100 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
+    def voltage_to_percent(self, v):
+        # this is a very naive heuristic not based on facts
+        v_max = 12.4
+        v_min = 10.4
+        v_crop = min(max(v_min, v), v_max)
+        perc = ((v_crop - v_min) / (v_max - v_min)) * 100
+        return perc
+        #a = -7.87073944428413e-5
+        #b = -0.001363457642237
+        #c = 12.529846888629164
+        #if v > c: 
+        #    return 100.0
+        #if v < 11.77:
+        #    return 0.0
+        #return 100 + ( b + math.sqrt(b*b - 4*a*c + 4*a*v)) / (2 * a)
       
