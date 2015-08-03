@@ -9,7 +9,7 @@ from python_qt_binding.QtCore import QSize
 
 class BatteryWidget(IconToolButton):
 
-    def __init__(self):
+    def __init__(self, label="Battery"):
         icons_path = path.join(roslib.packages.get_pkg_dir('mitro_dashboard'), "icons/")
         icons = []
         charge_icons = []
@@ -31,11 +31,12 @@ class BatteryWidget(IconToolButton):
         
         self.setFixedSize(QSize(40,40))
         
-        self.update_state(10)
-        
         self._voltage = -1
         self._perc = -1
         self._charging = False
+        self._label = label
+        
+        self.update_state(10)
 
 
     def update(self, perc, volt, charging):
@@ -52,10 +53,10 @@ class BatteryWidget(IconToolButton):
     def update_state(self, state):
         super(BatteryWidget, self).update_state(state)
         if state is 10:
-            self.setToolTip("Battery: Stale")
+            self.setToolTip("%s: Stale"%(self._label))
         else:
-            self.setToolTip("Battery: %.0f %% (%.2f V)"%(self._perc, self._voltage))
+            self.setToolTip("%s: %.0f %% (%.2f V)"%(self._label, self._perc, self._voltage))
 
 
     def set_stale(self):
-        super(BatteryWidget, self).update_state(6)
+        super(BatteryWidget, self).update_state(10)
