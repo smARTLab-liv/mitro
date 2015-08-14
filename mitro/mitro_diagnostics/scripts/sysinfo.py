@@ -14,8 +14,8 @@ import sensors
 
 class SystemInfo():
     
-    BAT_PERC_WARN = 40
-    BAT_PERC_ERROR = 20
+    BAT_PERC_WARN = 20
+    BAT_PERC_ERROR = 10
     BAT_VOLT_WARN = 11.5
     BAT_VOLT_ERROR = 11.0
     CPU_TEMP_WARN = 70
