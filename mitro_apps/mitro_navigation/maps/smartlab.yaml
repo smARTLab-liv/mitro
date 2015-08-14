@@ -1,4 +1,4 @@
-image: map.pgm
+image: smartlab.pgm
 resolution: 0.025000
 origin: [-3.750000, -8.000000, 0.000000]
 negate: 0

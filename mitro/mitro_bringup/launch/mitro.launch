@@ -13,7 +13,9 @@
     <include file="$(find assisted_drive)/launch/assisted_drive.launch" />
     
     <!-- start navigation -->
-    <include file="$(find mitro_navigation)/launch/mitro_navigation.launch" />
+    <include file="$(find mitro_navigation)/launch/mitro_navigation.launch">
+    	<arg name="map_name" value="smartlab_full" />
+    </include>
     
     <!-- start kinect -->
     <include file="$(find mitro_kinect)/launch/mitro_kinect.launch" />
