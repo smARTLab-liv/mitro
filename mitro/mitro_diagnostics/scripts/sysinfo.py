@@ -146,7 +146,7 @@ class SystemInfo():
             self.stat_system.level = DiagnosticStatus.ERROR
             self.stat_system.message = "CPU overheating"
         elif msg.cpu_temp_average > SystemInfo.CPU_TEMP_WARN:
-            self.stat_system.level = DiagnosticStatus.WARNING
+            self.stat_system.level = DiagnosticStatus.WARN
             self.stat_system.message = "CPU overheating"    
         elif msg.cpu_usage_average > SystemInfo.CPU_USAGE_ERROR:
             self.stat_system.level = DiagnosticStatus.ERROR
@@ -168,7 +168,7 @@ class SystemInfo():
         # this should be recalibrated 
         # msg.percent = self.voltage_to_perc(self._base_bat_voltage)
         msg.percent = -1;
-        if self._base_bat_voltage > 13.0:
+        if self._base_bat_voltage > 12.9:
             msg.plugged_in = True
         else:
             msg.plugged_in = False
@@ -230,8 +230,8 @@ class SystemInfo():
                                 KeyValue("Charging",str(msg.plugged_in))]
         
         if not success:
-            self.stat_bat_base.level = DiagnosticStatus.ERROR
-            self.stat_bat_base.message = "Cannot connect to the power board"
+            self.stat_bat_pc.level = DiagnosticStatus.ERROR
+            self.stat_bat_pc.message = "Cannot connect to the power board"
         elif msg.percent < SystemInfo.BAT_PERC_ERROR:
             self.stat_bat_pc.level = DiagnosticStatus.ERROR
             self.stat_bat_pc.message = "Battery almost empty"
