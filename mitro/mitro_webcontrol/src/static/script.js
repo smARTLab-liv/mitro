@@ -4,16 +4,16 @@ function send_cmds() {
 	linear = 0;
 	angular = 0;
 	if (keys[0] & !keys[1]) {
-	    linear = 0.7;
+	    linear = 0.4;
 	}
 	if (keys[1] & !keys[0]) {
-	    linear = -0.15;
+	    linear = -0.1;
 	}
 	if (keys[2] & !keys[3]) {
-	    angular = 1;
+	    angular = 0.75;
 	}
 	if (keys[3] & !keys[2]) {
-	    angular = -1;
+	    angular = -0.75;
 	}
 	ws.send('cmd:' + linear + ',' + angular);
     } 

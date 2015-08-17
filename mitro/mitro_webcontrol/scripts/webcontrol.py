@@ -294,12 +294,12 @@ if __name__ == '__main__':
 
     rospy.init_node('web_control', anonymous=False, disable_signals=True)
     global pub_twist, pub_view, pub_relais
-    pub_twist = rospy.Publisher("cmd_twist_tele", Twist)
-    pub_view = rospy.Publisher("multicam/view", Int16)
-    pub_relais = rospy.Publisher("cmd_relais", Bool)
-    pub_goal = rospy.Publisher("goal_planner/goal", PoseStamped)
-    pub_cancelgoal = rospy.Publisher("goal_planner/cancel", Bool)
-    pub_assisted = rospy.Publisher("assisted_drive/set", Bool)
+    pub_twist = rospy.Publisher("cmd_twist_tele", Twist, queue_size=10)
+    pub_view = rospy.Publisher("multicam/view", Int16, queue_size=10)
+    pub_relais = rospy.Publisher("cmd_relais", Bool, queue_size=10)
+    pub_goal = rospy.Publisher("goal_planner/goal", PoseStamped, queue_size=10)
+    pub_cancelgoal = rospy.Publisher("goal_planner/cancel", Bool, queue_size=10)
+    pub_assisted = rospy.Publisher("assisted_drive/set", Bool, queue_size=10)
     
     rospy.wait_for_service('/move_base/clear_costmaps')
     try:
