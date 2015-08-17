@@ -2,7 +2,7 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/Point.h>
 #include <std_msgs/Bool.h>
-#include <nav_msgs/GridCells.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <tf/transform_listener.h>
 #include <mitro_sonar/SonarScan.h>
 
@@ -72,24 +72,43 @@ void twist_cb(const geometry_msgs::Twist::ConstPtr& msg) {
     }
 }
 
-void costmap_cb(const nav_msgs::GridCells::ConstPtr& msg) {
+std::vector<geometry_msgs::PointStamped> occ_grid_to_points(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
+  double x_orig = msg->info.origin.position.x;
+  double y_orig = msg->info.origin.position.y;
+  double res = roundf(msg->info.resolution * 100) / 100;
+  std::vector<geometry_msgs::PointStamped> points;
+  for (int y_ind = 0; y_ind < msg->info.height; y_ind++) {
+    for (int x_ind = 0; x_ind < msg->info.width; x_ind++) {
+      if (msg->data[(y_ind * msg->info.width) + x_ind] > 0) {
+	geometry_msgs::PointStamped point;
+	point.header.stamp = msg->header.stamp;
+	point.header.frame_id = msg->header.frame_id;
+	point.point.x = x_orig + x_ind * res;
+	point.point.y = y_orig + y_ind * res;
+	points.push_back(point);
+      }
+    }
+  }
+  //ROS_DEBUG("Got %lu points", points.size());
+  return points;
+}
+
+void costmap_cb(const nav_msgs::OccupancyGrid::ConstPtr& msg) {
     obst_detected = false;
     obst_stop = false;
     if (use_assisted_drive) {
         ODOM_FRAME = msg->header.frame_id;
         
         last_costmap = msg->header.stamp;
-        std::vector<geometry_msgs::Point> points = msg->cells;
+        std::vector<geometry_msgs::PointStamped> points = occ_grid_to_points(msg);
         
+	//ROS_DEBUG("Extracted %lu obstacle points", points.size());
+
         tf_listener->waitForTransform(ODOM_FRAME, BASE_FRAME, msg->header.stamp, ros::Duration(0.2));
         
         for (std::vector<std::string>::size_type i = 0; i < points.size(); i++) {
-            geometry_msgs::PointStamped point, point_trans;
-            point.header.stamp = msg->header.stamp;
-            point.header.frame_id = ODOM_FRAME;
-            point.point.x = points[i].x;
-            point.point.y = points[i].y;
-            
+	    geometry_msgs::PointStamped point, point_trans;
+	    point = points.at(i);
             try {
                 tf_listener->transformPoint(BASE_FRAME, point, point_trans);
             }
@@ -169,7 +188,7 @@ int main(int argc, char** argv){
     tf_listener = new tf::TransformListener(nh);
     
     ros::Subscriber twist_sub = nh.subscribe<geometry_msgs::Twist>(source_topic, 10, twist_cb);
-    ros::Subscriber costmap_sub = nh.subscribe<nav_msgs::GridCells>(costmap_topic, 10, costmap_cb);
+    ros::Subscriber costmap_sub = nh.subscribe<nav_msgs::OccupancyGrid>(costmap_topic, 10, costmap_cb);
     ros::Subscriber sonar_sub = nh.subscribe<mitro_sonar::SonarScan>(sonar_topic, 10, sonar_cb);
     ros::Subscriber cmd_ad_sub = nh.subscribe<std_msgs::Bool>("assisted_drive/set", 10, cmd_ad_cb);
     twist_pub = nh.advertise<geometry_msgs::Twist>(target_topic, 10);

@@ -1,6 +1,6 @@
 source_topic: cmd_twist_tele
 target_topic: cmd_twist_tele_assisted
-costmap_topic: move_base/local_costmap/obstacles
+costmap_topic: move_base/local_costmap/costmap
 sonar_topic: sonar_scan
 base_frame_id: base_link
 max_range: 1.5 # maximum range for which obstacles will be considered
