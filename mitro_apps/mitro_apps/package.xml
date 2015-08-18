@@ -13,6 +13,7 @@
     <run_depend>mitro_dashboard</run_depend>
     <run_depend>mitro_navigation</run_depend>
     <run_depend>mitro_teleop</run_depend>
+    <run_depend>mitro_shepherd</run_depend>
     
     <export>
         <metapackage/>
