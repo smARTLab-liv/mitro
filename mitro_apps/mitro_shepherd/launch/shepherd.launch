@@ -6,13 +6,14 @@
 
 <arg name="cam_image_topic" default="/kinect/depth_registered/points" />
 <arg name="cam_info_topic" default="/kinect/depth_registered/camera_info" />
-<arg name="output_frame" default="/odom" />
+<arg name="output_frame" default="/map" />
 
 <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkers" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)" />
 
+<node pkg="swarming_turtles_communicate" type="lcm_relay" name="lcm_relay" output="screen" />
 <node pkg="swarming_turtles_detect" type="filter_markers.py" name="filter_markers" output="screen" />
-
-<node pkg="mitro_shepherd" type="detect_turtles.py" name="detect_turtles" output="screen" />
+<node pkg="mitro_shepherd" type="shepherding.py" name="shepherding" output="screen" />
+<node pkg="mitro_shepherd" type="detect_markers.py" name="detect_markers" output="screen" />
 <node pkg="swarming_turtles_detect" type="visualize_turtles.py" name="visualize_turtles" output="screen" />
 
 </launch>
