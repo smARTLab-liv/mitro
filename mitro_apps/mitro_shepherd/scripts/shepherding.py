@@ -49,7 +49,7 @@ def cb_set_status(request) :
 def cb_found_turtles(msg):
     global turtles
     current_turtles = []
-    rospy.loginfo("Previous turtles: %s"%str(turtles))
+    #rospy.loginfo("Previous turtles: %s"%str(turtles))
     
     for turtle in msg.turtles:
         current_turtles.append(turtle.name)
@@ -58,7 +58,7 @@ def cb_found_turtles(msg):
     
     if active :
         turtles = current_turtles
-        rospy.loginfo("Barked at: %s"%str(turtles))
+        #rospy.loginfo("Barked at: %s"%str(turtles))
 
 def cb_found_food(msg) :
     global food
