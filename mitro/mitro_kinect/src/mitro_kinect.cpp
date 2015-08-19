@@ -211,7 +211,7 @@ void filter(const sensor_msgs::PointCloud2 &cloud_in)
     }
 
   // publishing transform
-  //tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in.header.stamp, tf_frame, tf_target_frame));
+  tf_broadcaster->sendTransform(tf::StampedTransform(transform, cloud_in.header.stamp, tf_frame, tf_target_frame));
 
   if (!found)
     {
