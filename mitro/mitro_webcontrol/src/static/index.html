@@ -15,10 +15,10 @@
       <div id="status">
         <h2>Status</h2>
         <ul id="status_list">
-	        <li id="runstop" />
-	        <li id="wifi" />
-	        <li id="battery" />
-	        <!--<li id="battery_laptop" />-->
+	        <li id="runstop" title="Runstop" />
+	        <li id="wifi" title="WiFi"/>
+	        <li id="battery_base" title="Base battery"/>
+	        <li id="battery_pc" title="PC battery"/>
         </ul>
 	<br/><br/>
       </div>
@@ -27,7 +27,7 @@
       <div id="controls">
 	      <h2>Controls:</h2>
 	      <div id="relais">
-	        <button id="relais_button" class="toggle_button down"><img src="static/images/relais.png"></img></button>
+	        <button id="relais_button" class="toggle_button down" title="Relais"><img src="static/images/relais.png"></img></button>
 	      </div>
         <div id="arrow_keys">
 	        <button id="up"><img src="static/images/up.png"></img></button></br>
@@ -49,9 +49,9 @@
 	      <h2>Navigation:</h2>
 	      <div id="nav_controls">
 <!--	        <button id="home" disabled><img src="static/images/home.png"></img></button>       -->
-          <button id="nav" disabled class="toggle_button"><img src="static/images/nav.png"></img></button>
-          <button id="assisted" class="toggle_button"><img src="static/images/assisted_drive.png"></img></button>
-          <button id="costmap"><img src="static/images/settings.png"></img></button>
+          <button id="nav" disabled class="toggle_button" title="Navigation"><img src="static/images/nav.png"></img></button>
+          <button id="assisted" class="toggle_button" title="Assisted drive"><img src="static/images/assisted_drive.png"></img></button>
+          <button id="costmap" title="Clear costmap"><img src="static/images/settings.png"></img></button>
 	      </div>
 	      <div id="map">
 	        <div class="map_marker" id="goal_marker"></div>

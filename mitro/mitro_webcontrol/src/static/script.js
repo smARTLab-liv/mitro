@@ -82,15 +82,18 @@ $(document).ready(function() {
 	    if (perc >= 75) { $('#wifi').removeClass().addClass("green"); }
 	    else if (perc >= 50) { $('#wifi').removeClass().addClass("yellow"); }
 	    else { $('#wifi').removeClass().addClass("red"); }
+	    $("#wifi").attr("title","WiFi: " + obj.wifi + "dB");
             
             // handle battery
-            if (obj.battery_pc >= 60) { $('#battery').removeClass().addClass("green"); }
-            else if (obj.battery_pc >= 30) { $('#battery').removeClass().addClass("yellow"); }
+            if (obj.battery_pc >= 50) { $('#battery_pc').removeClass().addClass("green"); }
+            else if (obj.battery_pc >= 20) { $('#battery_pc').removeClass().addClass("yellow"); }
             else { $('#battery').removeClass().addClass("red"); }
+	    $("#battery_pc").attr("title","PC: " + Math.round(obj.battery_pc) + "%%");
 
-            //if (obj.battery_laptop >= 60) { $('#battery_laptop').removeClass().addClass("green"); }
-            //else if (obj.battery_laptop >= 30) { $('#battery_laptop').removeClass().addClass("yellow"); }
-            //else { $('#battery_laptop').removeClass().addClass("red"); }
+            if (obj.battery_base >= 12) { $('#battery_base').removeClass().addClass("green"); }
+            else if (obj.battery_laptop >= 11.7) { $('#battery_base').removeClass().addClass("yellow"); }
+            else { $('#battery_base').removeClass().addClass("red"); }
+	    $("#battery_base").attr("title","Base: " + obj.battery_base.toFixed(1) + "V");
 
             // handle goal status
             if (obj.hasgoal) {
