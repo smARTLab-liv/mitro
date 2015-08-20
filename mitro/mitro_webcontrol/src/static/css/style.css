@@ -236,7 +236,14 @@ h2 {
     top: 120px;
     left: 20px;
     background: transparent url('/static/images/home.png') no-repeat;
-    opacity: 0.4;
+    display: none;
+}
+
+#food_marker {
+    top: 120px;
+    left: 20px;
+    background: transparent url('/static/images/info.png') no-repeat;
+    display: none;
 }
 
 

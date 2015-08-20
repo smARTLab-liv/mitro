@@ -7,8 +7,7 @@ import tf
 from geometry_msgs.msg import PoseStamped
 from swarming_turtles_msgs.msg import Turtles, CommunicationProtocol
 from mitro_shepherd.srv import *
-
-from std_srvs.srv import Empty
+from std_msgs.msg import Bool
 
 turtles = []
 own_name = gethostname()  # hostname used for communication
@@ -43,6 +42,7 @@ def cb_set_status(request) :
         else :
             active = True
             result.result = "Shepherding enabled!"
+    rospy.loginfo(result.result)
     return result
 
 
@@ -87,11 +87,15 @@ def main() :
     tf_listener = tf.TransformListener()
     
     comm_pub = rospy.Publisher('/communication', CommunicationProtocol, queue_size=10)
+    shep_pub = rospy.Publisher('/mitro_shepherd/status', Bool, queue_size=1)
     rospy.Subscriber('found_turtles', Turtles, cb_found_turtles)
     rospy.Subscriber('found_food', PoseStamped, cb_found_food)
-    rospy.Service('set_shepherding_status', SetShepherdingStatus, cb_set_status)
+    rospy.Service('mitro_shepherd/set_shepherding_status', SetShepherdingStatus, cb_set_status)
     
-    rospy.spin()
+    r = rospy.Rate(1)
+    while not rospy.is_shutdown():
+        shep_pub.publish(active)
+        r.sleep()
 
 
 if __name__ == "__main__" :
