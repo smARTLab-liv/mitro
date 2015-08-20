@@ -133,7 +133,7 @@
 
       <link name="kinect_link"/>
       <joint name="kinect_joint" type="fixed">
-        <origin xyz="0.10 -0.06 0" rpy="${kinect_roll_angle} ${kinect_pitch_angle} ${kinect_yaw_angle}"/> <!-- TODO: requires meassurement -->
+        <origin xyz="0.11 -0.08 0" rpy="${kinect_roll_angle} ${kinect_pitch_angle} ${kinect_yaw_angle}"/> <!-- TODO: requires meassurement -->
         <parent link="top_pole_link"/>
         <child link="kinect_link"/>
       </joint>

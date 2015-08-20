@@ -4,11 +4,10 @@ project(mitro_kinect)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED roscpp tf dynamic_reconfigure nodelet pcl_conversions)
+find_package(catkin REQUIRED roscpp tf dynamic_reconfigure pcl_conversions)
 
 generate_dynamic_reconfigure_options(
-#  cfg/mitro_kinect.cfg
-  cfg/mitro_kinect_nodelet.cfg
+  cfg/mitro_kinect.cfg
 )
 
 ## System dependencies are found with CMake's conventions
@@ -57,7 +56,7 @@ find_package(PCL REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES my_package
-  CATKIN_DEPENDS roscpp tf dynamic_reconfigure nodelet pcl_conversions
+  CATKIN_DEPENDS roscpp tf dynamic_reconfigure pcl_conversions
   DEPENDS pcl
 )
 
@@ -67,20 +66,20 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(${PCL_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${PCL_INCLUDE_DIRS})
 
 ## Declare a cpp library
-add_library(mitro_kinect_nodelet src/mitro_kinect_nodelet.cpp)
+#add_library(mitro_kinect src/mitro_kinect.cpp)
 
 ## Declare a cpp executable
-#add_executable(mitro_kinect src/mitro_kinect.cpp)
+add_executable(mitro_kinect src/mitro_kinect.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(mitro_kinect_nodelet ${PROJECT_NAME}_gencfg)
+add_dependencies(mitro_kinect ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(mitro_kinect_nodelet ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(mitro_kinect ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 #############
 ## Install ##
