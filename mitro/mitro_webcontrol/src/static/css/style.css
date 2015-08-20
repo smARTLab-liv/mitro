@@ -171,13 +171,22 @@ h2 {
     background-image: url('../images/wifi.png');
 }
 
-#battery_base {
+.bat3 {
     background-image: url('../images/battery_3.png');
 }
 
-#battery_pc {
-    background-image: url('../images/battery_3.png');
+.bat2 {
+    background-image: url('../images/battery_2.png');
 }
+
+.bat1 {
+    background-image: url('../images/battery_1.png');
+}
+
+.bat0 {
+    background-image: url('../images/battery_0.png');
+}
+
 
 
 /* CONTROLS */
