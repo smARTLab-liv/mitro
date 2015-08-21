@@ -92,7 +92,7 @@ $(document).ready(function() {
 		$('#battery_pc').removeClass().addClass("yellow bat2");
 	    }
             else {
-		$('#battery').removeClass().addClass("red bat1");
+		$('#battery_pc').removeClass().addClass("red bat1");
 	    }
 	    $("#battery_pc").attr("title","PC: " + Math.round(obj.battery_pc) + "%%");
 
