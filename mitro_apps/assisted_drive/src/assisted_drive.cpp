@@ -196,7 +196,7 @@ int main(int argc, char** argv){
     
     last_update = ros::Time::now();
     
-    ros::Rate r(50);
+    ros::Rate r(100);
     while (ros::ok()) {
         update();
         ros::spinOnce();

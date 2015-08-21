@@ -171,13 +171,22 @@ h2 {
     background-image: url('../images/wifi.png');
 }
 
-#battery_base {
+.bat3 {
     background-image: url('../images/battery_3.png');
 }
 
-#battery_pc {
-    background-image: url('../images/battery_3.png');
+.bat2 {
+    background-image: url('../images/battery_2.png');
 }
+
+.bat1 {
+    background-image: url('../images/battery_1.png');
+}
+
+.bat0 {
+    background-image: url('../images/battery_0.png');
+}
+
 
 
 /* CONTROLS */
@@ -236,7 +245,14 @@ h2 {
     top: 120px;
     left: 20px;
     background: transparent url('/static/images/home.png') no-repeat;
-    opacity: 0.4;
+    display: none;
+}
+
+#food_marker {
+    top: 120px;
+    left: 20px;
+    background: transparent url('/static/images/info.png') no-repeat;
+    display: none;
 }
 
 

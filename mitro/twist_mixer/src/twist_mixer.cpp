@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 
     twist_pub = nh.advertise<geometry_msgs::Twist>("cmd_twist_mixed", 10);
 
-    ros::Rate loop_rate(50);
+    ros::Rate loop_rate(100);
     int count = 0;
     while (ros::ok()) {
       // if nothing is published, send 5 zero cmds to ensure the robot halts

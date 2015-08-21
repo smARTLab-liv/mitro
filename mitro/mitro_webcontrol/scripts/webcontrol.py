@@ -20,6 +20,7 @@ from std_msgs.msg import Int16, Bool
 from mitro_diagnostics.msg import SysInfo
 from nav_msgs.msg import MapMetaData
 from std_srvs.srv import Empty
+from mitro_shepherd.srv import SetShepherdingStatus
 
 from tf.transformations import euler_from_quaternion
 
@@ -127,7 +128,17 @@ class ChatWebSocketHandler(WebSocket):
             pub_assisted.publish(option)
             response = TextMessage('log:assisted drive %s'%('enabled' if option else 'disabled'));
             cherrypy.engine.publish('websocket-broadcast', response)
-
+        
+        if text.startswith('shepherding:'):
+            # shepherding switching protocol:
+            # shepherding:[0 1]
+            r = text.split(':')
+            option = bool(int(r[1]))
+            result = srv_shepherding(option)
+            response = TextMessage('log:%s'%result.result)
+            cherrypy.engine.publish('websocket-broadcast', response)
+        
+        
         if text.startswith('skype:'):
         #    response = TextMessage('log:we do not use skype anymore')
         #    cherrypy.engine.publish('websocket-broadcast', response)
@@ -207,12 +218,22 @@ def callback_goal(msg):
     y = msg.pose.position.y
     status_msg['goal'] =  (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
                            mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
-            
+
+def callback_food(msg):
+    global status_msg
+    x = msg.pose.position.x
+    y = msg.pose.position.y
+    status_msg['food'] =  (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
+                           mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
 
 def callback_assisted(msg):
     global status_msg
     status_msg['assisted'] = msg.data
-    
+
+def callback_shepherding(msg):
+    global status_msg
+    status_msg['shepherding'] = msg.data
+
 def callback_sysinfo(msg):
     global status_msg
     status_msg['wifi'] = msg.network.wifi_signallevel
@@ -243,12 +264,21 @@ class StatusThread(Thread):
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 trans = None
 
+            try:
+                (trans_hive,rot_hive) = self.listener.lookupTransform('/map', '/hive', rospy.Time(0))
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                trans_hive = None
+
             if trans and mapmeta:
                 (x, y, th) = trans
                 status_msg['location'] = (int((x-mapmeta.origin.position.x)/mapmeta.resolution), 
                                           mapmeta.height-int((y-mapmeta.origin.position.y)/mapmeta.resolution))
                 status_msg['orientation'] = -rpy[2];
-                
+            if trans_hive and mapmeta:
+                (x_h, y_h, th_h) = trans_hive
+                status_msg['home'] = (int((x_h-mapmeta.origin.position.x)/mapmeta.resolution), 
+                                          mapmeta.height-int((y_h-mapmeta.origin.position.y)/mapmeta.resolution))
+            
             cherrypy.engine.publish('websocket-broadcast', TextMessage(json.dumps(status_msg)))
             rospy.sleep(1)
 
@@ -306,7 +336,9 @@ if __name__ == '__main__':
         srv_costmap = rospy.ServiceProxy('/move_base/clear_costmaps', Empty)
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
-
+    
+    srv_shepherding = rospy.ServiceProxy('/mitro_shepherd/set_shepherding_status', SetShepherdingStatus)
+    
     rospy.Subscriber("relais", Bool, callback_relais)
     rospy.Subscriber("runstop", Bool, callback_runstop)
     rospy.Subscriber("assisted_drive/status", Bool, callback_assisted)
@@ -314,6 +346,8 @@ if __name__ == '__main__':
     rospy.Subscriber("sysinfo", SysInfo, callback_sysinfo)
     rospy.Subscriber("map_metadata", MapMetaData, callback_mapmeta)
     rospy.Subscriber("goal_planner/goal", PoseStamped, callback_goal)
+    rospy.Subscriber("found_food", PoseStamped, callback_food)
+    rospy.Subscriber("mitro_shepherd/status", Bool, callback_shepherding)
     
 #    rospy.Subscriber("/sysinfo", SysInfo, callback_sysinfo)
 #    rospy.Subscriber("/move_base/current_goal", PoseStamped, callback_goal)

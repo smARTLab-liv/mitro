@@ -85,14 +85,26 @@ $(document).ready(function() {
 	    $("#wifi").attr("title","WiFi: " + obj.wifi + "dB");
             
             // handle battery
-            if (obj.battery_pc >= 50) { $('#battery_pc').removeClass().addClass("green"); }
-            else if (obj.battery_pc >= 20) { $('#battery_pc').removeClass().addClass("yellow"); }
-            else { $('#battery').removeClass().addClass("red"); }
+            if (obj.battery_pc >= 50) {
+		$('#battery_pc').removeClass().addClass("green bat3");
+	    }
+            else if (obj.battery_pc >= 20) {
+		$('#battery_pc').removeClass().addClass("yellow bat2");
+	    }
+            else {
+		$('#battery_pc').removeClass().addClass("red bat1");
+	    }
 	    $("#battery_pc").attr("title","PC: " + Math.round(obj.battery_pc) + "%%");
 
-            if (obj.battery_base >= 12) { $('#battery_base').removeClass().addClass("green"); }
-            else if (obj.battery_laptop >= 11.7) { $('#battery_base').removeClass().addClass("yellow"); }
-            else { $('#battery_base').removeClass().addClass("red"); }
+            if (obj.battery_base >= 12) {
+		$('#battery_base').removeClass().addClass("green bat3");
+	    }
+            else if (obj.battery_laptop >= 11.7) {
+		$('#battery_base').removeClass().addClass("yellow bat2");
+	    }
+            else { 
+		$('#battery_base').removeClass().addClass("red bat1");
+	    }
 	    $("#battery_base").attr("title","Base: " + obj.battery_base.toFixed(1) + "V");
 
             // handle goal status
@@ -102,7 +114,7 @@ $(document).ready(function() {
             } else {
                 $('#nav').attr('disabled', 'disabled').removeClass('down');
                 $('#goal_marker').hide()
-            }
+            }	    
 
             // handle assisted drive status
             if (obj.assisted) {
@@ -112,17 +124,42 @@ $(document).ready(function() {
                 $('#assisted').removeClass("down");
             }
 
+	    // handle shepherding status
+            if (obj.shepherding) {
+                $('#shepherding').addClass("down");
+            }
+            else {
+                $('#shepherding').removeClass("down");
+            }
+
             // set robot location
             $('#robot_marker').css({'left': ""+(obj.location[0]-13)+"px", 'top': ""+(obj.location[1]-13)+"px"});
             // set robot rotation
             $('#robot_marker').css("-webkit-transform", "rotate("+obj.orientation+"rad)");
 
+            // set goal location
             if (obj.hasOwnProperty('goal')) {
-                // set goal location
                 $('#goal_marker').css({'left': ""+(obj.goal[0]-13)+"px", 'top': ""+(obj.goal[1]-26)+"px"});
             } else {
                 $('#goal_marker').hide();
             }
+
+            // set food location
+            if (obj.hasOwnProperty('food')) {
+                $('#food_marker').css({'left': ""+(obj.food[0]-13)+"px", 'top': ""+(obj.food[1]-26)+"px"});
+		$('#food_marker').show();
+            } else {
+                $('#food_marker').hide();
+            }
+
+            // set home location
+            if (obj.hasOwnProperty('home')) {
+                $('#home_marker').css({'left': ""+(obj.home[0]-13)+"px", 'top': ""+(obj.home[1]-26)+"px"});
+		$('#home_marker').show();
+            } else {
+                $('#home_marker').hide();
+            }
+
 	}
     };
     
@@ -176,6 +213,16 @@ $(document).ready(function() {
         }
         else {
             ws.send('relais:0');
+        }
+        return false;
+    });
+
+    $('#shepherding').click(function() {
+        if($(this).hasClass("down")) {
+            ws.send('shepherding:0');
+        }
+        else {
+            ws.send('shepherding:1');
         }
         return false;
     });
