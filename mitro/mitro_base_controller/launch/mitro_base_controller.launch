@@ -4,7 +4,7 @@
     <!-- set the base_frame_id for odom, either base_link (without kinect) or odom_kinect -->
     <arg name="frame_id" default="base_link" />
 
-    <node name="mitro_base_controller" pkg="roboclaw_driver" type="roboclaw_driver" output="screen" >
+    <node name="mitro_base_controller" pkg="roboclaw_python" type="roboclaw_node.py" output="screen" >
     	  <param name="port" value="/dev/mitro/roboclaw" />
 	  <param name="baud_rate" value="1000000" />
 	  <param name="rate" value="30" />
